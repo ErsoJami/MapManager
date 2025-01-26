@@ -31,6 +31,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonLogin;
     private TextView registerTextView;
 
+    private TextView passRecoveryTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,25 +44,22 @@ public class LoginActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
         registerTextView = findViewById(R.id.loginTextView);
+        passRecoveryTextView = findViewById(R.id.passRecovery);
+        buttonLogin.setOnClickListener(v -> {
+            String email = editTextEmail.getText().toString();
+            String password = editTextPassword.getText().toString();
 
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = editTextEmail.getText().toString();
-                String password = editTextPassword.getText().toString();
-
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Пожалуйста, заполните все поля.",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                loginUser(email, password);
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "Пожалуйста, заполните все поля.", Toast.LENGTH_SHORT).show();
+                return;
             }
+            loginUser(email, password);
         });
         String registerText = "Don't have an account? Register";
-        SpannableString ss = new SpannableString(registerText);
-        ClickableSpan clickableSpan = new ClickableSpan() {
+        String passRecovery = "Forgot password?";
+        SpannableString rt = new SpannableString(registerText);
+        SpannableString pr = new SpannableString(passRecovery);
+        ClickableSpan clickableRegText = new ClickableSpan() {
             @Override
             public void onClick(View widget) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -76,33 +75,62 @@ public class LoginActivity extends AppCompatActivity {
                 ds.setColor(Color.BLUE);
             }
         };
+        ClickableSpan clickablePassRecovery = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                String email = editTextEmail.getText().toString().trim();
 
-        ss.setSpan(clickableSpan, 23, 31, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if (email.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Пожалуйста, введите ваш email.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mAuth.sendPasswordResetEmail(email)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(LoginActivity.this, "Письмо для восстановления пароля отправлено на " + email, Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(LoginActivity.this, "Ошибка отправки письма: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
 
-        registerTextView.setText(ss);
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(true);
+                ds.setColor(Color.BLUE);
+            }
+        };
+        rt.setSpan(clickableRegText, 23, 31, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        pr.setSpan(clickablePassRecovery, 0, 16, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        registerTextView.setText(rt);
         registerTextView.setMovementMethod(LinkMovementMethod.getInstance());
         registerTextView.setHighlightColor(Color.TRANSPARENT);
+        passRecoveryTextView.setText(pr);
+        passRecoveryTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        passRecoveryTextView.setHighlightColor(Color.TRANSPARENT);
     }
 
     private void loginUser(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(LoginActivity.this, "Вход выполнен успешно.",
-                                    Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("CLEAR_DATA", true);
-                            startActivity(intent);
-                            finish();
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Toast.makeText(LoginActivity.this, "Вход выполнен успешно.", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("CLEAR_DATA", true);
+                        startActivity(intent);
+                        finish();
 
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Ошибка входа: " + task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Ошибка входа: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                });
+                }
+            });
     }
 }

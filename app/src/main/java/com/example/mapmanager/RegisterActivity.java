@@ -30,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView textViewTitle;
     private EditText editTextEmail;
     private EditText editTextPassword;
+    private EditText editTextConfirmPassword;
     private Button buttonRegister;
     private TextView loginTextView;
 
@@ -43,6 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
         textViewTitle = findViewById(R.id.textViewTitle);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
+        editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
         loginTextView = findViewById(R.id.loginTextView);
 
@@ -51,14 +53,13 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = editTextEmail.getText().toString();
                 String password = editTextPassword.getText().toString();
-
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(RegisterActivity.this, "Пожалуйста, заполните все поля.",
-                            Toast.LENGTH_SHORT).show();
+                String confirmPassword = editTextConfirmPassword.getText().toString();
+                if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                    Toast.makeText(RegisterActivity.this, "Пожалуйста, заполните все поля.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                registerUser(email, password);
+                registerUser(email, password, confirmPassword);
             }
         });
         String loginText = "Already have an account? Login";
@@ -87,21 +88,27 @@ public class RegisterActivity extends AppCompatActivity {
         loginTextView.setHighlightColor(Color.TRANSPARENT);
     }
 
-    private void registerUser(String email, String password) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(RegisterActivity.this, "Регистрация успешна.",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Ошибка регистрации: " + task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+    private void registerUser(String email, String password, String confirmPassword) {
+        if (password.equals(confirmPassword)) {
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                Toast.makeText(RegisterActivity.this, "Регистрация успешна.", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                intent.putExtra("CLEAR_DATA", true);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(RegisterActivity.this, "Ошибка регистрации: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+        } else {
+            Toast.makeText(RegisterActivity.this, "Пароли не совпадают.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
