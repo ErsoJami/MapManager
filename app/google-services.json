@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "45892710023",
+    "firebase_url": "https://samsung-a77d3-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "samsung-a77d3",
+    "storage_bucket": "samsung-a77d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45892710023:android:43e8ece69ee6f401cf5222",
+        "android_client_info": {
+          "package_name": "com.example.mapmanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgPiTMwSYh8K47kq5ajDCRhh-zcCeyJos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45892710023:android:e99db320aa58435fcf5222",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgPiTMwSYh8K47kq5ajDCRhh-zcCeyJos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
