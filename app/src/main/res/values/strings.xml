@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">MapManager</string>
+    <string name="login_head">Login</string>
+    <string name="login_button">Login</string>
+    <string name="register_head">Register</string>
+    <string name="register_button_text">Register</string>
+    <string name="email_text">Email</string>
+    <string name="password_text">Password</string>
+    <string name="confirm_password_text">Password confirm</string>
+    <string name="want_to_login_text">Already have an account? Login</string>
+    <string name="want_to_register_text">Don`t have an account? Register</string>
+    <string name="forgot_password_text">Forgot password?</string>
+    <string name="fill_all_fields_text">Please fill all fields</string>
+    <string name="enter_email_text">Please enter your email</string>
+    <string name="recovery_mail_send_text">The recovery mail has been sent to </string>
+    <string name="mail_send_error_text">Mail send error: </string>
+    <string name="enter_success_text">Login success.</string>
+    <string name="enter_error_text">Login error: </string>
+    <string name="register_success_text">Register success.</string>
+    <string name="register_error_text">Register error: </string>
+    <string name="different_passwords_text">Passwords are different.</string>
 </resources>

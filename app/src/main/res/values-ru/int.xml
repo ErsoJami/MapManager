@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="login_left_border">18</integer>
+    <integer name="login_right_border">25</integer>
+    <integer name="password_left_border">0</integer>
+    <integer name="password_right_border">14</integer>
+    <integer name="register_left_border">18</integer>
+    <integer name="register_right_border">35</integer>
+</resources>

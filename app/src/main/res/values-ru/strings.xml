@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">MapManager</string>
+    <string name="login_head">Вход</string>
+    <string name="login_button">Войти</string>
+    <string name="register_head">Регистрация</string>
+    <string name="register_button_text">Зарегистрироваться</string>
+    <string name="email_text">Электронная почта</string>
+    <string name="password_text">Пароль</string>
+    <string name="confirm_password_text">Подтверждение пароля</string>
+    <string name="want_to_login_text">Уже есть аккаунт? Войдите</string>
+    <string name="want_to_register_text">Ещё нет аккаунта? Зарегистрируйтесь</string>
+    <string name="forgot_password_text">Забыли пароль?</string>
+    <string name="fill_all_fields_text">Пожалуйста, заполните все поля</string>
+    <string name="enter_email_text">Пожалуйста, введите электронную почту</string>
+    <string name="recovery_mail_send_text">Письмо для восстановления пароля отправлено на </string>
+    <string name="mail_send_error_text">Ошибка отправки письма: </string>
+    <string name="enter_success_text">Вход выполнен успешно.</string>
+    <string name="enter_error_text">ошибка входа: </string>
+    <string name="register_success_text">Регистрация успешна.</string>
+    <string name="register_error_text">Ошибка регистрации: </string>
+    <string name="different_passwords_text">Пароли не совпадают.</string>
+</resources>

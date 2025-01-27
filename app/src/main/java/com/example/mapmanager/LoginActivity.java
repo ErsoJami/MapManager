@@ -50,13 +50,13 @@ public class LoginActivity extends AppCompatActivity {
             String password = editTextPassword.getText().toString();
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(LoginActivity.this, "Пожалуйста, заполните все поля.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, R.string.fill_all_fields_text, Toast.LENGTH_SHORT).show();
                 return;
             }
             loginUser(email, password);
         });
-        String registerText = "Don't have an account? Register";
-        String passRecovery = "Forgot password?";
+        String registerText = getResources().getString(R.string.want_to_register_text);
+        String passRecovery = getResources().getString(R.string.forgot_password_text);
         SpannableString rt = new SpannableString(registerText);
         SpannableString pr = new SpannableString(passRecovery);
         ClickableSpan clickableRegText = new ClickableSpan() {
@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                 String email = editTextEmail.getText().toString().trim();
 
                 if (email.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Пожалуйста, введите ваш email.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.enter_email_text, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 mAuth.sendPasswordResetEmail(email)
@@ -89,9 +89,9 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(LoginActivity.this, "Письмо для восстановления пароля отправлено на " + email, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(LoginActivity.this, R.string.recovery_mail_send_text + email, Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "Ошибка отправки письма: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this, R.string.mail_send_error_text + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -104,8 +104,8 @@ public class LoginActivity extends AppCompatActivity {
                 ds.setColor(Color.BLUE);
             }
         };
-        rt.setSpan(clickableRegText, 23, 31, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        pr.setSpan(clickablePassRecovery, 0, 16, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        rt.setSpan(clickableRegText, getResources().getInteger(R.integer.register_left_border), getResources().getInteger(R.integer.register_right_border), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        pr.setSpan(clickablePassRecovery, getResources().getInteger(R.integer.password_left_border), getResources().getInteger(R.integer.password_right_border), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         registerTextView.setText(rt);
         registerTextView.setMovementMethod(LinkMovementMethod.getInstance());
         registerTextView.setHighlightColor(Color.TRANSPARENT);
@@ -121,14 +121,14 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(LoginActivity.this, "Вход выполнен успешно.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, R.string.enter_success_text, Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.putExtra("CLEAR_DATA", true);
                         startActivity(intent);
                         finish();
 
                     } else {
-                        Toast.makeText(LoginActivity.this, "Ошибка входа: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, R.string.enter_error_text + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
