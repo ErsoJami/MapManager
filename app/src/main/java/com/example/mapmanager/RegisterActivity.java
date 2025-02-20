@@ -48,19 +48,16 @@ public class RegisterActivity extends AppCompatActivity {
         buttonRegister = findViewById(R.id.buttonRegister);
         loginTextView = findViewById(R.id.loginTextView);
 
-        buttonRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = editTextEmail.getText().toString();
-                String password = editTextPassword.getText().toString();
-                String confirmPassword = editTextConfirmPassword.getText().toString();
-                if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                    Toast.makeText(RegisterActivity.this, "@string/fill_all_fields_text", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                registerUser(email, password, confirmPassword);
+        buttonRegister.setOnClickListener(v -> {
+            String email = editTextEmail.getText().toString();
+            String password = editTextPassword.getText().toString();
+            String confirmPassword = editTextConfirmPassword.getText().toString();
+            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(RegisterActivity.this, "@string/fill_all_fields_text", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            registerUser(email, password, confirmPassword);
         });
         String loginText = getResources().getString(R.string.want_to_login_text);
         SpannableString ss = new SpannableString(loginText);

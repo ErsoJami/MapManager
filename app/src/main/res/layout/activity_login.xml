@@ -37,6 +37,7 @@
         android:id="@+id/editTextPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:hint="@string/password_text"
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@id/buttonLogin"

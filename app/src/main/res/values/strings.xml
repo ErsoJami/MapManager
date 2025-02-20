@@ -19,4 +19,6 @@
     <string name="register_success_text">Register success.</string>
     <string name="register_error_text">Register error: </string>
     <string name="different_passwords_text">Passwords are different.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
