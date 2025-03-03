@@ -21,36 +21,36 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/homeButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#00FFFFFF"
-            android:src="@drawable/map_icon" />
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/home_icon" />
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/mapButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#00FFFFFF"
-            android:src="@drawable/map_icon" />
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/map_icon_2" />
 
         <ImageButton
-            android:id="@+id/imageButton5"
+            android:id="@+id/chatButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#00FFFFFF"
-            android:src="@drawable/map_icon" />
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/free_icon_font_comment_3916612" />
 
         <ImageButton
-            android:id="@+id/imageButton6"
+            android:id="@+id/profileButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#00FFFFFF"
-            android:src="@drawable/account_icon" />
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/free_icon_font_user_3917705" />
     </LinearLayout>
 
 </LinearLayout>
