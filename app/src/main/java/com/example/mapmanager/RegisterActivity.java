@@ -16,12 +16,18 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -92,11 +98,31 @@ public class RegisterActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                Toast.makeText(RegisterActivity.this, "@string/register_success_text", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                intent.putExtra("CLEAR_DATA", true);
-                                startActivity(intent);
-                                finish();
+                                String uid = user.getUid();
+
+                                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
+                                Map<String, Object> userData = new HashMap<>();
+                                userData.put("email", email);
+                                userData.put("userName", "123");
+                                userData.put("phoneNumber", "213");
+                                // Добавьте другие нужные поля
+
+                                usersRef.child(uid).setValue(userData)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    Toast.makeText(RegisterActivity.this, "Регистрация успешна и данные сохранены.", Toast.LENGTH_SHORT).show();
+                                                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                                    intent.putExtra("CLEAR_DATA", true);
+                                                    startActivity(intent);
+                                                    finish();
+                                                } else {
+                                                    Toast.makeText(RegisterActivity.this, "Ошибка сохранения данных: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+
                             } else {
                                 Toast.makeText(RegisterActivity.this, "@string/register_error_text" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
