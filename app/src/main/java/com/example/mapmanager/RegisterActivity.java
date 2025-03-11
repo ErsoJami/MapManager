@@ -98,16 +98,12 @@ public class RegisterActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                String uid = user.getUid();
-
                                 DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
                                 Map<String, Object> userData = new HashMap<>();
                                 userData.put("email", email);
                                 userData.put("userName", "123");
-                                userData.put("phoneNumber", "213");
-                                // Добавьте другие нужные поля
-
-                                usersRef.child(uid).setValue(userData)
+                                userData.put("dateBirthday", "213");
+                                usersRef.child(user.getUid()).setValue(userData)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {

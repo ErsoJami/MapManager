@@ -34,7 +34,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/map_icon_2" />
+            android:src="@drawable/map_icon" />
 
         <ImageButton
             android:id="@+id/chatButton"
@@ -42,7 +42,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/free_icon_font_comment_3916612" />
+            android:src="@drawable/chat_icon" />
 
         <ImageButton
             android:id="@+id/profileButton"
