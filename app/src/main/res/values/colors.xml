@@ -8,4 +8,6 @@
     <color name="dark_grey">#666666</color>
     <color name="blue">#0005CB</color>
     <color name="red">#EDFF3535</color>
+    <color name="dark_red">#EDBF0606</color>
+    <color name="greed">#77FD13</color>
 </resources>
