@@ -125,17 +125,8 @@ public class ProfileFragment extends Fragment {
         deleteAccountText.setOnClickListener(v -> {
             LayoutInflater inflater = getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.dialog_custom, null);
-
-            // 4. Создаём AlertDialog.Builder.
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
             builder.setView(dialogView)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .setNegativeButton("Cancel", null)
                     .show();
         });
     }
