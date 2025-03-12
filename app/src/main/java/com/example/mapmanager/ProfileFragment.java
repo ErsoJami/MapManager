@@ -12,8 +12,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -126,17 +131,81 @@ public class ProfileFragment extends Fragment {
             LayoutInflater inflater = getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.dialog_custom, null);
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-            builder.setView(dialogView)
-                    .show();
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+            View deleteView = dialogView.findViewById(R.id.deleteView);
+            View cancelView = dialogView.findViewById(R.id.cancelView);
+            deleteView.setOnClickListener(v1 -> {
+                deleteAccount();
+                dialog.dismiss();
+            });
+
+            cancelView.setOnClickListener(v1 -> {
+                dialog.dismiss();
+            });
+
+            dialog.show();
+
         });
+    }
+    void changeUserPass(String newPass) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        user.updatePassword(newPass)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(requireContext(), "Pass change", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(requireContext(), "Pass don't change", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+    void deleteAccount() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        user.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+                            userData.removeValue();
+                            Toast.makeText(requireActivity(), R.string.enter_success_text, Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                            intent.putExtra("CLEAR_DATA", true);
+                            startActivity(intent);
+                            requireActivity().finish();
+                        } else {
+                            Toast.makeText(requireContext(), "Account deletion failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(requireContext(), "Account deletion failed: " + e.getLocalizedMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+
     }
     void signOut() {
         mAuth.signOut();
-        Toast.makeText(requireActivity(), R.string.enter_success_text, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(requireActivity(), LoginActivity.class);
-        intent.putExtra("CLEAR_DATA", true);
-        startActivity(intent);
-        requireActivity().finish();
+        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null) {
+                    Toast.makeText(requireActivity(), R.string.enter_success_text, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                    intent.putExtra("CLEAR_DATA", true);
+                    startActivity(intent);
+                    requireActivity().finish();
+                }
+            }
+        });
     }
 
 }

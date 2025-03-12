@@ -34,11 +34,12 @@
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     <View
-        android:id="@+id/view4"
+        android:id="@+id/deleteView"
         android:layout_width="312dp"
         android:layout_height="36dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/dark_red"
+        android:clickable="true"
         android:elevation="1dp"
         android:paddingTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,7 +47,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     <TextView
-        android:id="@+id/textView10"
+        android:id="@+id/deleteText"
         android:layout_width="305dp"
         android:layout_height="34dp"
         android:gravity="center"
@@ -55,26 +56,27 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:translationZ="1dp"
-        app:layout_constraintBottom_toBottomOf="@+id/view4"
+        app:layout_constraintBottom_toBottomOf="@+id/deleteView"
         app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintEnd_toEndOf="@+id/view4"
+        app:layout_constraintEnd_toEndOf="@+id/deleteView"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/view4"
+        app:layout_constraintStart_toStartOf="@+id/deleteView"
         app:layout_constraintTop_toBottomOf="@+id/textView9"
         app:layout_constraintVertical_bias="1.0" />
 
     <View
-        android:id="@+id/view13"
+        android:id="@+id/cancelView"
         android:layout_width="312dp"
         android:layout_height="36dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded"
         android:backgroundTint="#EDEDED"
+        android:clickable="true"
         android:elevation="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.485"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view4" />
+        app:layout_constraintTop_toBottomOf="@+id/deleteView" />
 
     <TextView
         android:id="@+id/textView11"
@@ -84,11 +86,11 @@
         android:textSize="20dp"
         android:textStyle="bold"
         android:translationZ="1dp"
-        app:layout_constraintBottom_toBottomOf="@+id/view13"
+        app:layout_constraintBottom_toBottomOf="@+id/cancelView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view13" />
+        app:layout_constraintTop_toTopOf="@+id/cancelView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
