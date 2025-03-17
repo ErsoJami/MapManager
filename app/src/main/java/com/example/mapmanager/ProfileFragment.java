@@ -1,7 +1,6 @@
 package com.example.mapmanager;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,7 +31,7 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
 
-    private TextView userTextView, emailTextView, dateTextView, quitAccountText, deleteAccountText;
+    private TextView userTextView, emailTextView, dateTextView, quitAccountText, deleteAccountText, changePassText;
     private View view1, view2, view3, view6, view7, view8, view9;
     private ImageView deleteAccountView;
     @Override
@@ -45,6 +44,7 @@ public class ProfileFragment extends Fragment {
         deleteAccountView = view.findViewById(R.id.deleteAccountView);
         quitAccountText = view.findViewById(R.id.quitAccountText);
         deleteAccountText = view.findViewById(R.id.deleteAccountText);
+        changePassText = view.findViewById(R.id.changePassText);
         view1 = view.findViewById(R.id.view);
         view2 = view.findViewById(R.id.view2);
         view3 = view.findViewById(R.id.view3);
@@ -129,11 +129,12 @@ public class ProfileFragment extends Fragment {
         });
         deleteAccountText.setOnClickListener(v -> {
             LayoutInflater inflater = getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.dialog_custom, null);
+            View dialogView = inflater.inflate(R.layout.account_delete_dialog, null);
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
             builder.setView(dialogView);
+//            builder.setCancelable(false);
             AlertDialog dialog = builder.create();
-            View deleteView = dialogView.findViewById(R.id.deleteView);
+            View deleteView = dialogView.findViewById(R.id.accountDeleteView);
             View cancelView = dialogView.findViewById(R.id.cancelView);
             deleteView.setOnClickListener(v1 -> {
                 deleteAccount();
@@ -147,6 +148,42 @@ public class ProfileFragment extends Fragment {
             dialog.show();
 
         });
+        changePassText.setOnClickListener(v ->{
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.change_pass_dialog, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+            builder.setView(dialogView);
+//            builder.setCancelable(false);
+            AlertDialog dialog = builder.create();
+            View changeView = dialogView.findViewById(R.id.applyChangePassView);
+            View cancelView = dialogView.findViewById(R.id.cancelView);
+            EditText editPasswordText, confirmPasswordText;
+            editPasswordText = dialogView.findViewById(R.id.editPasswordText);
+            confirmPasswordText = dialogView.findViewById(R.id.confirmPasswordText);
+
+            changeView.setOnClickListener(v1 -> {
+                String password = editPasswordText.getText().toString();
+                String confirmPassword = confirmPasswordText.getText().toString();
+                if (password.isEmpty() || confirmPassword.isEmpty()) {
+                    Toast.makeText(requireActivity(), "@string/fill_all_fields_text", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (password.equals(confirmPassword)) {
+                    changeUserPass(password);
+                } else {
+                    Toast.makeText(requireActivity(), "@string/different_passwords_text", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                dialog.dismiss();
+            });
+
+            cancelView.setOnClickListener(v1 -> {
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        });
+
     }
     void changeUserPass(String newPass) {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -190,7 +227,6 @@ public class ProfileFragment extends Fragment {
                                 Toast.LENGTH_LONG).show();
                     }
                 });
-
     }
     void signOut() {
         mAuth.signOut();

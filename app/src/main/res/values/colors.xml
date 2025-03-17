@@ -9,5 +9,7 @@
     <color name="blue">#0005CB</color>
     <color name="red">#EDFF3535</color>
     <color name="dark_red">#EDBF0606</color>
-    <color name="greed">#77FD13</color>
+    <color name="green_dark">#58cc02</color>
+    <color name="green">#5dff01</color>
+    <color name="green_light">#6eff02</color>
 </resources>

@@ -34,11 +34,11 @@
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     <View
-        android:id="@+id/deleteView"
+        android:id="@+id/accountDeleteView"
         android:layout_width="312dp"
         android:layout_height="36dp"
         android:background="@drawable/rounded"
-        android:backgroundTint="@color/dark_red"
+        android:backgroundTint="@color/green_dark"
         android:clickable="true"
         android:elevation="1dp"
         android:paddingTop="8dp"
@@ -56,11 +56,11 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:translationZ="1dp"
-        app:layout_constraintBottom_toBottomOf="@+id/deleteView"
+        app:layout_constraintBottom_toBottomOf="@id/accountDeleteView"
         app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintEnd_toEndOf="@+id/deleteView"
+        app:layout_constraintEnd_toEndOf="@id/accountDeleteView"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/deleteView"
+        app:layout_constraintStart_toStartOf="@id/accountDeleteView"
         app:layout_constraintTop_toBottomOf="@+id/textView9"
         app:layout_constraintVertical_bias="1.0" />
 
@@ -76,7 +76,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.485"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deleteView" />
+        app:layout_constraintTop_toBottomOf="@+id/accountDeleteView" />
 
     <TextView
         android:id="@+id/textView11"
