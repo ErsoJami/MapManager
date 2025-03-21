@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.widget.ImageButton;
 
 import com.yandex.mapkit.MapKitFactory;
+import com.yandex.mapkit.search.SearchFactory;
 
 public class MainActivity extends AppCompatActivity {
 
