@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,7 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mapmanager.Adapters.ChatAdapter;
+import com.example.mapmanager.Adapters.ChatListAdapter;
+import com.example.mapmanager.models.Chat;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,7 +31,7 @@ import java.util.List;
 public class ChatFragment extends Fragment {
     private FirebaseAuth mAuth;
     private List<Chat> chats;
-    private ChatAdapter adapter;
+    private ChatListAdapter adapter;
     private DatabaseReference databaseReference;
     private RecyclerView recyclerView;
     private DatabaseReference chatListReference;
@@ -56,13 +54,13 @@ public class ChatFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ChatAdapter.OnChatClickListener chatClickListener = new ChatAdapter.OnChatClickListener() {
+        ChatListAdapter.OnChatClickListener chatClickListener = new ChatListAdapter.OnChatClickListener() {
             @Override
             public void onChatClick(Chat chat, int position) {
                 Toast.makeText(requireContext(), chat.getId(), Toast.LENGTH_SHORT).show();
             }
         };
-        adapter = new ChatAdapter(requireContext(), chats, chatClickListener);
+        adapter = new ChatListAdapter(requireContext(), chats, chatClickListener);
         FirebaseUser user = mAuth.getCurrentUser();
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);

@@ -1,4 +1,4 @@
-package com.example.mapmanager;
+package com.example.mapmanager.models;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;

@@ -9,12 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mapmanager.Chat;
+import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.R;
 
 import java.util.List;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
+public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHolder>{
 
     private final LayoutInflater inflater;
     private final List<Chat> chats;
@@ -22,20 +22,20 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
     public interface OnChatClickListener{
         void onChatClick(Chat state, int position);
     }
-    public ChatAdapter(Context context, List<Chat> chats, OnChatClickListener onChatClickListener) {
+    public ChatListAdapter(Context context, List<Chat> chats, OnChatClickListener onChatClickListener) {
         this.chats = chats;
         this.inflater = LayoutInflater.from(context);
         this.onChatClickListener = onChatClickListener;
     }
     @NonNull
     @Override
-    public ChatAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ChatListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.chat_item_layout, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ChatAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(ChatListAdapter.ViewHolder holder, int position) {
         Chat chat = chats.get(position);
         if (chat != null) {
             holder.text1.setText(chat.getId());

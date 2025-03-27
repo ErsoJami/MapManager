@@ -52,6 +52,12 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, R.string.fill_all_fields_text, Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (mAuth.getCurrentUser() != null) {
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra("CLEAR_DATA", true);
+                startActivity(intent);
+                finish();
+            }
             loginUser(email, password);
         });
         String registerText = getResources().getString(R.string.want_to_register_text);
