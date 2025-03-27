@@ -9,6 +9,7 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,9 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
         mAuth = FirebaseAuth.getInstance();
-
         textViewTitle = findViewById(R.id.textViewTitle);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -89,7 +89,17 @@ public class RegisterActivity extends AppCompatActivity {
         loginTextView.setMovementMethod(LinkMovementMethod.getInstance());
         loginTextView.setHighlightColor(Color.TRANSPARENT);
     }
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+            intent.putExtra("CLEAR_DATA", true);
+            startActivity(intent);
+            finish();
+        }
+    }
     private void registerUser(String email, String password, String confirmPassword) {
         if (password.equals(confirmPassword)) {
             mAuth.createUserWithEmailAndPassword(email, password)
@@ -103,6 +113,9 @@ public class RegisterActivity extends AppCompatActivity {
                                 userData.put("email", email);
                                 userData.put("userName", "123");
                                 userData.put("dateBirthday", "213");
+                                Map<String, String> data = new HashMap<>();
+                                data.put("1", "-OMHppsvY7m3rN5SrODh");
+                                userData.put("chatsList", data);
                                 usersRef.child(user.getUid()).setValue(userData)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -129,11 +142,4 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-        }
-    }
 }
