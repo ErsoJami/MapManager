@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -29,20 +31,27 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
+import com.yandex.mapkit.Animation;
+import com.yandex.mapkit.GeoObject;
+import com.yandex.mapkit.GeoObjectCollection;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.BoundingBox;
 import com.yandex.mapkit.geometry.Geometry;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.layers.ObjectEvent;
+import com.yandex.mapkit.map.CameraPosition;
 import com.yandex.mapkit.map.IconStyle;
 import com.yandex.mapkit.map.MapObjectCollection;
+import com.yandex.mapkit.map.PlacemarkMapObject;
 import com.yandex.mapkit.map.RotationType;
+import com.yandex.mapkit.map.VisibleRegionUtils;
 import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.search.Response;
 import com.yandex.mapkit.search.SearchFactory;
 import com.yandex.mapkit.search.SearchManager;
 import com.yandex.mapkit.search.SearchManagerType;
 import com.yandex.mapkit.search.SearchOptions;
+import com.yandex.mapkit.search.SearchType;
 import com.yandex.mapkit.search.Session;
 import com.yandex.mapkit.search.Session.SearchListener;
 import com.yandex.mapkit.search.SuggestItem;
@@ -58,7 +67,9 @@ import com.yandex.runtime.Error;
 import com.yandex.runtime.image.ImageProvider;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapFragment extends Fragment implements UserLocationObjectListener, SearchListener, SuggestListener  {
     private MapView mapView;
@@ -68,8 +79,11 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
     private SearchView searchView;
     private SearchManager searchManager;
     private SuggestSession suggestSession;
-    private ArrayAdapter<String> adapter;
+    private ArrayAdapter<HashMap<String, String>> adapter;
+    private Session session;
+    private SearchOptions searchOptions;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private MapObjectCollection mapObjectCollection;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,13 +107,45 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
         getLocationPermission();
         listView = view.findViewById(R.id.listView);
         searchView = view.findViewById(R.id.searchView);
-        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+        mapObjectCollection = mapView.getMap().getMapObjects().addCollection();
+        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, new ArrayList<>()) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text1 = view.findViewById(android.R.id.text1);
+                TextView text2 = view.findViewById(android.R.id.text2);
+
+                Map<String, String> item = getItem(position);
+                if (item != null) {
+                    text1.setText(item.getOrDefault("name", ""));
+                    text2.setText(item.getOrDefault("info", ""));
+                }
+                return view;
+            }
+        };
         listView.setAdapter(adapter);
+        listView.setVisibility(View.GONE);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Map<String, String> adress = adapter.getItem(position);
+                searchOptions.setSearchTypes(SearchType.BIZ.value);
+                searchOptions.setResultPageSize(32);
+                session = searchManager.submit(new String(adress.get("name") + " " + adress.get("info")), VisibleRegionUtils.toPolygon(mapView.getMap().getVisibleRegion()), searchOptions, MapFragment.this);
+                listView.setVisibility(View.GONE);
+                searchView.setQuery(new String(adress.get("name") + " " + adress.get("info")), true);
+            }
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false;
+                searchOptions.setSearchTypes(SearchType.BIZ.value);
+                searchOptions.setResultPageSize(32);
+                session = searchManager.submit(query, VisibleRegionUtils.toPolygon(mapView.getMap().getVisibleRegion()), searchOptions, MapFragment.this);
+                return true;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 handler.removeCallbacksAndMessages(null);
@@ -111,12 +157,17 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
                     adapter.notifyDataSetChanged();
                     return true;
                 }
+                listView.setVisibility(View.VISIBLE);
                 handler.postDelayed(() -> {
                     requestSuggest(newText);
                 }, 500);
                 return true;
             }
         });
+        searchOptions = new SearchOptions();
+        searchOptions.setSearchTypes(SearchType.BIZ.value);
+        searchOptions.setResultPageSize(32);
+
         return view;
     }
     private void requestSuggest(String query) {
@@ -167,7 +218,20 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
         MapKitFactory.getInstance().onStop();
         super.onStop();
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView = null;
+        userLocationLayer = null;
+        getLocationPermission = null;
+        listView = null;
+        searchView = null;
+        searchManager = null;
+        suggestSession = null;
+        session = null;
+        searchOptions = null;
+        mapObjectCollection = null;
+    }
     @Override
     public void onObjectAdded(@NonNull UserLocationView userLocationView) {
         Bitmap bitmapPin = vectorToBitmap(requireContext(), R.drawable.pin);
@@ -204,7 +268,34 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
 
     @Override
     public void onSearchResponse(@NonNull Response response) {
+        mapObjectCollection.clear();
+        Bitmap bitmapPin = vectorToBitmap(requireContext(), R.drawable.pin);
+        for (GeoObjectCollection.Item geoObject : response.getCollection().getChildren()) {
+            Point point = geoObject.getObj().getGeometry().get(0).getPoint();
+            if (point != null) {
+                PlacemarkMapObject mark = mapObjectCollection.addPlacemark(point);
+                mark.setOpacity(0.7f);
+                mark.setIcon(ImageProvider.fromBitmap(bitmapPin));
+                mark.setUserData(geoObject);
 
+
+            }
+        }
+        if (!response.getCollection().getChildren().isEmpty()) {
+            GeoObjectCollection.Item firstResult = response.getCollection().getChildren().get(0);
+            GeoObject firstGeoObject = firstResult.getObj();
+            if (firstGeoObject != null && !firstGeoObject.getGeometry().isEmpty()) {
+                Point firstPoint = firstGeoObject.getGeometry().get(0).getPoint();
+                if (firstPoint != null && mapView != null) {
+                    mapView.getMap().move(
+                            new CameraPosition(firstPoint, 15.0f, 0.0f, 0.0f),
+                            new Animation(Animation.Type.SMOOTH, 0.5f),
+                            null
+                    );
+                }
+            }
+        }
+        adapter.clear();
     }
 
     @Override
@@ -221,14 +312,15 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
     @Override
     public void onResponse(@NonNull SuggestResponse suggestResponse) {
         List<SuggestItem> suggestItems = suggestResponse.getItems();
-        List<String> suggestions = new ArrayList<>();
+        List<HashMap<String, String>> suggestions = new ArrayList<>();
         for (SuggestItem item : suggestItems) {
-            if (item.getTitle() != null) {
-                suggestions.add(item.getTitle().getText());
+            if (item.getTitle() != null && item.getSubtitle() != null) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("name", item.getTitle().getText());
+                map.put("info", item.getSubtitle().getText());
+                suggestions.add(map);
             }
         }
-
-        // Обновляем адаптер ListView
         adapter.clear();
         adapter.addAll(suggestions);
         adapter.notifyDataSetChanged();

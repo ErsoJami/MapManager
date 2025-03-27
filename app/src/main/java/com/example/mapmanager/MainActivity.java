@@ -14,6 +14,7 @@ import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 
 import com.yandex.mapkit.MapKitFactory;
@@ -31,9 +32,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        try {
+            MapKitFactory.setApiKey("83f579bc-1158-4bb1-895a-794de12cbf29");
+            MapKitFactory.initialize(this);
+        } catch (AssertionError e) {
 
-        MapKitFactory.setApiKey("83f579bc-1158-4bb1-895a-794de12cbf29");
-        MapKitFactory.initialize(this);
+        }
+
 
         homeButton = findViewById(R.id.homeButton);
         profileButton = findViewById(R.id.profileButton);
