@@ -31,7 +31,7 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
 
-    private TextView userTextView, emailTextView, dateTextView, quitAccountText, deleteAccountText, changePassText;
+    private TextView userTextView, emailTextView, dateTextView, quitAccountText, deleteAccountText, changePassText, changePersonalDataText;
     private View view1, view2, view3, view6, view7, view8, view9;
     private ImageView deleteAccountView;
     @Override
@@ -45,6 +45,7 @@ public class ProfileFragment extends Fragment {
         quitAccountText = view.findViewById(R.id.quitAccountText);
         deleteAccountText = view.findViewById(R.id.deleteAccountText);
         changePassText = view.findViewById(R.id.changePassText);
+        changePersonalDataText = view.findViewById(R.id.changePersonalDataText);
         view1 = view.findViewById(R.id.view);
         view2 = view.findViewById(R.id.view2);
         view3 = view.findViewById(R.id.view3);
@@ -165,13 +166,13 @@ public class ProfileFragment extends Fragment {
                 String password = editPasswordText.getText().toString();
                 String confirmPassword = confirmPasswordText.getText().toString();
                 if (password.isEmpty() || confirmPassword.isEmpty()) {
-                    Toast.makeText(requireActivity(), "@string/fill_all_fields_text", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity(), R.string.fill_all_fields_text, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (password.equals(confirmPassword)) {
                     changeUserPass(password);
                 } else {
-                    Toast.makeText(requireActivity(), "@string/different_passwords_text", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity(), R.string.different_passwords_text, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 dialog.dismiss();
@@ -183,7 +184,12 @@ public class ProfileFragment extends Fragment {
 
             dialog.show();
         });
-
+        changePersonalDataText.setOnClickListener(v->{
+            Intent intent = new Intent(requireActivity(), ProfileChangeActivity.class);
+            intent.putExtra("CLEAR_DATA", true);
+            startActivity(intent);
+            requireActivity().finish();
+        });
     }
     void changeUserPass(String newPass) {
         FirebaseUser user = mAuth.getCurrentUser();
