@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mapmanager.Adapters.ChatListAdapter;
+import com.example.mapmanager.adapters.ChatListAdapter;
 import com.example.mapmanager.models.Chat;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;

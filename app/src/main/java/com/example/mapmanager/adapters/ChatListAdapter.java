@@ -1,4 +1,4 @@
-package com.example.mapmanager.Adapters;
+package com.example.mapmanager.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
