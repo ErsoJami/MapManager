@@ -20,7 +20,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     private final LayoutInflater inflater;
     private final List<Chat> chats;
     private final OnChatClickListener onChatClickListener;
-    public static interface OnChatClickListener{
+    public interface OnChatClickListener{
         void onChatClick(Chat chat, int position);
     }
     public ChatListAdapter(Context context, List<Chat> chats, OnChatClickListener onChatClickListener) {

@@ -31,6 +31,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.mapmanager.models.MapManager;
+import com.example.mapmanager.models.MapManager.MapManagerSearchListener;
+import com.example.mapmanager.models.MapManager.MapManagerSuggestListener;
+import com.example.mapmanager.models.MapManager;
 import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.GeoObject;
 import com.yandex.mapkit.GeoObjectCollection;
@@ -71,20 +75,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapFragment extends Fragment implements UserLocationObjectListener, SearchListener, SuggestListener  {
+public class MapFragment extends Fragment implements MapManagerSearchListener, MapManagerSuggestListener  {
     private MapView mapView;
-    private UserLocationLayer userLocationLayer;
     private ActivityResultLauncher<String[]> getLocationPermission;
     private ListView listView;
     private SearchView searchView;
-    private SearchManager searchManager;
-    private SuggestSession suggestSession;
-    private ArrayAdapter<HashMap<String, String>> adapter;
-    private Session session;
-    private SearchOptions searchOptions;
+    private ArrayAdapter<Map<String, String>> adapter;
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private MapObjectCollection mapObjectCollection;
-
+    private MapManager mapManager;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,22 +90,21 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
             Boolean fineLocationGranted = permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
             Boolean coarseLocationGranted = permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
             if (fineLocationGranted != null && fineLocationGranted || coarseLocationGranted!= null && coarseLocationGranted) {
-                createUserLayer();
+                mapManager.createUserLayer();
             } else {
                 Toast.makeText(requireContext(), "Location permission denied.", Toast.LENGTH_SHORT).show();
             }
         });
-        searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = view.findViewById(R.id.mapview);
+        mapManager = new MapManager(requireContext(), mapView, this, this);
         getLocationPermission();
         listView = view.findViewById(R.id.listView);
         searchView = view.findViewById(R.id.searchView);
-        mapObjectCollection = mapView.getMap().getMapObjects().addCollection();
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, new ArrayList<>()) {
             @NonNull
             @Override
@@ -130,19 +127,19 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, String> adress = adapter.getItem(position);
-                searchOptions.setSearchTypes(SearchType.BIZ.value);
-                searchOptions.setResultPageSize(32);
-                session = searchManager.submit(new String(adress.get("name") + " " + adress.get("info")), VisibleRegionUtils.toPolygon(mapView.getMap().getVisibleRegion()), searchOptions, MapFragment.this);
+                String responce = adress.getOrDefault("name", "") + " " + adress.getOrDefault("info", "").trim();
                 listView.setVisibility(View.GONE);
-                searchView.setQuery(new String(adress.get("name") + " " + adress.get("info")), true);
+                searchView.setQuery(responce, true);
+                adapter.clear();
+                adapter.notifyDataSetChanged();
             }
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchOptions.setSearchTypes(SearchType.BIZ.value);
-                searchOptions.setResultPageSize(32);
-                session = searchManager.submit(query, VisibleRegionUtils.toPolygon(mapView.getMap().getVisibleRegion()), searchOptions, MapFragment.this);
+                mapManager.search(query);
+                searchView.clearFocus();
+                listView.setVisibility(View.GONE);
                 return true;
             }
 
@@ -150,54 +147,26 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
             public boolean onQueryTextChange(String newText) {
                 handler.removeCallbacksAndMessages(null);
                 if (newText.isEmpty()) {
-                    if (suggestSession != null) {
-                        suggestSession.reset();
-                    }
                     adapter.clear();
                     adapter.notifyDataSetChanged();
+                    mapManager.suggest("");
                     return true;
                 }
                 listView.setVisibility(View.VISIBLE);
                 handler.postDelayed(() -> {
-                    requestSuggest(newText);
+                    mapManager.suggest(newText);
                 }, 500);
                 return true;
             }
         });
-        searchOptions = new SearchOptions();
-        searchOptions.setSearchTypes(SearchType.BIZ.value);
-        searchOptions.setResultPageSize(32);
 
         return view;
     }
-    private void requestSuggest(String query) {
-        if (suggestSession != null) {
-            suggestSession.reset();
-        }
-        suggestSession = searchManager.createSuggestSession();
-        SuggestOptions suggestOptions = new SuggestOptions();
-        suggestOptions.setSuggestTypes(SuggestType.GEO.value | SuggestType.BIZ.value);
-        if (userLocationLayer != null && userLocationLayer.cameraPosition() != null) {
-            Point userLocation = userLocationLayer.cameraPosition().getTarget();
-            suggestSession.suggest(query, new BoundingBox(new Point(userLocation.getLatitude() - 0.00899316, userLocation.getLongitude() - 0.01598718),
-                    new Point(userLocation.getLatitude() + 0.00899316, userLocation.getLongitude() + 0.01598718)), suggestOptions, this);
-        } else {
-            Toast.makeText(requireContext(), "Местоположение недоступно", Toast.LENGTH_SHORT).show();
-        }
-    }
-    private void createUserLayer() {
-        if (mapView == null) {
-            return;
-        }
-        userLocationLayer = MapKitFactory.getInstance().createUserLocationLayer(mapView.getMapWindow());
-        userLocationLayer.setVisible(true);
-        userLocationLayer.setHeadingEnabled(true);
-        userLocationLayer.setObjectListener(this);
-    }
+
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            createUserLayer();
+            mapManager.createUserLayer();
         } else {
             getLocationPermission.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -208,132 +177,51 @@ public class MapFragment extends Fragment implements UserLocationObjectListener,
     @Override
     public void onStart() {
         super.onStart();
-        MapKitFactory.getInstance().onStart();
-        mapView.onStart();
+        mapManager.onStart();
     }
 
     @Override
     public void onStop() {
-        mapView.onStop();
-        MapKitFactory.getInstance().onStop();
         super.onStop();
+        mapManager.onStop();
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         mapView = null;
-        userLocationLayer = null;
         getLocationPermission = null;
         listView = null;
         searchView = null;
-        searchManager = null;
-        suggestSession = null;
-        session = null;
-        searchOptions = null;
-        mapObjectCollection = null;
-    }
-    @Override
-    public void onObjectAdded(@NonNull UserLocationView userLocationView) {
-        Bitmap bitmapPin = vectorToBitmap(requireContext(), R.drawable.pin);
-        Bitmap bitmapArrow = vectorToBitmap(requireContext(), R.drawable.arrow);
-        userLocationView.getPin().setIcon(ImageProvider.fromBitmap(bitmapPin));
-        IconStyle iconStyle = new IconStyle();
-        iconStyle.setRotationType(RotationType.ROTATE);
-        userLocationView.getArrow().setIcon(ImageProvider.fromBitmap(bitmapArrow), iconStyle);
-        userLocationView.getAccuracyCircle().setFillColor(R.color.white2);
+        mapManager = null;
     }
 
     @Override
-    public void onObjectRemoved(@NonNull UserLocationView userLocationView) {
-
-    }
-
-    @Override
-    public void onObjectUpdated(@NonNull UserLocationView userLocationView, @NonNull ObjectEvent objectEvent) {
-
-    }
-    private Bitmap vectorToBitmap(Context context, int drawableId) {
-        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
-        if (drawable == null) {
-            return null;
-        }
-        drawable = DrawableCompat.wrap(drawable).mutate();
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
-    }
-
-    @Override
-    public void onSearchResponse(@NonNull Response response) {
-        mapObjectCollection.clear();
-        Bitmap bitmapPin = vectorToBitmap(requireContext(), R.drawable.pin);
-        for (GeoObjectCollection.Item geoObject : response.getCollection().getChildren()) {
-            Point point = geoObject.getObj().getGeometry().get(0).getPoint();
-            if (point != null) {
-                PlacemarkMapObject mark = mapObjectCollection.addPlacemark(point);
-                mark.setOpacity(0.7f);
-                mark.setIcon(ImageProvider.fromBitmap(bitmapPin));
-                mark.setUserData(geoObject);
-
-
-            }
-        }
-        if (!response.getCollection().getChildren().isEmpty()) {
-            GeoObjectCollection.Item firstResult = response.getCollection().getChildren().get(0);
-            GeoObject firstGeoObject = firstResult.getObj();
-            if (firstGeoObject != null && !firstGeoObject.getGeometry().isEmpty()) {
-                Point firstPoint = firstGeoObject.getGeometry().get(0).getPoint();
-                if (firstPoint != null && mapView != null) {
-                    mapView.getMap().move(
-                            new CameraPosition(firstPoint, 15.0f, 0.0f, 0.0f),
-                            new Animation(Animation.Type.SMOOTH, 0.5f),
-                            null
-                    );
-                }
-            }
-        }
+    public void onSearchSuccess() {
         adapter.clear();
-    }
-
-    @Override
-    public void onSearchError(@NonNull Error error) {
-        String errorMessage = "Unknown search error";
-        if (error instanceof com.yandex.runtime.network.RemoteError) {
-            errorMessage = "Remote error";
-        } else if (error instanceof com.yandex.runtime.network.NetworkError) {
-            errorMessage = "Network error";
-        }
-        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onResponse(@NonNull SuggestResponse suggestResponse) {
-        List<SuggestItem> suggestItems = suggestResponse.getItems();
-        List<HashMap<String, String>> suggestions = new ArrayList<>();
-        for (SuggestItem item : suggestItems) {
-            if (item.getTitle() != null && item.getSubtitle() != null) {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("name", item.getTitle().getText());
-                map.put("info", item.getSubtitle().getText());
-                suggestions.add(map);
-            }
-        }
-        adapter.clear();
-        adapter.addAll(suggestions);
         adapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onError(@NonNull Error error) {
-        String errorMessage = "Unknown suggest error";
-        if (error instanceof com.yandex.runtime.network.RemoteError) {
-            errorMessage = "Remote error";
-        } else if (error instanceof com.yandex.runtime.network.NetworkError) {
-            errorMessage = "Network error";
+    public void onSearchError(String error) {
+        listView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onSuggestResults(List<Map<String, String>> suggestions) {
+        adapter.clear();
+        if (!suggestions.isEmpty()) {
+            adapter.addAll(suggestions);
+            listView.setVisibility(View.VISIBLE);
+        } else {
+            listView.setVisibility(View.GONE);
         }
-        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSuggestError(String error) {
+        listView.setVisibility(View.GONE);
+        adapter.clear();
+        adapter.notifyDataSetChanged();
     }
 }
