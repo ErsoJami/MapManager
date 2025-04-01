@@ -1,32 +1,23 @@
 package com.example.mapmanager;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
 
 import com.yandex.mapkit.MapKitFactory;
-import com.yandex.mapkit.search.SearchFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat {
 
     private ImageButton homeButton, profileButton, chatButton, mapButton;
     private Drawable homeDrawable, profileDrawable, chatDrawable, mapDrawable;
     private HomeFragment homeFragment;
     private ProfileFragment profileFragment;
-    private ChatFragment chatFragment;
+    private MessengerFragment messengerFragment;
     private MapFragment mapFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         homeFragment = new HomeFragment();
         profileFragment = new ProfileFragment();
-        chatFragment = new ChatFragment();
+        messengerFragment = new MessengerFragment();
         mapFragment = new MapFragment();
         setCurrentFragment(homeFragment);
 
@@ -69,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         chatButton.setOnClickListener(v -> {
-            setCurrentFragment(chatFragment);
+            setCurrentFragment(messengerFragment);
         });
     }
 
@@ -85,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             homeDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
         } else if (fragment == profileFragment) {
             profileDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
-        } else if (fragment == chatFragment) {
+        } else if (fragment == messengerFragment) {
             chatDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
         } else if (fragment == mapFragment) {
             mapDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
@@ -94,5 +85,19 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onSelectChat(String id) {
+        ChatFragment chatFragment = ChatFragment.updateChat(id);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, chatFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
     }
 }

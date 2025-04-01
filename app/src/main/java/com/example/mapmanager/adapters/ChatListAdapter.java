@@ -1,5 +1,6 @@
-package com.example.mapmanager.Adapters;
+package com.example.mapmanager.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     private final List<Chat> chats;
     private final OnChatClickListener onChatClickListener;
     public interface OnChatClickListener{
-        void onChatClick(Chat state, int position);
+        void onChatClick(Chat chat, int position);
     }
     public ChatListAdapter(Context context, List<Chat> chats, OnChatClickListener onChatClickListener) {
         this.chats = chats;
@@ -34,7 +35,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-    @Override
+
+        @Override
     public void onBindViewHolder(ChatListAdapter.ViewHolder holder, int position) {
         Chat chat = chats.get(position);
         if (chat != null) {

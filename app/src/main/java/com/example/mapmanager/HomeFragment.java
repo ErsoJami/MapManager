@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.mapmanager.models.Chat;
+import com.example.mapmanager.models.Message;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +37,11 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+//        Chat chat = new Chat(Timestamp.now(), new ArrayList<>(), "пум", "https://goida");
+//        Message message1 = new Message(0, "123", "123", Timestamp.now(), "привет");
+//        Message message2 = new Message(0, "123", "123", Timestamp.now(), "привет1");
+//        message1.createNewMessage(chat.getId());
+//        message2.createNewMessage(chat.getId());
         return view;
     }
 }
