@@ -186,9 +186,7 @@ public class ProfileFragment extends Fragment {
         });
         changePersonalDataText.setOnClickListener(v->{
             Intent intent = new Intent(requireActivity(), ProfileChangeActivity.class);
-            intent.putExtra("CLEAR_DATA", true);
             startActivity(intent);
-            requireActivity().finish();
         });
     }
     void changeUserPass(String newPass) {
