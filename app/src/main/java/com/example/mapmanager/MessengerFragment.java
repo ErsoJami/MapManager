@@ -87,6 +87,7 @@ public class MessengerFragment extends Fragment {
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         chats.clear();
+                        adapter.notifyDataSetChanged();
                         for (DataSnapshot chatId : snapshot.getChildren()) {
                             String id = chatId.getValue(String.class);
                             chatsReference = FirebaseDatabase.getInstance().getReference().child("chats").child(id);

@@ -48,8 +48,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                 holder.text1.setText(message.getMessage());
                 holder.text1.setVisibility(View.VISIBLE);
             }
-
-
         }
     }
 

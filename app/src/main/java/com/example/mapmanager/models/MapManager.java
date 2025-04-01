@@ -65,13 +65,10 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     private SuggestSession suggestSession;
     private Session searchSession;
     private boolean userGetLocation = false;
-
-
     public interface MapManagerSearchListener {
         void onSearchSuccess();
         void onSearchError(String error);
     }
-
     public interface MapManagerSuggestListener {
         void onSuggestResults(List<Map<String, String>> suggestions);
         void onSuggestError(String error);
