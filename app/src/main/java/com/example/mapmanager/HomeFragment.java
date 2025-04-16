@@ -1,5 +1,12 @@
 package com.example.mapmanager;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +18,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.mapmanager.models.Chat;
@@ -25,7 +34,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,11 +50,14 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-//        Chat chat = new Chat(Timestamp.now(), new ArrayList<>(), "пум", "https://goida");
-//        Message message1 = new Message(0, "123", "123", Timestamp.now(), "привет");
-//        Message message2 = new Message(0, "123", "123", Timestamp.now(), "привет1");
-//        message1.createNewMessage(chat.getId());
-//        message2.createNewMessage(chat.getId());
+//        FirebaseStorage storage = FirebaseStorage.getInstance();
+//        StorageReference storageRef = storage.getReference();
+//        StorageReference test = storageRef.child("images");
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.main_photo);
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//        byte[] data = baos.toByteArray();
+//        test.putBytes(data);
         return view;
     }
 }

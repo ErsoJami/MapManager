@@ -61,7 +61,7 @@ public class MessengerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_messenger, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         return view;
-    }
+    }   
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

@@ -82,13 +82,13 @@ public class User {
         data.put("birthDate", birthDayTime);
         databaseReference.updateChildren(data);
     }
-    public void loadData(DataSnapshot Ashot) {
-        if (Ashot.child("name").exists()) name = Ashot.child("name").getValue(String.class);
-        if (Ashot.child("nick").exists()) nick = Ashot.child("nick").getValue(String.class);
-        if (Ashot.child("email").exists()) email = Ashot.child("email").getValue(String.class);
-        if (Ashot.child("phoneNumber").exists()) phoneNumber = Ashot.child("phoneNumber").getValue(String.class);
-        if (Ashot.child("country").exists()) country = Ashot.child("country").getValue(String.class);
-        if (Ashot.child("city").exists()) city = Ashot.child("city").getValue(String.class);
-        if (Ashot.child("birthDate").exists()) birthDayTime = Ashot.child("birthDate").getValue(long.class);
+    public void loadData(DataSnapshot ashot) {
+        if (ashot.child("name").exists()) name = ashot.child("name").getValue(String.class);
+        if (ashot.child("nick").exists()) nick = ashot.child("nick").getValue(String.class);
+        if (ashot.child("email").exists()) email = ashot.child("email").getValue(String.class);
+        if (ashot.child("phoneNumber").exists()) phoneNumber = ashot.child("phoneNumber").getValue(String.class);
+        if (ashot.child("country").exists()) country = ashot.child("country").getValue(String.class);
+        if (ashot.child("city").exists()) city = ashot.child("city").getValue(String.class);
+        if (ashot.child("birthDate").exists()) birthDayTime = ashot.child("birthDate").getValue(long.class);
     }
 }

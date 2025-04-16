@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.yandex.mapkit.MapKitFactory;
+import com.yandex.mapkit.directions.DirectionsFactory;
+import com.yandex.mapkit.transport.Transport;
+import com.yandex.mapkit.transport.TransportFactory;
 
 public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat, ProfileFragment.ProfileChangeEnterListener {
     public static User user = new User();
@@ -42,9 +46,12 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         try {
             MapKitFactory.setApiKey("83f579bc-1158-4bb1-895a-794de12cbf29");
             MapKitFactory.initialize(this);
+            DirectionsFactory.initialize(this);
+            TransportFactory.initialize(this);
         } catch (AssertionError e) {
 
         }
+
 
         homeButton = findViewById(R.id.homeButton);
         profileButton = findViewById(R.id.profileButton);

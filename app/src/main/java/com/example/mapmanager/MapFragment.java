@@ -1,23 +1,23 @@
 package com.example.mapmanager;
 
+import static com.google.common.primitives.Ints.max;
+
 import android.Manifest;
-import android.content.Context;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.hardware.Sensor;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Pair;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -29,61 +29,44 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mapmanager.adapters.WaypointsAdapter;
 import com.example.mapmanager.models.MapManager;
 import com.example.mapmanager.models.MapManager.MapManagerSearchListener;
 import com.example.mapmanager.models.MapManager.MapManagerSuggestListener;
-import com.example.mapmanager.models.MapManager;
-import com.yandex.mapkit.Animation;
+import com.example.mapmanager.models.MapManager.MapLongTapListener;
+import com.example.mapmanager.adapters.WaypointsAdapter.WaypointsAdapterListener;
+import com.example.mapmanager.models.Waypoint;
 import com.yandex.mapkit.GeoObject;
-import com.yandex.mapkit.GeoObjectCollection;
-import com.yandex.mapkit.MapKitFactory;
-import com.yandex.mapkit.geometry.BoundingBox;
-import com.yandex.mapkit.geometry.Geometry;
 import com.yandex.mapkit.geometry.Point;
-import com.yandex.mapkit.layers.ObjectEvent;
-import com.yandex.mapkit.map.CameraPosition;
-import com.yandex.mapkit.map.IconStyle;
-import com.yandex.mapkit.map.MapObjectCollection;
+import com.yandex.mapkit.layers.GeoObjectTapEvent;
+import com.yandex.mapkit.layers.GeoObjectTapListener;
 import com.yandex.mapkit.map.PlacemarkMapObject;
-import com.yandex.mapkit.map.RotationType;
-import com.yandex.mapkit.map.VisibleRegionUtils;
 import com.yandex.mapkit.mapview.MapView;
-import com.yandex.mapkit.search.Response;
-import com.yandex.mapkit.search.SearchFactory;
-import com.yandex.mapkit.search.SearchManager;
-import com.yandex.mapkit.search.SearchManagerType;
-import com.yandex.mapkit.search.SearchOptions;
-import com.yandex.mapkit.search.SearchType;
-import com.yandex.mapkit.search.Session;
-import com.yandex.mapkit.search.Session.SearchListener;
-import com.yandex.mapkit.search.SuggestItem;
-import com.yandex.mapkit.search.SuggestOptions;
-import com.yandex.mapkit.search.SuggestResponse;
-import com.yandex.mapkit.search.SuggestSession;
-import com.yandex.mapkit.search.SuggestSession.SuggestListener;
-import com.yandex.mapkit.search.SuggestType;
-import com.yandex.mapkit.user_location.UserLocationLayer;
-import com.yandex.mapkit.user_location.UserLocationObjectListener;
-import com.yandex.mapkit.user_location.UserLocationView;
-import com.yandex.runtime.Error;
-import com.yandex.runtime.image.ImageProvider;
+import com.yandex.mapkit.search.BusinessObjectMetadata;
+import com.yandex.mapkit.search.ToponymObjectMetadata;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapFragment extends Fragment implements MapManagerSearchListener, MapManagerSuggestListener  {
+public class MapFragment extends Fragment implements MapManagerSearchListener, MapManagerSuggestListener, MapLongTapListener, WaypointsAdapterListener {
     private MapView mapView;
     private ActivityResultLauncher<String[]> getLocationPermission;
     private ListView listView;
+    private View pointsView;
+    private ImageView userLocationImageView, newRouteImageView;
     private SearchView searchView;
     private ArrayAdapter<Map<String, String>> adapter;
+    private WaypointsAdapter waypointAdapter;
+    private ArrayList<PlacemarkMapObject> placemarkMapObjectArrayList;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private MapManager mapManager;
+    private RecyclerView recyclerView;
+    private Boolean isClosePointsView = true;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,10 +85,18 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = view.findViewById(R.id.mapview);
-        mapManager = new MapManager(requireContext(), mapView, this, this);
+        mapManager = new MapManager(requireContext(), mapView, this, this, this);
         getLocationPermission();
+        placemarkMapObjectArrayList = new ArrayList<>();
+        waypointAdapter = new WaypointsAdapter(requireContext(), placemarkMapObjectArrayList, this);
         listView = view.findViewById(R.id.listView);
+        recyclerView = view.findViewById(R.id.recyclerView1);
+        recyclerView.setAdapter(waypointAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        pointsView = view.findViewById(R.id.pointsView);
         searchView = view.findViewById(R.id.searchView);
+        userLocationImageView = view.findViewById(R.id.userPosition);
+        newRouteImageView = view.findViewById(R.id.createNewRoute);
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, new ArrayList<>()) {
             @NonNull
             @Override
@@ -161,6 +152,51 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         });
 
+        userLocationImageView.setOnClickListener(v -> {
+            if (mapManager != null) {
+                mapManager.moveCamera(mapManager.getCurrentUserLocation(), 17.0f);
+            }
+        });
+        newRouteImageView.setOnClickListener(v -> {
+            ValueAnimator valueAnimator;
+            ViewGroup.LayoutParams params = pointsView.getLayoutParams();
+            if (isClosePointsView) {
+                pointsView.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);
+                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(300f));
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                        params.height = (int) valueAnimator.getAnimatedValue();
+                        pointsView.setLayoutParams(params);
+                    }
+                });
+                valueAnimator.setDuration(500);
+                valueAnimator.start();
+                isClosePointsView = false;
+            } else {
+                valueAnimator = ValueAnimator.ofInt((int) DpToPx(300f), 1);
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                        params.height = (int) valueAnimator.getAnimatedValue();
+                        pointsView.setLayoutParams(params);
+                    }
+                });
+                valueAnimator.setDuration(500);
+                valueAnimator.start();
+                valueAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
+                        super.onAnimationEnd(animation, isReverse);
+                        pointsView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
+                });
+                isClosePointsView = true;
+            }
+
+        });
         return view;
     }
 
@@ -204,7 +240,8 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
     @Override
     public void onSearchError(String error) {
-        listView.setVisibility(View.VISIBLE);
+        adapter.clear();
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -224,5 +261,69 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         listView.setVisibility(View.GONE);
         adapter.clear();
         adapter.notifyDataSetChanged();
+    }
+    public float DpToPx(float dp){
+        return dp * ((float) requireContext().getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+    @Override
+    public void onMapLongTap(PlacemarkMapObject placemarkMapObject) {
+        placemarkMapObjectArrayList.add(placemarkMapObject);
+        mapManager.getRoute(placemarkMapObjectArrayList);
+        waypointAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void arrowUpClickListener(int position) {
+        if (position != 0) {
+            swap(position - 1, position);
+        }
+    }
+
+    @Override
+    public void arrowDownClickListener(int position) {
+        if (position != placemarkMapObjectArrayList.size() - 1) {
+            swap(position, position + 1);
+        }
+    }
+
+    @Override
+    public void onNameChanged(String text, int position) {
+        PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
+        Waypoint waypoint = (Waypoint) placemarkMapObject.getUserData();
+        waypoint.setName(text);
+        placemarkMapObject.setUserData(waypoint);
+        placemarkMapObjectArrayList.set(position, placemarkMapObject);
+    }
+
+    @Override
+    public void onDescriptionChanged(String text, int position) {
+        PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
+        Waypoint waypoint = (Waypoint) placemarkMapObject.getUserData();
+        waypoint.setDescription(text);
+        placemarkMapObject.setUserData(waypoint);
+        placemarkMapObjectArrayList.set(position, placemarkMapObject);
+    }
+
+    @Override
+    public void onDeleteWaypoint(int position) {
+        PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
+        mapManager.mapObjectCollection.remove(placemarkMapObject);
+        placemarkMapObjectArrayList.remove(position);
+        mapManager.getRoute(placemarkMapObjectArrayList);
+        waypointAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFocusToWaypoint(int position) {
+        Point point = placemarkMapObjectArrayList.get(position).getGeometry();
+        mapManager.moveCamera(point, 17.0f);
+    }
+
+    void swap(int position1, int position2) {
+        PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position1);
+        placemarkMapObjectArrayList.set(position1, placemarkMapObjectArrayList.get(position2));
+        placemarkMapObjectArrayList.set(position2, placemarkMapObject);
+        mapManager.getRoute(placemarkMapObjectArrayList);
+        waypointAdapter.notifyDataSetChanged();
     }
 }
