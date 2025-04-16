@@ -182,6 +182,7 @@
         android:layout_height="20dp"
         android:layout_marginStart="20dp"
         android:clickable="true"
+        android:hint="Выберите дату"
         app:layout_constraintBottom_toBottomOf="@+id/changeBirthDateView"
         app:layout_constraintStart_toEndOf="@+id/changeBirthDateText"
         app:layout_constraintTop_toTopOf="@+id/changeBirthDateView" />
@@ -206,6 +207,7 @@
         android:inputType="text"
         android:textColor="@color/material_dynamic_neutral50"
         android:textSize="14sp"
+        android:hint="Введите ник"
         app:layout_constraintBottom_toBottomOf="@+id/changeNicknameView"
         app:layout_constraintStart_toStartOf="@+id/changeNicknameView"
         app:layout_constraintTop_toTopOf="@+id/changeNicknameView" />
@@ -220,6 +222,7 @@
         android:inputType="text"
         android:textColor="@color/material_dynamic_neutral50"
         android:textSize="14sp"
+        android:hint="Введите имя"
         app:layout_constraintBottom_toBottomOf="@+id/changeRealNameView"
         app:layout_constraintStart_toStartOf="@+id/changeRealNameView"
         app:layout_constraintTop_toTopOf="@+id/changeRealNameView" />
@@ -234,6 +237,7 @@
         android:inputType="text"
         android:textColor="@color/material_dynamic_neutral50"
         android:textSize="14sp"
+        android:hint="Введите телефон"
         app:layout_constraintBottom_toBottomOf="@+id/changePhoneNumberView"
         app:layout_constraintStart_toStartOf="@+id/changePhoneNumberView"
         app:layout_constraintTop_toTopOf="@+id/changePhoneNumberView" />
@@ -248,6 +252,7 @@
         android:inputType="text"
         android:textColor="@color/material_dynamic_neutral50"
         android:textSize="14sp"
+        android:hint="Введите email"
         app:layout_constraintBottom_toBottomOf="@+id/changeEmailView"
         app:layout_constraintStart_toStartOf="@+id/changeEmailView"
         app:layout_constraintTop_toTopOf="@+id/changeEmailView" />
@@ -262,6 +267,7 @@
         android:inputType="text"
         android:textColor="@color/material_dynamic_neutral50"
         android:textSize="14sp"
+        android:hint="Укажите страну"
         app:layout_constraintBottom_toBottomOf="@+id/changeCountryView"
         app:layout_constraintStart_toStartOf="@+id/changeCountryView"
         app:layout_constraintTop_toTopOf="@+id/changeCountryView" />
@@ -276,6 +282,7 @@
         android:inputType="text"
         android:textColor="@color/material_dynamic_neutral50"
         android:textSize="14sp"
+        android:hint="Укажите город"
         app:layout_constraintBottom_toBottomOf="@+id/changeCityView"
         app:layout_constraintStart_toStartOf="@+id/changeCityView"
         app:layout_constraintTop_toTopOf="@+id/changeCityView" />

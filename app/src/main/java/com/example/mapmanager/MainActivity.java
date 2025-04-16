@@ -1,23 +1,39 @@
 package com.example.mapmanager;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 
+import com.example.mapmanager.models.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.yandex.mapkit.MapKitFactory;
 
-public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat {
-
+public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat, ProfileFragment.ProfileChangeEnterListener {
+    public static User user = new User();
+    private FirebaseAuth jAuth;
+    private DatabaseReference databaseReference;
     private ImageButton homeButton, profileButton, chatButton, mapButton;
     private Drawable homeDrawable, profileDrawable, chatDrawable, mapDrawable;
     private HomeFragment homeFragment;
     private ProfileFragment profileFragment;
     private MessengerFragment messengerFragment;
+    private ProfileChangeFragment profileChangeFragment;
     private MapFragment mapFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         } catch (AssertionError e) {
 
         }
-
 
         homeButton = findViewById(R.id.homeButton);
         profileButton = findViewById(R.id.profileButton);
@@ -45,7 +60,13 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         profileFragment = new ProfileFragment();
         messengerFragment = new MessengerFragment();
         mapFragment = new MapFragment();
+        profileFragment = new ProfileFragment();
+        profileChangeFragment = new ProfileChangeFragment();
+
         setCurrentFragment(homeFragment);
+
+        jAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(jAuth.getCurrentUser().getUid());
 
         homeButton.setOnClickListener(v -> {
             setCurrentFragment(homeFragment);
@@ -62,6 +83,27 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         chatButton.setOnClickListener(v -> {
             setCurrentFragment(messengerFragment);
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        databaseReference.addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            user.loadData(snapshot);
+                            if (profileChangeFragment.isAdded()) profileChangeFragment.dataLoad();
+                            if (profileFragment.isAdded()) profileFragment.dataLoad();
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                }
+        );
     }
 
     private void resetButtonsColor() {
@@ -99,5 +141,12 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
+    }
+    @Override
+    public void startChangingProfile() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, profileChangeFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 }

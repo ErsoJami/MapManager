@@ -1,8 +1,10 @@
 package com.example.mapmanager;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,13 +30,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class ProfileFragment extends Fragment {
-
+    public static interface ProfileChangeEnterListener {
+        void startChangingProfile();
+    }
+    private ProfileChangeEnterListener profileChangeEnterListener;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
-
     private TextView userTextView, emailTextView, dateTextView, quitAccountText, deleteAccountText, changePassText, changePersonalDataText;
     private View view1, view2, view3, view6, view7, view8, view9;
     private ImageView deleteAccountView;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        profileChangeEnterListener = (ProfileChangeEnterListener) context;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -53,6 +62,7 @@ public class ProfileFragment extends Fragment {
         view7 = view.findViewById(R.id.view7);
         view8 = view.findViewById(R.id.view8);
         view9 = view.findViewById(R.id.view9);
+        dataLoad();
         view1.post(new Runnable() {
             @Override
             public void run() {
@@ -84,47 +94,6 @@ public class ProfileFragment extends Fragment {
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
         FirebaseUser user = mAuth.getCurrentUser();
-
-        if (user != null) {
-            DatabaseReference userData = databaseReference.child("users").child(user.getUid());
-            userData.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        String userName = dataSnapshot.child("userName").getValue(String.class);
-                        String email = dataSnapshot.child("email").getValue(String.class);
-                        String dateBirthday = dataSnapshot.child("dateBirthday").getValue(String.class);
-                        if (userName != null) {
-                            userTextView.setText(userName);
-                        } else {
-                            userTextView.setText("User name not found");
-                        }
-                        if (email != null) {
-                            emailTextView.setText(email);
-                        } else {
-                            emailTextView.setText("Email not found");
-                        }
-                        if (dateBirthday != null) {
-                            dateTextView.setText(dateBirthday);
-                        } else {
-                            dateTextView.setText("Date birthday not found");
-                        }
-                    } else {
-                        userTextView.setText("User data not found");
-                        emailTextView.setText("User data not found");
-                        dateTextView.setText("User data not found");
-                    }
-                }
-
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    userTextView.setText("Error loading data");
-                }
-            });
-        } else {
-            userTextView.setText("User not logged in");
-        }
         quitAccountText.setOnClickListener(v -> {
             signOut();
         });
@@ -185,8 +154,7 @@ public class ProfileFragment extends Fragment {
             dialog.show();
         });
         changePersonalDataText.setOnClickListener(v->{
-            Intent intent = new Intent(requireActivity(), ProfileChangeActivity.class);
-            startActivity(intent);
+            profileChangeEnterListener.startChangingProfile();
         });
     }
     void changeUserPass(String newPass) {
@@ -251,6 +219,14 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+    }
+    public void dataLoad() {
+        if (MainActivity.user.getName() != null)
+            userTextView.setText(MainActivity.user.getName());
+        if (MainActivity.user.getEmail() != null)
+            emailTextView.setText(MainActivity.user.getEmail());
+        if (MainActivity.user.getBirthDayTime() != 0)
+            dateTextView.setText(DateUtils.formatDateTime( requireActivity(), MainActivity.user.getBirthDayTime(),
+                    DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_DATE));
     }
 }
