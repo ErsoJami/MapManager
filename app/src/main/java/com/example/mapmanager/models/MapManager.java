@@ -36,6 +36,7 @@ import com.yandex.mapkit.map.IconStyle;
 import com.yandex.mapkit.map.InputListener;
 import com.yandex.mapkit.map.MapObject;
 import com.yandex.mapkit.map.MapObjectCollection;
+import com.yandex.mapkit.map.MapObjectDragListener;
 import com.yandex.mapkit.map.PlacemarkMapObject;
 import com.yandex.mapkit.map.PolylineMapObject;
 import com.yandex.mapkit.map.RotationType;
@@ -76,7 +77,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapManager implements UserLocationObjectListener, SearchListener, SuggestListener, InputListener, com.yandex.mapkit.transport.masstransit.Session.RouteListener {
+public class MapManager implements UserLocationObjectListener, SearchListener, SuggestListener, InputListener, com.yandex.mapkit.transport.masstransit.Session.RouteListener, MapObjectDragListener {
     private final MapView mapView;
     private final Context context;
     private UserLocationLayer userLocationLayer;
@@ -95,21 +96,6 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     private final PedestrianRouter pedestrianRouter;
     private boolean userGetLocation = false;
 
-    @Override
-    public void onMasstransitRoutes(@NonNull List<Route> list) {
-        Route route = list.get(0);
-        mapWaypointObjectCollection.clear();
-        PolylineMapObject routePolyline = mapWaypointObjectCollection.addPolyline(route.getGeometry());
-//        CameraPosition cameraPosition = mapView.getMap().cameraPosition(
-//                Geometry.fromPolyline(route.getGeometry())
-//        );
-//        mapView.getMap().move(cameraPosition);
-    }
-
-    @Override
-    public void onMasstransitRoutesError(@NonNull Error error) {
-        mapWaypointObjectCollection.clear();
-    }
 
 
     public interface MapManagerSearchListener {
@@ -122,6 +108,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     }
     public interface MapLongTapListener {
         void onMapLongTap(PlacemarkMapObject placemarkMapObject);
+        void OnDragWaypoint();
     }
     private final MapManagerSearchListener searchListener;
     private final MapLongTapListener mapLongTapListener;
@@ -356,14 +343,43 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     public void onMapTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
 
     }
+    @Override
+    public void onMasstransitRoutes(@NonNull List<Route> list) {
+        Route route = list.get(0);
+        mapWaypointObjectCollection.clear();
+        PolylineMapObject routePolyline = mapWaypointObjectCollection.addPolyline(route.getGeometry());
+//        CameraPosition cameraPosition = mapView.getMap().cameraPosition(
+//                Geometry.fromPolyline(route.getGeometry())
+//        );
+//        mapView.getMap().move(cameraPosition);
+    }
 
+    @Override
+    public void onMasstransitRoutesError(@NonNull Error error) {
+        mapWaypointObjectCollection.clear();
+    }
+
+    @Override
+    public void onMapObjectDragStart(@NonNull MapObject mapObject) {
+
+    }
+
+    @Override
+    public void onMapObjectDrag(@NonNull MapObject mapObject, @NonNull Point point) {
+
+    }
+
+    @Override
+    public void onMapObjectDragEnd(@NonNull MapObject mapObject) {
+        mapLongTapListener.OnDragWaypoint();
+    }
     @Override
     public void onMapLongTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
         ImageProvider pinProvider = ImageProvider.fromBitmap(userArrowBitmap);
         PlacemarkMapObject mark = mapObjectCollection.addPlacemark(point);
         mark.setIcon(pinProvider);
         mark.setDraggable(true);
-        mark.setUserData(new Waypoint("тест", "абоба"));
+        mark.setUserData(new Waypoint("123", "123"));
         mapLongTapListener.onMapLongTap(mark);
     }
 }

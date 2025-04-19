@@ -39,7 +39,10 @@ import com.example.mapmanager.models.MapManager.MapManagerSearchListener;
 import com.example.mapmanager.models.MapManager.MapManagerSuggestListener;
 import com.example.mapmanager.models.MapManager.MapLongTapListener;
 import com.example.mapmanager.adapters.WaypointsAdapter.WaypointsAdapterListener;
+import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.Waypoint;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.yandex.mapkit.GeoObject;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.layers.GeoObjectTapEvent;
@@ -50,6 +53,7 @@ import com.yandex.mapkit.search.BusinessObjectMetadata;
 import com.yandex.mapkit.search.ToponymObjectMetadata;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +61,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private MapView mapView;
     private ActivityResultLauncher<String[]> getLocationPermission;
     private ListView listView;
-    private View pointsView;
+    private View pointsView, saveRouteView;
     private ImageView userLocationImageView, newRouteImageView;
     private SearchView searchView;
     private ArrayAdapter<Map<String, String>> adapter;
@@ -97,6 +101,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         searchView = view.findViewById(R.id.searchView);
         userLocationImageView = view.findViewById(R.id.userPosition);
         newRouteImageView = view.findViewById(R.id.createNewRoute);
+        saveRouteView = view.findViewById(R.id.saveRoute);
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, new ArrayList<>()) {
             @NonNull
             @Override
@@ -197,6 +202,13 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
 
         });
+        saveRouteView.setOnClickListener(v -> {
+            Route route = new Route(placemarkMapObjectArrayList, "", "1488", "1488");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routes");
+            DatabaseReference routeRef = databaseReference.push();
+            route.setId(routeRef.getKey());
+            routeRef.setValue(route);
+        });
         return view;
     }
 
@@ -270,6 +282,11 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         placemarkMapObjectArrayList.add(placemarkMapObject);
         mapManager.getRoute(placemarkMapObjectArrayList);
         waypointAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void OnDragWaypoint() {
+        mapManager.getRoute(placemarkMapObjectArrayList);
     }
 
     @Override

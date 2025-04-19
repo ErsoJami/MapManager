@@ -34,6 +34,7 @@ public class ProfileChangeFragment extends Fragment {
     ImageView profileImage;
     ImageView leaveButton;
     ImageView dateIcon;
+    View saveData;
     TextView currentDate;
     EditText changeNicknameText;
     EditText changeRealNameText;
@@ -41,12 +42,13 @@ public class ProfileChangeFragment extends Fragment {
     EditText changeEmailText;
     EditText changeCountryText;
     EditText changeCityText;
+    private View view1, view2, view3, view4, view5, view6, view7;
     Calendar date = Calendar.getInstance();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         Log.e("Halo", "SUCCES");
-        View view = inflater.inflate(R.layout.activity_profile_change, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile_change, container, false);
         profileImage = view.findViewById(R.id.ProfileIconChangingButton);
         dateIcon = view.findViewById(R.id.dateChangeIcon);
         currentDate = view.findViewById(R.id.dateText);
@@ -57,6 +59,25 @@ public class ProfileChangeFragment extends Fragment {
         changeEmailText = view.findViewById(R.id.emailInput);
         changeCountryText = view.findViewById(R.id.countryInput);
         changeCityText = view.findViewById(R.id.cityInput);
+        saveData = view.findViewById(R.id.saveData);
+        view1 = view.findViewById(R.id.view5);
+        view2 = view.findViewById(R.id.view10);
+        view3 = view.findViewById(R.id.view11);
+        view4 = view.findViewById(R.id.view12);
+        view5 = view.findViewById(R.id.view13);
+        view6 = view.findViewById(R.id.view14);
+        view7 = view.findViewById(R.id.changeView);
+        view7.post(new Runnable() {
+            @Override
+            public void run() {
+                view1.bringToFront();
+                view2.bringToFront();
+                view3.bringToFront();
+                view4.bringToFront();
+                view5.bringToFront();
+                view6.bringToFront();
+            }
+        });
         return view;
     }
 
@@ -75,45 +96,17 @@ public class ProfileChangeFragment extends Fragment {
             new DatePickerDialog(requireActivity(), d, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH)).show();
         });
         leaveButton.setOnClickListener(v->{
-            MainActivity.user.changeData(databaseReference);
-
+            requireActivity().getOnBackPressedDispatcher().onBackPressed();
         });
         dataLoad();
-        changeNicknameText.addTextChangedListener(new AfterChangedTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                MainActivity.user.setNick(changeNicknameText.getText().toString());
-            }
-        });
-        changeRealNameText.addTextChangedListener(new AfterChangedTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                MainActivity.user.setName(changeRealNameText.getText().toString());
-            }
-        });
-        changePhoneText.addTextChangedListener(new AfterChangedTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                MainActivity.user.setPhoneNumber(changePhoneText.getText().toString());
-            }
-        });
-        changeEmailText.addTextChangedListener(new AfterChangedTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                MainActivity.user.setEmail(changeEmailText.getText().toString());
-            }
-        });
-        changeCountryText.addTextChangedListener(new AfterChangedTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                MainActivity.user.setCountry(changeCountryText.getText().toString());
-            }
-        });
-        changeCityText.addTextChangedListener(new AfterChangedTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                MainActivity.user.setCity(changeCityText.getText().toString());
-            }
+        saveData.setOnClickListener(v -> {
+            MainActivity.user.setNick(changeNicknameText.getText().toString());
+            MainActivity.user.setName(changeRealNameText.getText().toString());
+            MainActivity.user.setPhoneNumber(changePhoneText.getText().toString());
+            MainActivity.user.setEmail(changeEmailText.getText().toString());
+            MainActivity.user.setCountry(changeCountryText.getText().toString());
+            MainActivity.user.setCity(changeCityText.getText().toString());
+            MainActivity.user.changeData(databaseReference);
         });
     }
 
@@ -157,13 +150,5 @@ public class ProfileChangeFragment extends Fragment {
         if (MainActivity.user.getBirthDayTime() != 0)
             currentDate.setText(DateUtils.formatDateTime(requireContext(), MainActivity.user.getBirthDayTime(),
                     DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_DATE));
-    }
-    public abstract class AfterChangedTextWatcher implements TextWatcher {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        @Override
-        public void afterTextChanged(Editable s) {}
     }
 }
