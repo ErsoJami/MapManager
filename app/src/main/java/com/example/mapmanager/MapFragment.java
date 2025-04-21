@@ -6,6 +6,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -41,6 +43,7 @@ import com.example.mapmanager.models.MapManager.MapLongTapListener;
 import com.example.mapmanager.adapters.WaypointsAdapter.WaypointsAdapterListener;
 import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.Waypoint;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.yandex.mapkit.GeoObject;
@@ -59,10 +62,11 @@ import java.util.Map;
 
 public class MapFragment extends Fragment implements MapManagerSearchListener, MapManagerSuggestListener, MapLongTapListener, WaypointsAdapterListener {
     private MapView mapView;
+    private FirebaseAuth mAuth;
     private ActivityResultLauncher<String[]> getLocationPermission;
     private ListView listView;
-    private View pointsView, saveRouteView;
-    private ImageView userLocationImageView, newRouteImageView;
+    private View pointsView, saveRouteView, menuView;
+    private ImageView userLocationImageView, newRouteImageView, menuImageView;
     private SearchView searchView;
     private ArrayAdapter<Map<String, String>> adapter;
     private WaypointsAdapter waypointAdapter;
@@ -70,7 +74,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private final Handler handler = new Handler(Looper.getMainLooper());
     private MapManager mapManager;
     private RecyclerView recyclerView;
-    private Boolean isClosePointsView = true;
+    private Boolean isClosePointsView = true, isCloseMenuView = true;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,12 +87,15 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 Toast.makeText(requireContext(), "Location permission denied.", Toast.LENGTH_SHORT).show();
             }
         });
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = view.findViewById(R.id.mapview);
+        menuView = view.findViewById(R.id.menuView);
+        menuImageView = view.findViewById(R.id.menuButton);
         mapManager = new MapManager(requireContext(), mapView, this, this, this);
         getLocationPermission();
         placemarkMapObjectArrayList = new ArrayList<>();
@@ -203,12 +210,72 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
         });
         saveRouteView.setOnClickListener(v -> {
-            Route route = new Route(placemarkMapObjectArrayList, "", "1488", "1488");
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routes");
-            DatabaseReference routeRef = databaseReference.push();
-            route.setId(routeRef.getKey());
-            routeRef.setValue(route);
+            LayoutInflater inflater2 = getLayoutInflater();
+            View dialogView = inflater2.inflate(R.layout.save_route_dialog, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+            View saveView = dialogView.findViewById(R.id.applySaveRoute);
+            View cancelView = dialogView.findViewById(R.id.cancelView);
+            EditText text1, text2;
+            text1 = dialogView.findViewById(R.id.editNameText);
+            text2 = dialogView.findViewById(R.id.editDescriptionText);
+            saveView.setOnClickListener(v1 -> {
+                Route route = new Route(placemarkMapObjectArrayList, "", text1.getText().toString(), text2.getText().toString());
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference routeRef = databaseReference.child("routes").push();
+                route.setId(routeRef.getKey());
+                routeRef.setValue(route);
+                ArrayList<String> routeList = MainActivity.user.getRouteList();
+                routeList.add(route.getId());
+                MainActivity.user.setRouteList(routeList);
+                MainActivity.user.changeData(databaseReference.child("users").child(mAuth.getUid()));
+                dialog.dismiss();
+            });
+
+            cancelView.setOnClickListener(v1 -> {
+                dialog.dismiss();
+            });
+            dialog.show();
         });
+        menuImageView.setOnClickListener(v ->{
+            ValueAnimator valueAnimator;
+            ViewGroup.LayoutParams params = menuView.getLayoutParams();
+            if (isCloseMenuView) {
+                menuView.setVisibility(View.VISIBLE);
+                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(200f));
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                        params.width = (int) valueAnimator.getAnimatedValue();
+                        menuView.setLayoutParams(params);
+                    }
+                });
+                valueAnimator.setDuration(500);
+                valueAnimator.start();
+                isCloseMenuView = false;
+            } else {
+                valueAnimator = ValueAnimator.ofInt((int) DpToPx(200f), 1);
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                        params.width = (int) valueAnimator.getAnimatedValue();
+                        menuView.setLayoutParams(params);
+                    }
+                });
+                valueAnimator.setDuration(500);
+                valueAnimator.start();
+                valueAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
+                        super.onAnimationEnd(animation, isReverse);
+                        menuView.setVisibility(View.GONE);
+                    }
+                });
+                isCloseMenuView = true;
+            }
+        });
+
         return view;
     }
 

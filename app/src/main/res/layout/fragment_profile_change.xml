@@ -63,7 +63,7 @@
                     android:layout_height="35dp"
                     android:layout_marginTop="20dp"
                     android:background="@drawable/rounded"
-                    android:backgroundTint="@color/green"
+                    android:backgroundTint="@color/green_light"
                     android:clickable="true"
                     android:translationZ="2dp"
                     app:layout_constraintEnd_toEndOf="parent"
