@@ -44,7 +44,10 @@ import com.example.mapmanager.models.MapManager.MapLongTapListener;
 import com.example.mapmanager.adapters.WaypointsAdapter.WaypointsAdapterListener;
 import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.Waypoint;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.yandex.mapkit.GeoObject;
@@ -105,6 +108,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         routeAdapter = new RouteAdapter(requireContext(), routeArrayList);
         routeRecyclerView.setAdapter(routeAdapter);
         routeRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        dataLoad();
         menuImageView = view.findViewById(R.id.menuButton);
         mapManager = new MapManager(requireContext(), mapView, this, this, this);
         getLocationPermission();
@@ -231,7 +235,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             text1 = dialogView.findViewById(R.id.editNameText);
             text2 = dialogView.findViewById(R.id.editDescriptionText);
             saveView.setOnClickListener(v1 -> {
-                Route route = new Route(placemarkMapObjectArrayList, "", text1.getText().toString(), text2.getText().toString());
+                ArrayList<Waypoint> waypointArrayList = new ArrayList<>();
+                for (PlacemarkMapObject placemarkMapObject : placemarkMapObjectArrayList) {
+                    Waypoint data = (Waypoint) placemarkMapObject.getUserData();
+                    waypointArrayList.add(new Waypoint(data.getName(), data.getDescription(), placemarkMapObject.getGeometry()));
+                }
+                Route route = new Route(waypointArrayList, "", text1.getText().toString(), text2.getText().toString());
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
                 DatabaseReference routeRef = databaseReference.child("routes").push();
                 route.setId(routeRef.getKey());
@@ -254,7 +263,8 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             if (isCloseMenuView) {
                 menuView.setVisibility(View.VISIBLE);
                 routeText.setVisibility(View.VISIBLE);
-                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(200f));
+                routeRecyclerView.setVisibility(View.VISIBLE);
+                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(400f));
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -266,7 +276,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 valueAnimator.start();
                 isCloseMenuView = false;
             } else {
-                valueAnimator = ValueAnimator.ofInt((int) DpToPx(200f), 1);
+                valueAnimator = ValueAnimator.ofInt((int) DpToPx(400f), 1);
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -282,6 +292,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                         super.onAnimationEnd(animation, isReverse);
                         menuView.setVisibility(View.GONE);
                         routeText.setVisibility(View.GONE);
+                        routeRecyclerView.setVisibility(View.GONE);
                     }
                 });
                 isCloseMenuView = true;
@@ -292,16 +303,26 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     }
 
     public void dataLoad() {
+        routeArrayList.clear();
         ArrayList<String> routeId = MainActivity.user.getRouteList();
         if (routeId != null) {
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routes");
             for (String id : routeId) {
                 DatabaseReference routesRef = databaseReference.child(id);
                 if (routesRef != null) {
-//                    Route route = databaseReference.child(id).getValue();
+                    databaseReference.child(id).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                        @Override
+                        public void onSuccess(DataSnapshot dataSnapshot) {
+                            Route route = dataSnapshot.getValue(Route.class);
+                            if (route != null) {
+                                routeArrayList.add(route);
+                            }
+                        }
+                    });
                 }
             }
         }
+        routeAdapter.notifyDataSetChanged();
     }
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&

@@ -8,26 +8,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Route {
-    private ArrayList<PlacemarkMapObject> placemarkMapObjects;
+    private ArrayList<Waypoint> waypointArrayList;
     private String id;
     private String name;
     private String description;
 
     public Route() {}
 
-    public Route(ArrayList<PlacemarkMapObject> placemarkMapObjects, String id, String name, String description) {
-        this.placemarkMapObjects = placemarkMapObjects;
+    public Route(ArrayList<Waypoint> waypointArrayList, String id, String name, String description) {
+        this.waypointArrayList = waypointArrayList;
         this.id = id;
         this.name = name;
         this.description = description;
     }
 
-    public ArrayList<PlacemarkMapObject> getPlacemarkMapObjects() {
-        return placemarkMapObjects;
+    public ArrayList<Waypoint> getWaypointArrayList() {
+        return waypointArrayList;
     }
 
-    public void setPlacemarkMapObjects(ArrayList<PlacemarkMapObject> placemarkMapObjects) {
-        this.placemarkMapObjects = placemarkMapObjects;
+    public void setWaypointArrayList(ArrayList<Waypoint> waypointArrayList) {
+        this.waypointArrayList = waypointArrayList;
     }
 
     public String getId() {
