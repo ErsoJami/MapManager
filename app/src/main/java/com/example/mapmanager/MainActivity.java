@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
                             user.loadData(snapshot);
                             if (profileChangeFragment.isAdded()) profileChangeFragment.dataLoad();
                             if (profileFragment.isAdded()) profileFragment.dataLoad();
+                            if (mapFragment.isAdded()) mapFragment.dataLoad();
                         }
                     }
                     @Override

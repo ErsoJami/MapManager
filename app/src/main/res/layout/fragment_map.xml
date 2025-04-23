@@ -5,23 +5,52 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/routeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Мои маршруты"
+        android:textColor="@color/black"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:translationZ="5dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/searchView"
+        app:layout_constraintStart_toStartOf="@+id/menuView"
+        app:layout_constraintTop_toTopOf="@+id/searchView" />
+
     <View
         android:id="@+id/menuView"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@drawable/rounded_left"
+        android:backgroundTint="@color/white"
+        android:elevation="1dp"
+        android:translationZ="3dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:translationZ="1dp"/>
+        tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/routeRecyclerView"
+        android:layout_width="200dp"
+        android:layout_height="680dp"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/menuView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/menuView" />
 
     <com.yandex.mapkit.mapview.MapView
         android:id="@+id/mapview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
+        tools:layout_editor_absoluteX="0dp" >
+
+    </com.yandex.mapkit.mapview.MapView>
 
     <ImageView
         android:id="@+id/menuButton"
@@ -68,7 +97,6 @@
         android:layout_marginBottom="40dp"
         android:translationZ="2dp"
         android:visibility="gone"
-        android:animateLayoutChanges="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView14"
@@ -108,7 +136,6 @@
         android:backgroundTint="@color/white"
         android:layout_marginTop="2dp"
         android:elevation="2dp"
-        android:animateLayoutChanges="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchView"
@@ -139,7 +166,7 @@
 
     <SearchView
         android:id="@+id/searchView"
-        android:layout_width="400dp"
+        android:layout_width="380dp"
         android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded"
@@ -147,6 +174,7 @@
         android:elevation="2dp"
         android:queryBackground="@null"
         android:translationZ="1dp"
+        android:paddingEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/mapview" >

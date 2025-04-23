@@ -35,6 +35,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mapmanager.adapters.RouteAdapter;
 import com.example.mapmanager.adapters.WaypointsAdapter;
 import com.example.mapmanager.models.MapManager;
 import com.example.mapmanager.models.MapManager.MapManagerSearchListener;
@@ -65,15 +66,18 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private FirebaseAuth mAuth;
     private ActivityResultLauncher<String[]> getLocationPermission;
     private ListView listView;
-    private View pointsView, saveRouteView, menuView;
+    private TextView routeText;
+    private View pointsView, saveRouteView, menuView, myRoutesView;
     private ImageView userLocationImageView, newRouteImageView, menuImageView;
     private SearchView searchView;
     private ArrayAdapter<Map<String, String>> adapter;
     private WaypointsAdapter waypointAdapter;
+    private RouteAdapter routeAdapter;
     private ArrayList<PlacemarkMapObject> placemarkMapObjectArrayList;
+    private ArrayList<Route> routeArrayList;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private MapManager mapManager;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView, routeRecyclerView;
     private Boolean isClosePointsView = true, isCloseMenuView = true;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -95,6 +99,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = view.findViewById(R.id.mapview);
         menuView = view.findViewById(R.id.menuView);
+        routeText = view.findViewById(R.id.routeText);
+        routeRecyclerView = view.findViewById(R.id.routeRecyclerView);
+        routeArrayList = new ArrayList<>();
+        routeAdapter = new RouteAdapter(requireContext(), routeArrayList);
+        routeRecyclerView.setAdapter(routeAdapter);
+        routeRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         menuImageView = view.findViewById(R.id.menuButton);
         mapManager = new MapManager(requireContext(), mapView, this, this, this);
         getLocationPermission();
@@ -243,6 +253,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             ViewGroup.LayoutParams params = menuView.getLayoutParams();
             if (isCloseMenuView) {
                 menuView.setVisibility(View.VISIBLE);
+                routeText.setVisibility(View.VISIBLE);
                 valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(200f));
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
@@ -270,6 +281,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                     public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
                         super.onAnimationEnd(animation, isReverse);
                         menuView.setVisibility(View.GONE);
+                        routeText.setVisibility(View.GONE);
                     }
                 });
                 isCloseMenuView = true;
@@ -279,6 +291,18 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         return view;
     }
 
+    public void dataLoad() {
+        ArrayList<String> routeId = MainActivity.user.getRouteList();
+        if (routeId != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routes");
+            for (String id : routeId) {
+                DatabaseReference routesRef = databaseReference.child(id);
+                if (routesRef != null) {
+//                    Route route = databaseReference.child(id).getValue();
+                }
+            }
+        }
+    }
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {

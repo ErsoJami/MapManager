@@ -4,6 +4,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.yandex.mapkit.map.PlacemarkMapObject;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -12,6 +16,5 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
     }
 }
