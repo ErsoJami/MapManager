@@ -24,10 +24,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
     private final LayoutInflater inflater;
     private final List<Message> messageList;
     private FirebaseAuth mAuth;
-    public ChatAdapter(Context context, List<Message> messageList) {
+    public interface ChatAdapterListener {
+        void onMyMessageClick(int position);
+        void onOtherMessageClick(int position);
+    }
+    private ChatAdapterListener chatAdapterListener;
+    public ChatAdapter(Context context, List<Message> messageList, ChatAdapterListener chatAdapterListener) {
         this.messageList = messageList;
         this.inflater = LayoutInflater.from(context);
         this.mAuth = FirebaseAuth.getInstance();
+        this.chatAdapterListener = chatAdapterListener;
     }
     @NonNull
     @Override
@@ -43,10 +49,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         if (message != null) {
             if (message.getUserId().equals(mAuth.getCurrentUser().getUid())) {
                 holder.text2.setText(message.getMessage());
+                holder.text1.setText(message.getMessage());
                 holder.text2.setVisibility(View.VISIBLE);
+                holder.text2.setOnLongClickListener(v -> {
+                    chatAdapterListener.onMyMessageClick(position);
+                    return true;
+                });
+                holder.text1.setVisibility(View.GONE);
             } else {
                 holder.text1.setText(message.getMessage());
+                holder.text2.setText(message.getMessage());
+                holder.text1.setOnLongClickListener(v -> {
+                    chatAdapterListener.onOtherMessageClick(position);
+                    return true;
+                });
                 holder.text1.setVisibility(View.VISIBLE);
+                holder.text2.setVisibility(View.GONE);
             }
         }
     }

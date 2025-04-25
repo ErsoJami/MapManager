@@ -12,7 +12,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/routeListView"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="194dp"
             android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="@+id/routeSearch"
@@ -22,7 +22,7 @@
 
         <SearchView
             android:id="@+id/routeSearch"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="49dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
@@ -32,25 +32,16 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:background="@drawable/rounded" />
 
-        <View
-            android:id="@+id/plusView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/circle"
-            android:clickable="true"
+            android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:layout_constraintBottom_toBottomOf="@+id/plusView"
-            app:layout_constraintEnd_toEndOf="@+id/plusView"
-            app:layout_constraintStart_toStartOf="@+id/plusView"
-            app:layout_constraintTop_toTopOf="@+id/plusView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/plus" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

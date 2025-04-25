@@ -1,5 +1,7 @@
 package com.example.mapmanager.models;
 
+import android.util.Pair;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.GenericTypeIndicator;
@@ -7,6 +9,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 public class User {
     private String email;
@@ -16,10 +19,21 @@ public class User {
     private String country;
     private String city;
     private ArrayList<String> routeList;
+    private HashMap<String, String> chatList;
     private long birthDayTime;
     public User() {
         this.routeList = new ArrayList<>();
+        this.chatList = new HashMap<>();
     }
+
+    public HashMap<String, String> getChatList() {
+        return chatList;
+    }
+
+    public void setChatList(HashMap<String, String> chatList) {
+        this.chatList = chatList;
+    }
+
     public ArrayList<String> getRouteList() {
         return routeList;
     }
@@ -93,6 +107,7 @@ public class User {
         data.put("city", city);
         data.put("birthDate", birthDayTime);
         data.put("routeList", routeList);
+        data.put("chatList", chatList);
         databaseReference.updateChildren(data);
     }
     public void loadData(DataSnapshot ashot) {
@@ -104,6 +119,8 @@ public class User {
         if (ashot.child("city").exists()) city = ashot.child("city").getValue(String.class);
         if (ashot.child("birthDate").exists()) birthDayTime = ashot.child("birthDate").getValue(long.class);
         GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
+        GenericTypeIndicator<HashMap<String, String>> t1 = new GenericTypeIndicator<HashMap<String, String>>() {};
         if (ashot.child("routeList").exists()) routeList = ashot.child("routeList").getValue(t);
+        if (ashot.child("chatList").exists()) chatList = ashot.child("chatList").getValue(t1);
     }
 }

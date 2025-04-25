@@ -19,9 +19,17 @@ import java.util.ArrayList;
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> {
     private final LayoutInflater inflater;
     private final ArrayList<Route> routeArrayList;
-    public RouteAdapter(Context context, ArrayList<Route> routeArrayList) {
+    private RouteAdapterListener routeAdapterListener;
+    public interface RouteAdapterListener {
+        void onRouteNameChanged(String text, int position);
+        void onRouteDescriptionChanged(String text, int position);
+        void onDeleteRoute(int position);
+        void onFocusToRoute(int position);
+    }
+    public RouteAdapter(Context context, ArrayList<Route> routeArrayList, RouteAdapterListener routeAdapterListener) {
         this.routeArrayList = routeArrayList;
         this.inflater = LayoutInflater.from(context);
+        this.routeAdapterListener = routeAdapterListener;
     }
     @NonNull
     @Override
@@ -36,6 +44,20 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
         if (route != null) {
             holder.text1.setText(route.getName());
             holder.text2.setText(route.getDescription());
+            holder.checkUp.setOnClickListener(v -> {
+                String text = holder.text1.getText().toString();
+                routeAdapterListener.onRouteNameChanged(text, position);
+            });
+            holder.checkDown.setOnClickListener(v -> {
+                String text = holder.text2.getText().toString();
+                routeAdapterListener.onRouteDescriptionChanged(text, position);
+            });
+            holder.deleteRoute.setOnClickListener(v -> {
+                routeAdapterListener.onDeleteRoute(position);
+            });
+            holder.focusToRoute.setOnClickListener(v -> {
+                routeAdapterListener.onFocusToRoute(position);
+            });
         }
     }
 
@@ -45,15 +67,15 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
     }
     public static class ViewHolder extends RecyclerView.ViewHolder {
         final EditText text1, text2;
-        final ImageView checkUp, checkDown, focusToWaypoint, deleteWaypoint;
+        final ImageView checkUp, checkDown, focusToRoute, deleteRoute;
         ViewHolder(View view){
             super(view);
             text1 = view.findViewById(R.id.editNameText);
             text2 = view.findViewById(R.id.editDescriptionText);
             checkUp = view.findViewById(R.id.checkUp);
             checkDown = view.findViewById(R.id.checkDown);
-            focusToWaypoint = view.findViewById(R.id.focusToRoute);
-            deleteWaypoint = view.findViewById(R.id.deleteRoute);
+            focusToRoute = view.findViewById(R.id.focusToRoute);
+            deleteRoute = view.findViewById(R.id.deleteRoute);
         }
     }
 }

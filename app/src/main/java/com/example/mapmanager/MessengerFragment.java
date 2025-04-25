@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,27 +15,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mapmanager.adapters.ChatListAdapter;
 import com.example.mapmanager.models.Chat;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class MessengerFragment extends Fragment {
 
     public interface OnChatSelectChat {
-        void onSelectChat(String id);
+        void onSelectChat(String id, String lastReadMessageId);
     }
     private OnChatSelectChat selectChatListner;
     private FirebaseAuth mAuth;
-    private List<Chat> chats;
+    private ArrayList<Chat> chats;
     private ChatListAdapter adapter;
     private DatabaseReference databaseReference;
     private RecyclerView recyclerView;
@@ -61,7 +56,7 @@ public class MessengerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_messenger, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         return view;
-    }   
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -69,9 +64,8 @@ public class MessengerFragment extends Fragment {
         ChatListAdapter.OnChatClickListener chatClickListener = new ChatListAdapter.OnChatClickListener() {
             @Override
             public void onChatClick(Chat chat, int position) {
-                Toast.makeText(requireContext(), chat.getId(), Toast.LENGTH_SHORT).show();
                 if (selectChatListner != null) {
-                    selectChatListner.onSelectChat(chat.getId());
+                    selectChatListner.onSelectChat(chat.getId(), chat.getLastReadMessageId());
                 }
             }
         };
@@ -80,41 +74,29 @@ public class MessengerFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.VISIBLE);
-        if (user != null) {
-            chatListReference = databaseReference.child("users").child(user.getUid()).child("chatsList");
-            chatListReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        chats.clear();
-                        adapter.notifyDataSetChanged();
-                        for (DataSnapshot chatId : snapshot.getChildren()) {
-                            String id = chatId.getValue(String.class);
-                            chatsReference = FirebaseDatabase.getInstance().getReference().child("chats").child(id);
-                            chatsReference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-                                @Override
-                                public void onSuccess(DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        List<String> usersChatList = dataSnapshot.child("membersList").getValue(new GenericTypeIndicator<List<String>>() {});
-                                        String chatName = dataSnapshot.child("groupName").getValue(String.class);
-                                        String chatAvatarUrl = dataSnapshot.child("groupAvatarUrl").getValue(String.class);
-                                        chats.add(new Chat(id, Timestamp.now(), usersChatList, chatName, chatAvatarUrl));
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+        dataLoad();
 
+    }
+    public void dataLoad() {
+        chats.clear();
+        for (Map.Entry<String, String> item : MainActivity.user.getChatList().entrySet()) {
+            String chatId = item.getKey();
+            String lastReadMessageId = item.getValue();
+            chatsReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId);
+            chatsReference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                @Override
+                public void onSuccess(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Chat chat = dataSnapshot.getValue(Chat.class);
+                        chat.setLastReadMessageId(lastReadMessageId);
+                        chat.setId(chatId);
+                        chats.add(chat);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             });
         }
-
     }
-
     @Override
     public void onDetach() {
         super.onDetach();

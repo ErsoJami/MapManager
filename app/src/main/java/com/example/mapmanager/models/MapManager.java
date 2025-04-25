@@ -125,7 +125,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         this.mapWaypointObjectCollection = mapView.getMap().getMapObjects().addCollection();
         this.userPinBitmap = vectorToBitmap(context, R.drawable.pin);
         this.userArrowBitmap = vectorToBitmap(context, R.drawable.arrow);
-        this.placemarkBitmap = vectorToBitmap(context, R.drawable.pin);
+        this.placemarkBitmap = vectorToBitmap(context, R.drawable.waypoint_icon);
         this.searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED);
         this.searchOptions = new SearchOptions()
                 .setSearchTypes(SearchType.GEO.value | SearchType.BIZ.value)
@@ -375,11 +375,15 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     }
     @Override
     public void onMapLongTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
-        ImageProvider pinProvider = ImageProvider.fromBitmap(userArrowBitmap);
+        PlacemarkMapObject mark = addPlacemarkMapObject(point);
+        mapLongTapListener.onMapLongTap(mark);
+    }
+    public PlacemarkMapObject addPlacemarkMapObject(Point point) {
         PlacemarkMapObject mark = mapObjectCollection.addPlacemark(point);
+        ImageProvider pinProvider = ImageProvider.fromBitmap(placemarkBitmap);
         mark.setIcon(pinProvider);
         mark.setDraggable(true);
         mark.setUserData(new Waypoint("123", "123"));
-        mapLongTapListener.onMapLongTap(mark);
+        return mark;
     }
 }

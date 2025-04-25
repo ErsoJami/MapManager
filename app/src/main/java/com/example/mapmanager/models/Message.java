@@ -11,20 +11,19 @@ public class Message {
     private int typeMessage;  // 0 - текс, 1 - избражение
     private String userId;
     private String messageId;
-    private Timestamp time;
+    private long time;
     private String message;
     private DatabaseReference databaseReference;
     public Message() {
         this.typeMessage = 0;
         this.userId = null;
         this.messageId = null;
-        this.time = null;
+        this.time = 0;
         this.message = null;
     }
-    public Message(int typeMessage, String userId, String messageId, Timestamp time, String message) {
+    public Message(int typeMessage, String userId, long time, String message) {
         this.typeMessage = typeMessage;
         this.userId = userId;
-        this.messageId = messageId;
         this.time = time;
         this.message = message;
     }
@@ -39,6 +38,23 @@ public class Message {
         DatabaseReference newChat = databaseReference.push();
         this.messageId = newChat.getKey();
         newChat.setValue(data);
+    }
+    public void updateMessage(String chatId) {
+        if (this.messageId != null) {
+            databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages").child(this.messageId);
+            Map<String, Object> data = new HashMap<>();
+            data.put("typeMessage", this.typeMessage);
+            data.put("userId", this.userId);
+            data.put("time", this.time);
+            data.put("message", this.message);
+            databaseReference.updateChildren(data);
+        }
+    }
+    public void deleteMessage(String chatId) {
+        if (this.messageId != null) {
+            databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages").child(this.messageId);
+            databaseReference.removeValue();
+        }
     }
     public int getTypeMessage() {
         return typeMessage;
@@ -72,12 +88,11 @@ public class Message {
         this.message = message;
     }
 
-    public Timestamp getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(long time) {
         this.time = time;
     }
-
 }

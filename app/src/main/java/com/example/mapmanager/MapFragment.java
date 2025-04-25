@@ -1,5 +1,6 @@
 package com.example.mapmanager;
 
+import static com.example.mapmanager.MainActivity.user;
 import static com.google.common.primitives.Ints.max;
 
 import android.Manifest;
@@ -7,6 +8,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapmanager.adapters.RouteAdapter;
+import com.example.mapmanager.adapters.RouteAdapter.RouteAdapterListener;
 import com.example.mapmanager.adapters.WaypointsAdapter;
 import com.example.mapmanager.models.MapManager;
 import com.example.mapmanager.models.MapManager.MapManagerSearchListener;
@@ -64,12 +67,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapFragment extends Fragment implements MapManagerSearchListener, MapManagerSuggestListener, MapLongTapListener, WaypointsAdapterListener {
+public class MapFragment extends Fragment implements MapManagerSearchListener, MapManagerSuggestListener, MapLongTapListener, WaypointsAdapterListener, RouteAdapterListener {
     private MapView mapView;
     private FirebaseAuth mAuth;
     private ActivityResultLauncher<String[]> getLocationPermission;
     private ListView listView;
-    private TextView routeText;
+    private TextView routeText, saveRouteText;
     private View pointsView, saveRouteView, menuView, myRoutesView;
     private ImageView userLocationImageView, newRouteImageView, menuImageView;
     private SearchView searchView;
@@ -103,9 +106,10 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         mapView = view.findViewById(R.id.mapview);
         menuView = view.findViewById(R.id.menuView);
         routeText = view.findViewById(R.id.routeText);
+        saveRouteText = view.findViewById(R.id.textView10);
         routeRecyclerView = view.findViewById(R.id.routeRecyclerView);
         routeArrayList = new ArrayList<>();
-        routeAdapter = new RouteAdapter(requireContext(), routeArrayList);
+        routeAdapter = new RouteAdapter(requireContext(), routeArrayList, this);
         routeRecyclerView.setAdapter(routeAdapter);
         routeRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         dataLoad();
@@ -184,12 +188,14 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         });
         newRouteImageView.setOnClickListener(v -> {
-            ValueAnimator valueAnimator;
+            ValueAnimator valueAnimator, valueAnimator1;
             ViewGroup.LayoutParams params = pointsView.getLayoutParams();
             if (isClosePointsView) {
                 pointsView.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);
-                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(300f));
+                saveRouteView.setVisibility(View.VISIBLE);
+                saveRouteText.setVisibility(View.VISIBLE);
+                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(300f, requireContext()));
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -198,10 +204,19 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                     }
                 });
                 valueAnimator.setDuration(500);
+                valueAnimator1 = ValueAnimator.ofFloat(180f, 360f);
+                valueAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                        newRouteImageView.setRotation((Float) valueAnimator1.getAnimatedValue());
+                    }
+                });
+                valueAnimator1.setDuration(500);
                 valueAnimator.start();
+                valueAnimator1.start();
                 isClosePointsView = false;
             } else {
-                valueAnimator = ValueAnimator.ofInt((int) DpToPx(300f), 1);
+                valueAnimator = ValueAnimator.ofInt((int) DpToPx(300f, requireContext()), 1);
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -210,15 +225,26 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                     }
                 });
                 valueAnimator.setDuration(500);
-                valueAnimator.start();
                 valueAnimator.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
                         super.onAnimationEnd(animation, isReverse);
                         pointsView.setVisibility(View.GONE);
+                        saveRouteView.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.GONE);
+                        saveRouteText.setVisibility(View.GONE);
                     }
                 });
+                valueAnimator1 = ValueAnimator.ofFloat(360f, 180f);
+                valueAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                        newRouteImageView.setRotation((Float) valueAnimator1.getAnimatedValue());
+                    }
+                });
+                valueAnimator1.setDuration(500);
+                valueAnimator.start();
+                valueAnimator1.start();
                 isClosePointsView = true;
             }
 
@@ -245,10 +271,10 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 DatabaseReference routeRef = databaseReference.child("routes").push();
                 route.setId(routeRef.getKey());
                 routeRef.setValue(route);
-                ArrayList<String> routeList = MainActivity.user.getRouteList();
+                ArrayList<String> routeList = user.getRouteList();
                 routeList.add(route.getId());
-                MainActivity.user.setRouteList(routeList);
-                MainActivity.user.changeData(databaseReference.child("users").child(mAuth.getUid()));
+                user.setRouteList(routeList);
+                user.changeData(databaseReference.child("users").child(mAuth.getUid()));
                 dialog.dismiss();
             });
 
@@ -264,7 +290,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 menuView.setVisibility(View.VISIBLE);
                 routeText.setVisibility(View.VISIBLE);
                 routeRecyclerView.setVisibility(View.VISIBLE);
-                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(400f));
+                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(400f, requireContext()));
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -276,7 +302,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 valueAnimator.start();
                 isCloseMenuView = false;
             } else {
-                valueAnimator = ValueAnimator.ofInt((int) DpToPx(400f), 1);
+                valueAnimator = ValueAnimator.ofInt((int) DpToPx(400f, requireContext()), 1);
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -304,7 +330,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
     public void dataLoad() {
         routeArrayList.clear();
-        ArrayList<String> routeId = MainActivity.user.getRouteList();
+        ArrayList<String> routeId = user.getRouteList();
         if (routeId != null) {
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routes");
             for (String id : routeId) {
@@ -386,8 +412,8 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         adapter.clear();
         adapter.notifyDataSetChanged();
     }
-    public float DpToPx(float dp){
-        return dp * ((float) requireContext().getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    public static float DpToPx(float dp, Context context){
+        return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
     @Override
     public void onMapLongTap(PlacemarkMapObject placemarkMapObject) {
@@ -431,6 +457,48 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         waypoint.setDescription(text);
         placemarkMapObject.setUserData(waypoint);
         placemarkMapObjectArrayList.set(position, placemarkMapObject);
+    }
+
+    @Override
+    public void onRouteNameChanged(String text, int position) {
+        Route route = routeArrayList.get(position);
+        route.setName(text);
+        routeArrayList.set(position, route);
+        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).child("name").setValue(text);
+    }
+
+    @Override
+    public void onRouteDescriptionChanged(String text, int position) {
+        Route route = routeArrayList.get(position);
+        route.setDescription(text);
+        routeArrayList.set(position, route);
+        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).child("description").setValue(text);
+    }
+
+    @Override
+    public void onDeleteRoute(int position) {
+        Route route = routeArrayList.get(position);
+        ArrayList<String> routeList = MainActivity.user.getRouteList();
+        routeList.remove(route.getId());
+        MainActivity.user.setRouteList(routeList);
+        routeArrayList.remove(position);
+        routeAdapter.notifyDataSetChanged();
+        MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()));
+    }
+
+    @Override
+    public void onFocusToRoute(int position) {
+        placemarkMapObjectArrayList.clear();
+        mapManager.mapObjectCollection.clear();
+        Route route = routeArrayList.get(position);
+        ArrayList<Waypoint> waypointArrayList = route.getWaypointArrayList();
+        for (Waypoint waypoint : waypointArrayList) {
+            PlacemarkMapObject mark = mapManager.addPlacemarkMapObject(waypoint.getPoint());
+            mark.setUserData(new Waypoint(waypoint.getName(), waypoint.getDescription()));
+            placemarkMapObjectArrayList.add(mark);
+        }
+        mapManager.getRoute(placemarkMapObjectArrayList);
+        waypointAdapter.notifyDataSetChanged();
     }
 
     @Override
