@@ -7,14 +7,51 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white2">
 
-        <ListView
-            android:layout_width="409dp"
-            android:layout_height="729dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/routeListView"
+            android:layout_width="0dp"
+            android:layout_height="194dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintEnd_toEndOf="@+id/routeSearch"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/routeSearch"
+            app:layout_constraintTop_toBottomOf="@id/routeSearch" />
+
+        <SearchView
+            android:id="@+id/routeSearch"
+            android:layout_width="0dp"
+            android:layout_height="49dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="70dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@drawable/rounded" />
+
+        <View
+            android:id="@+id/plusView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/circle"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintBottom_toBottomOf="@+id/plusView"
+            app:layout_constraintEnd_toEndOf="@+id/plusView"
+            app:layout_constraintStart_toStartOf="@+id/plusView"
+            app:layout_constraintTop_toTopOf="@+id/plusView"
+            app:srcCompat="@drawable/plus" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

@@ -47,7 +47,6 @@ public class ProfileChangeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        Log.e("Halo", "SUCCES");
         View view = inflater.inflate(R.layout.fragment_profile_change, container, false);
         profileImage = view.findViewById(R.id.ProfileIconChangingButton);
         dateIcon = view.findViewById(R.id.dateChangeIcon);
@@ -113,8 +112,7 @@ public class ProfileChangeFragment extends Fragment {
     private void setInitialDateTime() {
         currentDate.setText(DateUtils.formatDateTime(requireContext(),
                 date.getTimeInMillis(),
-                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
-                        | DateUtils.FORMAT_SHOW_DATE));
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
     }
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {

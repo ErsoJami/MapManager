@@ -84,7 +84,6 @@ public class ChatFragment extends Fragment {
                         String message = snapshot.child("message").getValue(String.class);
                         messageList.add(new Message(typeMessage, userId, id, time, message));
                         adapter.notifyDataSetChanged();
-
                     }
                 }
 

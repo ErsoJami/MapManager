@@ -21,9 +21,16 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mapmanager.adapters.ChatAdapter;
+import com.example.mapmanager.adapters.RouteDisplayAdapter;
 import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.models.Message;
+import com.example.mapmanager.models.Route;
+import com.example.mapmanager.models.RouteCard;
+import com.example.mapmanager.models.RouteCardSettings;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,18 +53,26 @@ import java.util.List;
 
 
 public class HomeFragment extends Fragment {
+    private RecyclerView routeListView;
+    private RouteDisplayAdapter adapter;
+    private List<RouteCard> routeList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-//        FirebaseStorage storage = FirebaseStorage.getInstance();
-//        StorageReference storageRef = storage.getReference();
-//        StorageReference test = storageRef.child("images");
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.main_photo);
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//        byte[] data = baos.toByteArray();
-//        test.putBytes(data);
+        routeListView = view.findViewById(R.id.routeListView);
+        routeList = new ArrayList<RouteCard>();
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        adapter = new RouteDisplayAdapter(getContext(), routeList);
+        routeListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        routeListView.setAdapter(adapter);
+        routeListView.setVisibility(View.VISIBLE);
+        routeList.add(new RouteCard(new Route(), "dsfsdfsdfsdf", "Hijab", "The way of Hitler", new RouteCardSettings(), 1488, 5252));
+        adapter.notifyDataSetChanged();
     }
 }

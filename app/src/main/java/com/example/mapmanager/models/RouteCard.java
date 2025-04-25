@@ -5,20 +5,39 @@ public class RouteCard {
     private String id;
     private String name;
     private String description;
+    private long startTime, endTime;
     private RouteCardSettings routeCardSettings;
     public RouteCard() {}
 
-    public RouteCard(Route route, String id, String name, String description, RouteCardSettings routeCardSettings) {
+    public RouteCard(Route route, String id, String name, String description, RouteCardSettings routeCardSettings, long startTime, long endTime) {
         this.route = route;
         this.id = id;
         this.name = name;
         this.description = description;
         this.routeCardSettings = routeCardSettings;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
     public Route getRoute() {
         return route;
     }
-
     public void setRoute(Route route) {
         this.route = route;
     }

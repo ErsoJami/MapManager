@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+    <TextView
+        android:id="@+id/RouteNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:text="Not stated"
+        android:textColor="@color/black"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/RouteTimeIntervalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="14:88 - 52:42"
+        android:textColor="@color/dark_grey"
+        android:textSize="10sp"
+        app:layout_constraintStart_toStartOf="@+id/RouteNameText"
+        app:layout_constraintTop_toBottomOf="@+id/RouteNameText" />
+
+    <View
+        android:id="@+id/AcceptRouteButton"
+        android:layout_width="79dp"
+        android:layout_height="23dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="#3262FF"
+        android:clickable="true"
+        android:elevation="1dp"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/AcceptRouteText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
+        android:text="Accept"
+        android:textAllCaps="false"
+        android:textColor="#DEDCDC"
+        app:layout_constraintBottom_toBottomOf="@+id/AcceptRouteButton"
+        app:layout_constraintEnd_toEndOf="@+id/AcceptRouteButton"
+        app:layout_constraintStart_toStartOf="@+id/AcceptRouteButton"
+        app:layout_constraintTop_toTopOf="@+id/AcceptRouteButton" />
+
+    <ImageView
+        android:id="@+id/ShowInMapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:clickable="true"
+        android:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/region_icon" />
+
+    <View
+        android:id="@+id/RouteDescriptionTable"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="@color/grey"
+        android:elevation="1dp"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ShowInMapButton"
+        app:layout_constraintStart_toEndOf="@+id/AcceptRouteButton"
+        app:layout_constraintTop_toBottomOf="@+id/RouteNameText"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/DescriptionTextView"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/RouteDescriptionTable"
+        app:layout_constraintEnd_toEndOf="@+id/RouteDescriptionTable"
+        app:layout_constraintStart_toStartOf="@+id/RouteDescriptionTable"
+        app:layout_constraintTop_toTopOf="@+id/RouteDescriptionTable" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
