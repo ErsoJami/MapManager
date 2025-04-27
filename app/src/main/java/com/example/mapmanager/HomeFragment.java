@@ -77,7 +77,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         routeList.add(new RouteCard(new Route(), "dsfsdfsdfsdf", "Hijab", "The way of Hitler", new RouteCardSettings(), 1488, 5252));
-        for (int i = 0; i < 12; i++) localRouteList.add(new Route(new ArrayList<Waypoint>(), "luberGay", "RooK", "BlablaBlaBla"));
+        for (int i = 0; i < 12; i++) localRouteList.add(new Route(new ArrayList<Waypoint>(), "lumberGay", "RooK", "BlablaBlaBla"));
         adapter = new RouteDisplayAdapter(getContext(), routeList);
         selectAdapter = new RouteSelectAdapter(localRouteList);
         routeListView.setLayoutManager(new LinearLayoutManager(getContext()));
