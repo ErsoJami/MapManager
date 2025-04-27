@@ -1,6 +1,7 @@
 package com.example.mapmanager;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,11 +27,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapmanager.adapters.ChatAdapter;
 import com.example.mapmanager.adapters.RouteDisplayAdapter;
+import com.example.mapmanager.adapters.RouteSelectAdapter;
 import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.models.Message;
 import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.RouteCard;
 import com.example.mapmanager.models.RouteCardSettings;
+import com.example.mapmanager.models.Waypoint;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,26 +56,42 @@ import java.util.List;
 
 
 public class HomeFragment extends Fragment {
-    private RecyclerView routeListView;
+    private RecyclerView routeListView, selectingRouteListView;
     private RouteDisplayAdapter adapter;
+    private RouteSelectAdapter selectAdapter;
     private List<RouteCard> routeList;
+    private List<Route> localRouteList;
+    private View plusView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        routeListView = view.findViewById(R.id.routeListView);
         routeList = new ArrayList<RouteCard>();
+        localRouteList = new ArrayList<Route>();
+        routeListView = view.findViewById(R.id.routeListView);
+        plusView = view.findViewById(R.id.plusView);
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        routeList.add(new RouteCard(new Route(), "dsfsdfsdfsdf", "Hijab", "The way of Hitler", new RouteCardSettings(), 1488, 5252));
+        for (int i = 0; i < 12; i++) localRouteList.add(new Route(new ArrayList<Waypoint>(), "luberGay", "RooK", "BlablaBlaBla"));
         adapter = new RouteDisplayAdapter(getContext(), routeList);
+        selectAdapter = new RouteSelectAdapter(localRouteList);
         routeListView.setLayoutManager(new LinearLayoutManager(getContext()));
         routeListView.setAdapter(adapter);
         routeListView.setVisibility(View.VISIBLE);
-        routeList.add(new RouteCard(new Route(), "dsfsdfsdfsdf", "Hijab", "The way of Hitler", new RouteCardSettings(), 1488, 5252));
-        adapter.notifyDataSetChanged();
+        plusView.setOnClickListener(v->{
+            LayoutInflater inflater = getLayoutInflater();
+            View changeDialogView = inflater.inflate(R.layout.select_route_dialog, null);
+            AlertDialog dialog = new AlertDialog.Builder(requireActivity()).setView(changeDialogView).create();
+            selectingRouteListView = changeDialogView.findViewById(R.id.selectingRouteListView);
+            selectingRouteListView.setLayoutManager(new LinearLayoutManager(getContext()));
+            selectingRouteListView.setAdapter(selectAdapter);
+            selectingRouteListView.setVisibility(View.VISIBLE);
+            dialog.show();
+        });
     }
 }

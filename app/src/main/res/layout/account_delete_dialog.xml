@@ -37,6 +37,7 @@
         android:id="@+id/accountDeleteView"
         android:layout_width="312dp"
         android:layout_height="36dp"
+        android:layout_marginTop="5dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/green_dark"
         android:clickable="true"
@@ -61,8 +62,7 @@
         app:layout_constraintEnd_toEndOf="@id/accountDeleteView"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@id/accountDeleteView"
-        app:layout_constraintTop_toBottomOf="@+id/textView9"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@+id/accountDeleteView" />
 
     <View
         android:id="@+id/cancelView"
@@ -74,7 +74,7 @@
         android:clickable="true"
         android:elevation="1dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.485"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/accountDeleteView" />
 
