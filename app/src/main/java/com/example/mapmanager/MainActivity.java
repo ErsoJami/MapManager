@@ -100,10 +100,12 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
+
                             user.loadData(snapshot);
                             if (profileChangeFragment.isAdded()) profileChangeFragment.dataLoad();
                             if (profileFragment.isAdded()) profileFragment.dataLoad();
                             if (mapFragment.isAdded()) mapFragment.dataLoad();
+                            if (messengerFragment.isAdded()) messengerFragment.dataLoad();
                         }
                     }
                     @Override
@@ -138,8 +140,8 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
     }
 
     @Override
-    public void onSelectChat(String id) {
-        ChatFragment chatFragment = ChatFragment.updateChat(id);
+    public void onSelectChat(String id, String lastReadMessageId) {
+        ChatFragment chatFragment = ChatFragment.updateChat(id, lastReadMessageId);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, chatFragment);
         fragmentTransaction.addToBackStack(null);

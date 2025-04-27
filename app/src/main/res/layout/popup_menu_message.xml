@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded"
+    android:backgroundTint="@color/white"
+    android:elevation="3dp"
+    android:translationZ="1dp">
+
+    <TextView
+        android:id="@+id/copyMessageText"
+        android:layout_width="wrap_content"
+        android:layout_height="31dp"
+        android:layout_margin="5dp"
+        android:paddingEnd="8dp"
+        android:text="Скопировать текст"
+        android:textSize="24dp"
+        android:translationZ="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/view4"
+        app:layout_constraintStart_toEndOf="@+id/view4"
+        app:layout_constraintTop_toTopOf="@+id/view4" />
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="83dp"
+        android:layout_marginBottom="41dp"
+        android:background="@color/light_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="41dp"
+        android:layout_marginBottom="83dp"
+        android:background="@color/light_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/view3"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="8dp"
+        android:tint="@color/red"
+        android:translationZ="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view2"
+        app:srcCompat="@drawable/delete_account_icon" />
+
+    <ImageView
+        android:id="@+id/view4"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="8dp"
+        android:translationZ="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/copy_icon" />
+
+    <ImageView
+        android:id="@+id/view17"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:translationZ="1dp"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view5"
+        app:srcCompat="@drawable/edit_icon" />
+
+    <TextView
+        android:id="@+id/deleteMessageText"
+        android:layout_width="wrap_content"
+        android:layout_height="31dp"
+        android:layout_margin="5dp"
+        android:paddingEnd="8dp"
+        android:text="Удалить сообщение"
+        android:textColor="@color/red"
+        android:textSize="24dp"
+        android:translationZ="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/view3"
+        app:layout_constraintStart_toEndOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/view3" />
+
+    <TextView
+        android:id="@+id/changeMessageText"
+        android:layout_width="wrap_content"
+        android:layout_height="31dp"
+        android:layout_margin="5dp"
+        android:paddingEnd="8dp"
+        android:text="Изменить"
+        android:textSize="24dp"
+        android:translationZ="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/view17"
+        app:layout_constraintStart_toEndOf="@+id/view17"
+        app:layout_constraintTop_toTopOf="@+id/view17" />
+</androidx.constraintlayout.widget.ConstraintLayout>

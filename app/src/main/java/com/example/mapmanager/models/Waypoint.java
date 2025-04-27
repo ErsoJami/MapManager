@@ -2,6 +2,9 @@ package com.example.mapmanager.models;
 
 import com.yandex.mapkit.geometry.Geometry;
 import com.yandex.mapkit.geometry.Point;
+import com.yandex.mapkit.map.PlacemarkMapObject;
+
+import java.util.ArrayList;
 
 public class Waypoint {
     private String name;
@@ -42,4 +45,5 @@ public class Waypoint {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }
