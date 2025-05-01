@@ -22,11 +22,13 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
 
+import com.example.mapmanager.models.ChatsData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class ProfileChangeFragment extends Fragment {
     private FirebaseAuth mAuth;
@@ -99,12 +101,25 @@ public class ProfileChangeFragment extends Fragment {
         });
         dataLoad();
         saveData.setOnClickListener(v -> {
+            if (!changeNicknameText.getText().toString().equals(MainActivity.user.getNick())) {
+                HashMap<String, Object> data2 = new HashMap<>();
+                DatabaseReference chatReference = FirebaseDatabase.getInstance().getReference().child("chats");
+                for (HashMap.Entry<String, ChatsData> item : MainActivity.user.getUserChatsData().entrySet()) {
+                    String chatId = item.getKey();
+                    ChatsData chatsData = item.getValue();
+                    for (String messageId : chatsData.getMessageList()) {
+                        data2.put("/" + chatId + "/messages/" + messageId + "/nick", changeNicknameText.getText().toString());
+                    }
+                }
+                chatReference.updateChildren(data2);
+            }
             MainActivity.user.setNick(changeNicknameText.getText().toString());
             MainActivity.user.setName(changeRealNameText.getText().toString());
             MainActivity.user.setPhoneNumber(changePhoneText.getText().toString());
             MainActivity.user.setEmail(changeEmailText.getText().toString());
             MainActivity.user.setCountry(changeCountryText.getText().toString());
             MainActivity.user.setCity(changeCityText.getText().toString());
+            MainActivity.user.setBirthDayTime(date.getTimeInMillis());
             MainActivity.user.changeData(databaseReference);
         });
     }
@@ -119,7 +134,6 @@ public class ProfileChangeFragment extends Fragment {
             date.set(Calendar.YEAR, year);
             date.set(Calendar.MONTH, monthOfYear);
             date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            MainActivity.user.setBirthDayTime(date.getTimeInMillis());
             setInitialDateTime();
         }
     };

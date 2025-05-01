@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapmanager.R;
-import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.RouteCard;
 
 import java.util.List;
@@ -19,14 +18,20 @@ import java.util.List;
 public class RouteDisplayAdapter extends RecyclerView.Adapter<RouteDisplayAdapter.ViewHolder> {
     private List<RouteCard> routeList;
     private Context context;
-    public RouteDisplayAdapter(Context context, List<RouteCard> routeList) {
+    private RouteDisplayListener routeDisplayListener;
+    public RouteDisplayAdapter(Context context, List<RouteCard> routeList, RouteDisplayListener routeDisplayListener) {
         this.routeList = routeList;
         this.context = context;
+        this.routeDisplayListener = routeDisplayListener;
+    }
+    public interface RouteDisplayListener {
+        void acceptRouteButton(int position);
+        void showInMapButton(int position);
     }
     @NonNull
     @Override
     public RouteDisplayAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.route_item_ultimate_brutal_man_power_version, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.route_card_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -37,10 +42,10 @@ public class RouteDisplayAdapter extends RecyclerView.Adapter<RouteDisplayAdapte
         holder.DescriptionTextView.setText(curRoute.getDescription());
         holder.RouteTimeIntervalText.setText(timeIntervalConversion(curRoute.getStartTime(), curRoute.getEndTime()));
         holder.AcceptRouteButton.setOnClickListener(v->{
-
+            routeDisplayListener.acceptRouteButton(position);
         });
         holder.ShowInMapButton.setOnClickListener(v->{
-
+            routeDisplayListener.showInMapButton(position);
         });
     }
 

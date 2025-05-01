@@ -72,8 +72,8 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private FirebaseAuth mAuth;
     private ActivityResultLauncher<String[]> getLocationPermission;
     private ListView listView;
-    private TextView routeText, saveRouteText;
-    private View pointsView, saveRouteView, menuView, myRoutesView;
+    private TextView routeText, saveRouteText, deleteRouteText, focusRouteText, hintText;
+    private View pointsView, menuView;
     private ImageView userLocationImageView, newRouteImageView, menuImageView;
     private SearchView searchView;
     private ArrayAdapter<Map<String, String>> adapter;
@@ -85,6 +85,9 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private MapManager mapManager;
     private RecyclerView recyclerView, routeRecyclerView;
     private Boolean isClosePointsView = true, isCloseMenuView = true;
+
+    private Route routeToShowOnReady = null;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,11 +105,18 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (getArguments() != null) {
+            routeToShowOnReady = (Route) getArguments().getSerializable("ROUTE_TO_SHOW");
+            Log.d("MapFragment", "Маршрут получен из аргументов.");
+        }
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = view.findViewById(R.id.mapview);
         menuView = view.findViewById(R.id.menuView);
         routeText = view.findViewById(R.id.routeText);
-        saveRouteText = view.findViewById(R.id.textView10);
+        hintText = view.findViewById(R.id.hintText);
+        saveRouteText = view.findViewById(R.id.saveRoute);
+        deleteRouteText = view.findViewById(R.id.deleteRoute);
+        focusRouteText = view.findViewById(R.id.focusRoute);
         routeRecyclerView = view.findViewById(R.id.routeRecyclerView);
         routeArrayList = new ArrayList<>();
         routeAdapter = new RouteAdapter(requireContext(), routeArrayList, this);
@@ -126,7 +136,6 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         searchView = view.findViewById(R.id.searchView);
         userLocationImageView = view.findViewById(R.id.userPosition);
         newRouteImageView = view.findViewById(R.id.createNewRoute);
-        saveRouteView = view.findViewById(R.id.saveRoute);
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, new ArrayList<>()) {
             @NonNull
             @Override
@@ -183,73 +192,23 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         });
 
         userLocationImageView.setOnClickListener(v -> {
-            if (mapManager != null) {
+            if (mapManager != null && mapManager.getCurrentUserLocation() != null) {
                 mapManager.moveCamera(mapManager.getCurrentUserLocation(), 17.0f);
             }
         });
         newRouteImageView.setOnClickListener(v -> {
-            ValueAnimator valueAnimator, valueAnimator1;
-            ViewGroup.LayoutParams params = pointsView.getLayoutParams();
+            if (!mapManager.isUserInCreateMode()) {
+                mapManager.setUserInCreateMode(true);
+                newRouteImageView.setImageResource(R.drawable.arrow_up);
+            }
             if (isClosePointsView) {
-                pointsView.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.VISIBLE);
-                saveRouteView.setVisibility(View.VISIBLE);
-                saveRouteText.setVisibility(View.VISIBLE);
-                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(300f, requireContext()));
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
-                        params.height = (int) valueAnimator.getAnimatedValue();
-                        pointsView.setLayoutParams(params);
-                    }
-                });
-                valueAnimator.setDuration(500);
-                valueAnimator1 = ValueAnimator.ofFloat(180f, 360f);
-                valueAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
-                        newRouteImageView.setRotation((Float) valueAnimator1.getAnimatedValue());
-                    }
-                });
-                valueAnimator1.setDuration(500);
-                valueAnimator.start();
-                valueAnimator1.start();
-                isClosePointsView = false;
+                openRouteView();
             } else {
-                valueAnimator = ValueAnimator.ofInt((int) DpToPx(300f, requireContext()), 1);
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
-                        params.height = (int) valueAnimator.getAnimatedValue();
-                        pointsView.setLayoutParams(params);
-                    }
-                });
-                valueAnimator.setDuration(500);
-                valueAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
-                        super.onAnimationEnd(animation, isReverse);
-                        pointsView.setVisibility(View.GONE);
-                        saveRouteView.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.GONE);
-                        saveRouteText.setVisibility(View.GONE);
-                    }
-                });
-                valueAnimator1 = ValueAnimator.ofFloat(360f, 180f);
-                valueAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
-                        newRouteImageView.setRotation((Float) valueAnimator1.getAnimatedValue());
-                    }
-                });
-                valueAnimator1.setDuration(500);
-                valueAnimator.start();
-                valueAnimator1.start();
-                isClosePointsView = true;
+                closeRouteView();
             }
 
         });
-        saveRouteView.setOnClickListener(v -> {
+        saveRouteText.setOnClickListener(v -> {
             LayoutInflater inflater2 = getLayoutInflater();
             View dialogView = inflater2.inflate(R.layout.save_route_dialog, null);
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
@@ -283,51 +242,152 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             });
             dialog.show();
         });
+        deleteRouteText.setOnClickListener(v -> {
+            closeRouteView();
+            mapManager.mapObjectCollection.clear();
+            placemarkMapObjectArrayList.clear();
+            mapManager.mapWaypointObjectCollection.clear();
+            waypointAdapter.notifyDataSetChanged();
+            newRouteImageView.setImageResource(R.drawable.plus);
+            mapManager.setUserInCreateMode(false);
+        });
         menuImageView.setOnClickListener(v ->{
-            ValueAnimator valueAnimator;
-            ViewGroup.LayoutParams params = menuView.getLayoutParams();
             if (isCloseMenuView) {
-                menuView.setVisibility(View.VISIBLE);
-                routeText.setVisibility(View.VISIBLE);
-                routeRecyclerView.setVisibility(View.VISIBLE);
-                valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(400f, requireContext()));
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
-                        params.width = (int) valueAnimator.getAnimatedValue();
-                        menuView.setLayoutParams(params);
-                    }
-                });
-                valueAnimator.setDuration(500);
-                valueAnimator.start();
-                isCloseMenuView = false;
+                openMenuView();
             } else {
-                valueAnimator = ValueAnimator.ofInt((int) DpToPx(400f, requireContext()), 1);
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
-                        params.width = (int) valueAnimator.getAnimatedValue();
-                        menuView.setLayoutParams(params);
-                    }
-                });
-                valueAnimator.setDuration(500);
-                valueAnimator.start();
-                valueAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
-                        super.onAnimationEnd(animation, isReverse);
-                        menuView.setVisibility(View.GONE);
-                        routeText.setVisibility(View.GONE);
-                        routeRecyclerView.setVisibility(View.GONE);
-                    }
-                });
-                isCloseMenuView = true;
+                closeMenuView();
             }
+        });
+        focusRouteText.setOnClickListener(v -> {
+            mapManager.focusOnPolyline();
+            closeRouteView();
         });
 
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (routeToShowOnReady != null) {
+            routeOnMap(routeToShowOnReady);
+        }
+    }
+
+    private void openMenuView() {
+        ValueAnimator valueAnimator;
+        ViewGroup.LayoutParams params = menuView.getLayoutParams();
+        if (isCloseMenuView) {
+            menuView.setVisibility(View.VISIBLE);
+            routeText.setVisibility(View.VISIBLE);
+            routeRecyclerView.setVisibility(View.VISIBLE);
+            valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(400f, requireContext()));
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                    params.width = (int) valueAnimator.getAnimatedValue();
+                    menuView.setLayoutParams(params);
+                }
+            });
+            valueAnimator.setDuration(500);
+            valueAnimator.start();
+            isCloseMenuView = false;
+        }
+    }
+    private void closeMenuView() {
+        ValueAnimator valueAnimator;
+        ViewGroup.LayoutParams params = menuView.getLayoutParams();
+        if (!isCloseMenuView) {
+            valueAnimator = ValueAnimator.ofInt((int) DpToPx(400f, requireContext()), 1);
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                    params.width = (int) valueAnimator.getAnimatedValue();
+                    menuView.setLayoutParams(params);
+                }
+            });
+            valueAnimator.setDuration(500);
+            valueAnimator.start();
+            valueAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
+                    super.onAnimationEnd(animation, isReverse);
+                    menuView.setVisibility(View.GONE);
+                    routeText.setVisibility(View.GONE);
+                    routeRecyclerView.setVisibility(View.GONE);
+                }
+            });
+            isCloseMenuView = true;
+        }
+    }
+    private void openRouteView() {
+        if (isClosePointsView) {
+            ValueAnimator valueAnimator, valueAnimator1;
+            ViewGroup.LayoutParams params = pointsView.getLayoutParams();
+            pointsView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
+            saveRouteText.setVisibility(View.VISIBLE);
+            deleteRouteText.setVisibility(View.VISIBLE);
+            focusRouteText.setVisibility(View.VISIBLE);
+            valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(300f, requireContext()));
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                    params.height = (int) valueAnimator.getAnimatedValue();
+                    pointsView.setLayoutParams(params);
+                }
+            });
+            valueAnimator.setDuration(500);
+            valueAnimator1 = ValueAnimator.ofFloat(180f, 360f);
+            valueAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                    newRouteImageView.setRotation((Float) valueAnimator1.getAnimatedValue());
+                }
+            });
+            valueAnimator1.setDuration(500);
+            valueAnimator.start();
+            valueAnimator1.start();
+            isClosePointsView = false;
+        }
+    }
+    private void closeRouteView() {
+        if (!isClosePointsView) {
+            ValueAnimator valueAnimator, valueAnimator1;
+            ViewGroup.LayoutParams params = pointsView.getLayoutParams();
+            valueAnimator = ValueAnimator.ofInt((int) DpToPx(300f, requireContext()), 1);
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                    params.height = (int) valueAnimator.getAnimatedValue();
+                    pointsView.setLayoutParams(params);
+                }
+            });
+            valueAnimator.setDuration(500);
+            valueAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
+                    super.onAnimationEnd(animation, isReverse);
+                    pointsView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.GONE);
+                    saveRouteText.setVisibility(View.GONE);
+                    deleteRouteText.setVisibility(View.GONE);
+                    focusRouteText.setVisibility(View.GONE);
+                }
+            });
+            valueAnimator1 = ValueAnimator.ofFloat(360f, 180f);
+            valueAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                    newRouteImageView.setRotation((Float) valueAnimator1.getAnimatedValue());
+                }
+            });
+            valueAnimator1.setDuration(500);
+            valueAnimator.start();
+            valueAnimator1.start();
+            isClosePointsView = true;
+        }
+    }
     public void dataLoad() {
         routeArrayList.clear();
         ArrayList<String> routeId = user.getRouteList();
@@ -342,13 +402,13 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                             Route route = dataSnapshot.getValue(Route.class);
                             if (route != null) {
                                 routeArrayList.add(route);
+                                routeAdapter.notifyDataSetChanged();
                             }
                         }
                     });
                 }
             }
         }
-        routeAdapter.notifyDataSetChanged();
     }
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -419,6 +479,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     public void onMapLongTap(PlacemarkMapObject placemarkMapObject) {
         placemarkMapObjectArrayList.add(placemarkMapObject);
         mapManager.getRoute(placemarkMapObjectArrayList);
+        hintText.setVisibility(View.GONE);
         waypointAdapter.notifyDataSetChanged();
     }
 
@@ -482,12 +543,15 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         routeList.remove(route.getId());
         MainActivity.user.setRouteList(routeList);
         routeArrayList.remove(position);
-        routeAdapter.notifyDataSetChanged();
+        routeAdapter.notifyItemRemoved(position);
+        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).removeValue();
+//        Log.d("debug", "onDeleteRoute: " + routeArrayList.size() + " " + routeAdapter.getItemCount() + " " + routeRecyclerView.getVisibility());
         MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()));
     }
 
     @Override
     public void onFocusToRoute(int position) {
+        hintText.setVisibility(View.GONE);
         placemarkMapObjectArrayList.clear();
         mapManager.mapObjectCollection.clear();
         Route route = routeArrayList.get(position);
@@ -498,14 +562,37 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             placemarkMapObjectArrayList.add(mark);
         }
         mapManager.getRoute(placemarkMapObjectArrayList);
+        mapManager.setUserInCreateMode(true);
+        closeMenuView();
+        newRouteImageView.setImageResource(R.drawable.arrow_up);
+        openRouteView();
         waypointAdapter.notifyDataSetChanged();
     }
-
+    public void routeOnMap(Route route) {
+        hintText.setVisibility(View.GONE);
+        placemarkMapObjectArrayList.clear();
+        mapManager.mapObjectCollection.clear();
+        ArrayList<Waypoint> waypointArrayList = route.getWaypointArrayList();
+        for (Waypoint waypoint : waypointArrayList) {
+            PlacemarkMapObject mark = mapManager.addPlacemarkMapObject(waypoint.getPoint());
+            mark.setUserData(new Waypoint(waypoint.getName(), waypoint.getDescription()));
+            placemarkMapObjectArrayList.add(mark);
+        }
+        mapManager.getRoute(placemarkMapObjectArrayList);
+        mapManager.setUserInCreateMode(true);
+        closeMenuView();
+        newRouteImageView.setImageResource(R.drawable.arrow_up);
+        openRouteView();
+        waypointAdapter.notifyDataSetChanged();
+    }
     @Override
     public void onDeleteWaypoint(int position) {
         PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
         mapManager.mapObjectCollection.remove(placemarkMapObject);
         placemarkMapObjectArrayList.remove(position);
+        if (placemarkMapObjectArrayList.isEmpty()) {
+            hintText.setVisibility(View.VISIBLE);
+        }
         mapManager.getRoute(placemarkMapObjectArrayList);
         waypointAdapter.notifyDataSetChanged();
     }

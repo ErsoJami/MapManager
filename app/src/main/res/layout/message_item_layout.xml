@@ -3,49 +3,94 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TextView
-        android:id="@+id/textView13"
+    android:layout_height="wrap_content"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/otherMessageContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="3dp"
-        android:background="@drawable/rounded"
-        android:backgroundTint="#18293B"
-        android:padding="10dp"
-        android:text="TextView"
-        android:textColor="@color/white"
-        android:visibility="visible"
+        android:layout_marginEnd="80dp"
         app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        android:background="@drawable/rounded"
+        android:backgroundTint="#18293B"
+        android:paddingTop="5dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:visibility="gone"
+        tools:visibility="visible" >
 
-    <TextView
-        android:id="@+id/textView14"
+        <TextView
+            android:id="@+id/otherUsernameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Имя Пользователя"
+            android:textColor="#A0A0A0"
+            android:textSize="12sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"/>
+
+        <TextView
+            android:id="@+id/otherTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Чужое сообщение."
+            android:textColor="@color/white"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintWidth_default="wrap"
+            app:layout_constraintTop_toBottomOf="@+id/otherUsernameTextView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/myMessageContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginStart="80dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="3dp"
-        android:background="@drawable/rounded"
-        android:backgroundTint="#2B5377"
-        android:padding="10dp"
-        android:text="TextView"
-        android:textColor="@color/white"
-        android:visibility="visible"
         app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        android:background="@drawable/rounded"
+        android:backgroundTint="#2B5377"
+        android:paddingTop="5dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:visibility="gone"
+        tools:visibility="visible" >
+
+        <TextView
+            android:id="@+id/myTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Моё сообщение"
+            android:textColor="@color/white"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_default="wrap" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

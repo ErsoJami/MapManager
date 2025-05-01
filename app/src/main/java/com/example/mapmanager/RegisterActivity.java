@@ -111,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
                                 Map<String, Object> userData = new HashMap<>();
                                 userData.put("email", email);
-                                userData.put("userName", "123");
+                                userData.put("name", "123");
                                 userData.put("dateBirthday", "213");
                                 Map<String, String> data = new HashMap<>();
                                 data.put("1", "-OMHppsvY7m3rN5SrODh");

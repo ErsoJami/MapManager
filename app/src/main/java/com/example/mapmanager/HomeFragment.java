@@ -1,5 +1,7 @@
 package com.example.mapmanager;
 
+import static com.example.mapmanager.MainActivity.user;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -23,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,6 +48,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -59,11 +63,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 
-public class HomeFragment extends Fragment implements RouteSelectAdapter.PostListener {
+public class HomeFragment extends Fragment implements RouteSelectAdapter.PostListener, RouteDisplayAdapter.RouteDisplayListener  {
     private RecyclerView routeListView, selectingRouteListView;
     private RouteDisplayAdapter adapter;
     private RouteSelectAdapter selectAdapter;
@@ -73,10 +78,32 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private TextView addRouteCardView, routeCardBuildingDateEditText, routeCardBuildingStartTimeEditText, routeCardBuildingEndTimeEditText;
     private EditText routeCardBuildingNameEnter, routeCardBuildingDescriptionEnter;
     private View plusView;
-    private DatabaseReference databaseReference;
     private AlertDialog dialog;
     private FirebaseAuth mAuth;
     private Calendar startTime, endTime;
+    private HomeFragmentListener homeFragmentListener;
+
+    @Override
+    public void acceptRouteButton(int position) {
+
+    }
+
+    @Override
+    public void showInMapButton(int position) {
+        FirebaseDatabase.getInstance().getReference().child("routes").child(routeList.get(position).getRoute()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    homeFragmentListener.showInMap(dataSnapshot.getValue(Route.class));
+                }
+            }
+        });
+
+    }
+
+    interface HomeFragmentListener {
+        void showInMap(Route route);
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -85,13 +112,104 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         localRouteList = new ArrayList<Route>();
         startTime = Calendar.getInstance();
         endTime = Calendar.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routeCards");
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot.exists()) {
+                    routeList.add(snapshot.getValue(RouteCard.class));
+                    adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot.exists()) {
+                    RouteCard routeCard = snapshot.getValue(RouteCard.class);
+                    int position = Collections.binarySearch(routeList, routeCard, new Comparator<RouteCard>() {
+                        @Override
+                        public int compare(RouteCard routeCard, RouteCard routeCard1) {
+                            return routeCard.getId().compareTo(routeCard1.getId());
+                        }
+                    });
+                    if (position != -1) {
+                        routeList.set(position, routeCard);
+                    }
+                    adapter.notifyItemChanged(position);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                RouteCard routeCard = snapshot.getValue(RouteCard.class);
+                int position = Collections.binarySearch(routeList, routeCard, new Comparator<RouteCard>() {
+                    @Override
+                    public int compare(RouteCard routeCard, RouteCard routeCard1) {
+                        return routeCard.getId().compareTo(routeCard1.getId());
+                    }
+                });
+                if (position != -1) {
+                    routeList.remove(position);
+                }
+                adapter.notifyItemRemoved(position);
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        DatabaseReference routeReference = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()).child("routeList");
+        routeReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                localRouteList.clear();
+                GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
+                ArrayList<String> routeId = snapshot.getValue(t);
+                if (routeId != null) {
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routes");
+                    for (String id : routeId) {
+                        DatabaseReference routesRef = databaseReference.child(id);
+                        if (routesRef != null) {
+                            databaseReference.child(id).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                                @Override
+                                public void onSuccess(DataSnapshot dataSnapshot) {
+                                    Route route = dataSnapshot.getValue(Route.class);
+                                    if (route != null) {
+                                        localRouteList.add(route);
+                                        selectAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        homeFragmentListener = (HomeFragmentListener) context;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         routeListView = view.findViewById(R.id.routeListView);
-        plusView = view.findViewById(R.id.plusView);
+        plusView = view.findViewById(R.id.imageView3);
+        adapter = new RouteDisplayAdapter(getContext(), routeList, this);
+        selectAdapter = new RouteSelectAdapter(localRouteList, this);
+        routeListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        routeListView.setAdapter(adapter);
+        routeListView.setVisibility(View.VISIBLE);
         return view;
     }
 
@@ -100,16 +218,6 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         super.onViewCreated(view, savedInstanceState);
 
         mAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        routeList.add(new RouteCard(new Route(), "dsfsdfsdfsdf", "Hijab", "The way of Hitler", new RouteCardSettings(), 1488, 5252));
-        for (int i = 0; i < 12; i++) localRouteList.add(new Route(new ArrayList<Waypoint>(), "lumberGay", "RooK", "BlablaBlaBla"));
-
-        adapter = new RouteDisplayAdapter(getContext(), routeList);
-        selectAdapter = new RouteSelectAdapter(localRouteList, this);
-        routeListView.setLayoutManager(new LinearLayoutManager(getContext()));
-        routeListView.setAdapter(adapter);
-        routeListView.setVisibility(View.VISIBLE);
         plusView.setOnClickListener(v->{
             LayoutInflater inflater = getLayoutInflater();
             View changeDialogView = inflater.inflate(R.layout.select_route_dialog, null);
@@ -121,7 +229,6 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             dialog.show();
         });
     }
-
     @Override
     public void postRouteCard(Route curRoute) {
         dialog.dismiss();
@@ -133,7 +240,25 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             buildDialog.dismiss();
         });
         addRouteCardView.setOnClickListener(v->{
-
+            final long initialStartTimeMillis = startTime.getTimeInMillis();
+            final long initialEndTimeMillis = endTime.getTimeInMillis();
+            startTime = Calendar.getInstance();
+            endTime = Calendar.getInstance();
+            startTime.add(Calendar.SECOND, 1);
+            endTime.add(Calendar.SECOND, 1);
+            if (!routeCardBuildingNameEnter.getText().toString().isEmpty() &&
+                    initialStartTimeMillis > startTime.getTimeInMillis() && initialEndTimeMillis > endTime.getTimeInMillis()) {
+                RouteCard routeCard = new RouteCard(curRoute.getId(), routeCardBuildingNameEnter.getText().toString(), routeCardBuildingDescriptionEnter.getText().toString(),
+                        new RouteCardSettings(), startTime.getTimeInMillis(), endTime.getTimeInMillis());
+                routeCard.createRoutCard();
+                buildDialog.dismiss();
+                startTime = Calendar.getInstance();
+                endTime = Calendar.getInstance();
+            } else if (routeCardBuildingNameEnter.getText().toString().isEmpty()) {
+                Toast.makeText(requireContext(), "Маршрут должен иметь название", Toast.LENGTH_SHORT).show();
+            } else if (initialStartTimeMillis <= startTime.getTimeInMillis() && initialEndTimeMillis <= endTime.getTimeInMillis()) {
+                Toast.makeText(requireContext(), "Недопустимое время начала и конца", Toast.LENGTH_SHORT).show();
+            }
         });
         routeCardBuildingDateEditText.setOnClickListener(v->{
             new DatePickerDialog(requireActivity(), d, startTime.get(Calendar.YEAR), startTime.get(Calendar.MONTH), startTime.get(Calendar.DAY_OF_MONTH)).show();
@@ -164,6 +289,9 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             endTime.set(Calendar.YEAR, year);
             endTime.set(Calendar.MONTH, monthOfYear);
             endTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            if (startTime.getTimeInMillis() >= endTime.getTimeInMillis()) {
+                endTime.add(Calendar.DAY_OF_MONTH, 1);
+            }
             setInitialDate();
         }
     };
@@ -204,4 +332,5 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 startTime.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
     }
+
 }

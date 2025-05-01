@@ -4,9 +4,10 @@ import com.yandex.mapkit.geometry.Geometry;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.map.PlacemarkMapObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Waypoint {
+public class Waypoint implements Serializable {
     private String name;
     private String description;
     private Point point;

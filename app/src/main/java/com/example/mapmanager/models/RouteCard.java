@@ -1,7 +1,13 @@
 package com.example.mapmanager.models;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.ktx.Firebase;
+
+import java.util.HashMap;
+
 public class RouteCard {
-    private Route route;
+    private String route;
     private String id;
     private String name;
     private String description;
@@ -9,7 +15,7 @@ public class RouteCard {
     private RouteCardSettings routeCardSettings;
     public RouteCard() {}
 
-    public RouteCard(Route route, String id, String name, String description, RouteCardSettings routeCardSettings, long startTime, long endTime) {
+    public RouteCard(String route, String id, String name, String description, RouteCardSettings routeCardSettings, long startTime, long endTime) {
         this.route = route;
         this.id = id;
         this.name = name;
@@ -17,6 +23,27 @@ public class RouteCard {
         this.routeCardSettings = routeCardSettings;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+    public RouteCard(String route, String name, String description, RouteCardSettings routeCardSettings, long startTime, long endTime) {
+        this.route = route;
+        this.name = name;
+        this.description = description;
+        this.routeCardSettings = routeCardSettings;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+    public void createRoutCard() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routeCards");
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("route", route);
+        data.put("name", name);
+        data.put("description", description);
+        data.put("startTime", startTime);
+        data.put("endTime", endTime);
+        data.put("routeCardSettings", routeCardSettings);
+        DatabaseReference newRouteCard = databaseReference.push();
+        data.put("id", newRouteCard.getKey());
+        newRouteCard.setValue(data);
     }
 
     public long getEndTime() {
@@ -35,10 +62,10 @@ public class RouteCard {
         this.startTime = startTime;
     }
 
-    public Route getRoute() {
+    public String getRoute() {
         return route;
     }
-    public void setRoute(Route route) {
+    public void setRoute(String route) {
         this.route = route;
     }
 

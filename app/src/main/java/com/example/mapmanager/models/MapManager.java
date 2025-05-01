@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -83,7 +84,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     private UserLocationLayer userLocationLayer;
     public final MapObjectCollection mapObjectCollection;
     public final MapObjectCollection mapRoutesObjectCollection;
-    private final MapObjectCollection mapWaypointObjectCollection;
+    public final MapObjectCollection mapWaypointObjectCollection;
     private final Bitmap userPinBitmap;
     private final Bitmap userArrowBitmap;
     private final Bitmap placemarkBitmap;
@@ -96,6 +97,9 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     private final PedestrianRouter pedestrianRouter;
     private boolean userGetLocation = false;
 
+    private boolean userInCreateMode = false;
+
+    private PolylineMapObject lastRoutePolyline;
 
 
     public interface MapManagerSearchListener {
@@ -345,15 +349,33 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     }
     @Override
     public void onMasstransitRoutes(@NonNull List<Route> list) {
-        Route route = list.get(0);
-        mapWaypointObjectCollection.clear();
-        PolylineMapObject routePolyline = mapWaypointObjectCollection.addPolyline(route.getGeometry());
-//        CameraPosition cameraPosition = mapView.getMap().cameraPosition(
-//                Geometry.fromPolyline(route.getGeometry())
-//        );
-//        mapView.getMap().move(cameraPosition);
-    }
+        if (list != null && list.size() != 0) {
+            Route route = list.get(0);
+            mapWaypointObjectCollection.clear();
+            PolylineMapObject routePolyline = mapWaypointObjectCollection.addPolyline(route.getGeometry());
+            lastRoutePolyline = routePolyline;
+        } else {
+            mapWaypointObjectCollection.clear();
+            Toast.makeText(context, "Некорректный маршрут", Toast.LENGTH_SHORT).show();
+        }
 
+    }
+    public void focusOnPolyline() {
+        if (lastRoutePolyline != null) {
+            CameraPosition userPosition = mapView.getMap().cameraPosition(Geometry.fromPolyline(lastRoutePolyline.getGeometry()));
+            CameraPosition zoomedOutPosition = new CameraPosition(
+                    userPosition.getTarget(),
+                    Math.max(0.0f, userPosition.getZoom() - 0.5f),
+                    userPosition.getAzimuth(),
+                    userPosition.getTilt()
+            );
+            mapView.getMap().move(
+                    zoomedOutPosition,
+                    new Animation(Animation.Type.SMOOTH, 0.5f),
+                    null
+            );
+        }
+    }
     @Override
     public void onMasstransitRoutesError(@NonNull Error error) {
         mapWaypointObjectCollection.clear();
@@ -361,12 +383,10 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
 
     @Override
     public void onMapObjectDragStart(@NonNull MapObject mapObject) {
-
     }
 
     @Override
     public void onMapObjectDrag(@NonNull MapObject mapObject, @NonNull Point point) {
-
     }
 
     @Override
@@ -375,15 +395,27 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     }
     @Override
     public void onMapLongTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
-        PlacemarkMapObject mark = addPlacemarkMapObject(point);
-        mapLongTapListener.onMapLongTap(mark);
+        if (userInCreateMode) {
+            PlacemarkMapObject mark = addPlacemarkMapObject(point);
+            mapLongTapListener.onMapLongTap(mark);
+        }
     }
+
+    public boolean isUserInCreateMode() {
+        return userInCreateMode;
+    }
+
+    public void setUserInCreateMode(boolean userInCreateMode) {
+        this.userInCreateMode = userInCreateMode;
+    }
+
     public PlacemarkMapObject addPlacemarkMapObject(Point point) {
         PlacemarkMapObject mark = mapObjectCollection.addPlacemark(point);
         ImageProvider pinProvider = ImageProvider.fromBitmap(placemarkBitmap);
         mark.setIcon(pinProvider);
         mark.setDraggable(true);
-        mark.setUserData(new Waypoint("123", "123"));
+        mark.setDragListener(this);
+        mark.setUserData(new Waypoint("Имя", "Описание..."));
         return mark;
     }
 }

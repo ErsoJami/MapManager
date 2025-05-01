@@ -58,8 +58,7 @@ public class WaypointsAdapter extends RecyclerView.Adapter<WaypointsAdapter.View
         if (mark != null) {
             Waypoint waypoint = (Waypoint) mark.getUserData();
             holder.text1.setText(waypoint.getName());
-//            holder.text2.setText(waypoint.getDescription());
-            holder.text2.setText(mark.getGeometry().getLatitude() + " " + mark.getGeometry().getLongitude());
+            holder.text2.setText(waypoint.getDescription());
             if (position == 0) {
                 holder.arrowUp.setVisibility(View.GONE);
             } else {

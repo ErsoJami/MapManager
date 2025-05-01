@@ -4,10 +4,12 @@ import com.yandex.mapkit.RequestPoint;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.map.PlacemarkMapObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Route {
+public class Route implements Serializable {
+
     private ArrayList<Waypoint> waypointArrayList;
     private String id;
     private String name;

@@ -2,8 +2,10 @@ package com.example.mapmanager.models;
 
 import android.util.Pair;
 
+import com.example.mapmanager.MainActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 
 import java.util.ArrayList;
@@ -19,19 +21,18 @@ public class User {
     private String country;
     private String city;
     private ArrayList<String> routeList;
-    private HashMap<String, String> chatList;
+    private HashMap<String, ChatsData> userChatsData;
     private long birthDayTime;
     public User() {
         this.routeList = new ArrayList<>();
-        this.chatList = new HashMap<>();
     }
 
-    public HashMap<String, String> getChatList() {
-        return chatList;
+    public HashMap<String, ChatsData> getUserChatsData() {
+        return userChatsData;
     }
 
-    public void setChatList(HashMap<String, String> chatList) {
-        this.chatList = chatList;
+    public void setUserChatsData(HashMap<String, ChatsData> userChatsData) {
+        this.userChatsData = userChatsData;
     }
 
     public ArrayList<String> getRouteList() {
@@ -101,13 +102,13 @@ public class User {
         HashMap<String, Object> data = new HashMap<>();
         data.put("name", name);
         data.put("nick", nick);
+        data.put("chatList", userChatsData);
         data.put("email", email);
         data.put("phoneNumber", phoneNumber);
         data.put("country", country);
         data.put("city", city);
         data.put("birthDate", birthDayTime);
         data.put("routeList", routeList);
-        data.put("chatList", chatList);
         databaseReference.updateChildren(data);
     }
     public void loadData(DataSnapshot ashot) {
@@ -119,8 +120,8 @@ public class User {
         if (ashot.child("city").exists()) city = ashot.child("city").getValue(String.class);
         if (ashot.child("birthDate").exists()) birthDayTime = ashot.child("birthDate").getValue(long.class);
         GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
-        GenericTypeIndicator<HashMap<String, String>> t1 = new GenericTypeIndicator<HashMap<String, String>>() {};
+        GenericTypeIndicator<HashMap<String, ChatsData>> t1 = new GenericTypeIndicator<>() {};
         if (ashot.child("routeList").exists()) routeList = ashot.child("routeList").getValue(t);
-        if (ashot.child("chatList").exists()) chatList = ashot.child("chatList").getValue(t1);
+        if (ashot.child("chatList").exists()) userChatsData = ashot.child("chatList").getValue(t1);
     }
 }

@@ -36,18 +36,18 @@ public class Chat {
         this.groupAvatarUrl = groupAvatarUrl;
     }
     public void addNewMember(String userId) {
-        membersList.add(userId);
-        HashMap<String, String> chatList = MainActivity.user.getChatList();
-        chatList.replace(id, "0");
-        MainActivity.user.setChatList(chatList);
-        MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(userId));
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(id);
-        Map<String, Object> data = new HashMap<>();
-        data.put("groupName", this.groupName);
-        data.put("groupAvatarUrl", this.groupAvatarUrl);
-        data.put("lastMessageTime", this.lastMessageTime);
-        data.put("membersList", this.membersList);
-        databaseReference.updateChildren(data);
+//        membersList.add(userId);
+//        HashMap<String, String> chatList = MainActivity.user.getChatList();
+//        chatList.replace(id, "0");
+//        MainActivity.user.setChatList(chatList);
+//        MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(userId));
+//        databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(id);
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("groupName", this.groupName);
+//        data.put("groupAvatarUrl", this.groupAvatarUrl);
+//        data.put("lastMessageTime", this.lastMessageTime);
+//        data.put("membersList", this.membersList);
+//        databaseReference.updateChildren(data);
     }
 
     public String getLastReadMessageId() {

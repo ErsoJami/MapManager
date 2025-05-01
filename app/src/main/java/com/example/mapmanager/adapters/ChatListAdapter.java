@@ -40,9 +40,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     public void onBindViewHolder(ChatListAdapter.ViewHolder holder, int position) {
         Chat chat = chats.get(position);
         if (chat != null) {
-            holder.text1.setText(chat.getId());
-            holder.text2.setText(chat.getGroupName());
-            holder.text3.setText(chat.getGroupAvatarUrl());
+            holder.text1.setText(chat.getGroupName());
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,12 +55,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
         return chats.size();
     }
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        final TextView text1, text2, text3;
+        final TextView text1, text2;
         ViewHolder(View view){
             super(view);
             text1 = view.findViewById(R.id.textView);
             text2 = view.findViewById(R.id.textView2);
-            text3 = view.findViewById(R.id.textView3);
         }
     }
 }

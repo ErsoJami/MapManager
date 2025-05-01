@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.R;
 import com.example.mapmanager.models.Message;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -48,23 +51,32 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         Message message = messageList.get(position);
         if (message != null) {
             if (message.getUserId().equals(mAuth.getCurrentUser().getUid())) {
-                holder.text2.setText(message.getMessage());
-                holder.text1.setText(message.getMessage());
-                holder.text2.setVisibility(View.VISIBLE);
-                holder.text2.setOnLongClickListener(v -> {
+                holder.myTextView.setText(message.getMessage());
+                holder.otherTextView.setText(message.getMessage());
+                holder.otherUsernameTextView.setText(message.getMessage());
+                holder.myTextView.setVisibility(View.VISIBLE);
+                holder.myMessageContainer.setVisibility(View.VISIBLE);
+                holder.myTextView.setOnLongClickListener(v -> {
                     chatAdapterListener.onMyMessageClick(position);
                     return true;
                 });
-                holder.text1.setVisibility(View.GONE);
+                holder.otherTextView.setVisibility(View.GONE);
+                holder.otherUsernameTextView.setVisibility(View.GONE);
+                holder.otherMessageContainer.setVisibility(View.GONE);
             } else {
-                holder.text1.setText(message.getMessage());
-                holder.text2.setText(message.getMessage());
-                holder.text1.setOnLongClickListener(v -> {
+                holder.myTextView.setText(message.getMessage());
+                holder.otherTextView.setText(message.getMessage());
+                holder.otherUsernameTextView.setText(message.getNick());
+                holder.otherTextView.setOnLongClickListener(v -> {
                     chatAdapterListener.onOtherMessageClick(position);
                     return true;
                 });
-                holder.text1.setVisibility(View.VISIBLE);
-                holder.text2.setVisibility(View.GONE);
+                holder.otherMessageContainer.setVisibility(View.VISIBLE);
+                holder.otherTextView.setVisibility(View.VISIBLE);
+                holder.otherUsernameTextView.setVisibility(View.VISIBLE);
+                holder.myMessageContainer.setVisibility(View.VISIBLE);
+                holder.myTextView.setVisibility(View.GONE);
+                holder.myMessageContainer.setVisibility(View.GONE);
             }
         }
     }
@@ -74,11 +86,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         return messageList.size();
     }
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        final TextView text1, text2;
+        final ConstraintLayout otherMessageContainer, myMessageContainer;
+        final TextView myTextView, otherTextView, otherUsernameTextView;
+        final DatabaseReference databaseReference;
         ViewHolder(View view){
             super(view);
-            text1 = view.findViewById(R.id.textView13);
-            text2 = view.findViewById(R.id.textView14);
+            otherMessageContainer = view.findViewById(R.id.otherMessageContainer);
+            myMessageContainer = view.findViewById(R.id.myMessageContainer);
+            myTextView = view.findViewById(R.id.myTextView);
+            otherTextView = view.findViewById(R.id.otherTextView);
+            otherUsernameTextView = view.findViewById(R.id.otherUsernameTextView);
+            databaseReference = FirebaseDatabase.getInstance().getReference();
         }
     }
 }

@@ -83,8 +83,10 @@
 
                 <View
                     android:id="@+id/view12"
-                    android:layout_width="320dp"
+                    android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
                     android:layout_marginTop="64dp"
                     android:background="@color/light_grey"
                     android:translationZ="1dp"
@@ -94,8 +96,10 @@
 
                 <View
                     android:id="@+id/view13"
-                    android:layout_width="320dp"
+                    android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
                     android:layout_marginTop="64dp"
                     android:background="@color/light_grey"
                     android:translationZ="1dp"
@@ -105,8 +109,10 @@
 
                 <View
                     android:id="@+id/view14"
-                    android:layout_width="320dp"
+                    android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
                     android:layout_marginTop="64dp"
                     android:background="@color/light_grey"
                     android:translationZ="1dp"
@@ -116,8 +122,10 @@
 
                 <View
                     android:id="@+id/view5"
-                    android:layout_width="320dp"
+                    android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
                     android:layout_marginTop="64dp"
                     android:background="@color/light_grey"
                     android:translationZ="1dp"
@@ -127,8 +135,10 @@
 
                 <View
                     android:id="@+id/view10"
-                    android:layout_width="320dp"
+                    android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
                     android:layout_marginTop="64dp"
                     android:background="@color/light_grey"
                     android:translationZ="1dp"
@@ -138,8 +148,10 @@
 
                 <View
                     android:id="@+id/view11"
-                    android:layout_width="320dp"
+                    android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
                     android:layout_marginTop="64dp"
                     android:background="@color/light_grey"
                     android:translationZ="1dp"
@@ -159,9 +171,11 @@
 
                 <View
                     android:id="@+id/changeView"
-                    android:layout_width="320dp"
+                    android:layout_width="0dp"
                     android:layout_height="440dp"
+                    android:layout_marginStart="40dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="40dp"
                     android:background="@drawable/rounded"
                     android:backgroundTint="@color/white"
                     android:elevation="1dp"

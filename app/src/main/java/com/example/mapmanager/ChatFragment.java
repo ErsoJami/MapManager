@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapmanager.adapters.ChatAdapter;
 import com.example.mapmanager.models.Chat;
+import com.example.mapmanager.models.ChatsData;
 import com.example.mapmanager.models.Message;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -146,9 +147,9 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                     LinearLayoutManager layoutManager = (LinearLayoutManager) messageListView.getLayoutManager();
                     int position = layoutManager.findLastVisibleItemPosition();
                     lastMessageId = messageList.get(position).getMessageId();
-                    HashMap<String, String> map = MainActivity.user.getChatList();
-                    map.replace(chatId, lastMessageId);
-                    MainActivity.user.setChatList(map);
+                    HashMap<String, ChatsData> map = MainActivity.user.getUserChatsData();
+                    map.replace(chatId, new ChatsData(map.get(chatId).getMessageList(), lastMessageId));
+                    MainActivity.user.setUserChatsData(map);
                     MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()));
                 }
 
@@ -163,7 +164,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                         Message message1 = snapshot.getValue(Message.class);
                         message1.setMessageId(snapshot.getKey());
                         messageList.add(message1);
-                        adapter.notifyDataSetChanged();
+                        adapter.notifyItemInserted(adapter.getItemCount() - 1);
                         if (!isFocus[0] && message1.getMessageId().compareTo(key1) > 0) {
                             if (messageList.size() > 1) {
                                 focusOnMessage(messageList.size() - 2);
@@ -194,7 +195,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                     if (position != -1) {
                         messageList.set(position, message);
                     }
-                    adapter.notifyDataSetChanged();
+                    adapter.notifyItemChanged(position);
                 }
 
                 @Override
@@ -211,7 +212,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                         if (position != -1) {
                             messageList.remove(position);
                         }
-                        adapter.notifyDataSetChanged();
+                        adapter.notifyItemRemoved(position);
                     }
                 }
 
@@ -255,8 +256,16 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 int viewHeight = messageListView.getHeight();
                 LayoutInflater inflater = LayoutInflater.from(requireContext());
                 View itemView = inflater.inflate(R.layout.message_item_layout, messageListView, false);
-                TextView textView = itemView.findViewById(R.id.textView14);
-                textView.setText(messageList.get(position).getMessage());
+                Message message = messageList.get(position);
+                if (message.getUserId().equals(mAuth.getUid())) {
+                    TextView textView = itemView.findViewById(R.id.myTextView);
+                    textView.setText(message.getMessage());
+                } else {
+                    TextView textView = itemView.findViewById(R.id.otherTextView);
+                    TextView usernameTextView = itemView.findViewById(R.id.otherUsernameTextView);
+                    textView.setText(message.getMessage());
+                    usernameTextView.setText(message.getNick());
+                }
                 int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
                 int parentWidth = messageListView.getWidth();
                 int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parentWidth - messageListView.getPaddingLeft() - messageListView.getPaddingRight(), View.MeasureSpec.EXACTLY);
@@ -322,6 +331,12 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         deleteMessageText.setOnClickListener(v -> {
             Message message = messageList.get(position);
             message.deleteMessage(chatId);
+            HashMap<String, ChatsData> map = MainActivity.user.getUserChatsData();
+            ChatsData chatsData = map.get(chatId);
+            ArrayList<String> messageList = chatsData.getMessageList();
+            messageList.remove(message.getMessageId());
+            chatsData.setMessageList(messageList);
+            map.replace(chatId, chatsData);
             popupWindow.dismiss();
         });
         copyMessageText.setOnClickListener(v -> {

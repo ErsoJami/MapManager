@@ -1,6 +1,8 @@
 package com.example.mapmanager.models;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -10,6 +12,7 @@ import java.util.Map;
 public class Message {
     private int typeMessage;  // 0 - текс, 1 - избражение
     private String userId;
+    private String nick;
     private String messageId;
     private long time;
     private String message;
@@ -27,6 +30,13 @@ public class Message {
         this.time = time;
         this.message = message;
     }
+    public Message(int typeMessage, String userId, String nick, long time, String message) {
+        this.typeMessage = typeMessage;
+        this.userId = userId;
+        this.time = time;
+        this.nick = nick;
+        this.message = message;
+    }
 
     public void createNewMessage(String chatId) {
         databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages");
@@ -37,7 +47,18 @@ public class Message {
         data.put("message", this.message);
         DatabaseReference newChat = databaseReference.push();
         this.messageId = newChat.getKey();
-        newChat.setValue(data);
+        FirebaseDatabase.getInstance().getReference().child("users").child(this.userId).child("nick").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String userName = dataSnapshot.getValue(String.class);
+                    setNick(userName);
+                    data.put("nick", userName);
+                    newChat.setValue(data);
+
+                }
+            }
+        });
     }
     public void updateMessage(String chatId) {
         if (this.messageId != null) {
@@ -47,6 +68,7 @@ public class Message {
             data.put("userId", this.userId);
             data.put("time", this.time);
             data.put("message", this.message);
+            data.put("nick", this.nick);
             databaseReference.updateChildren(data);
         }
     }
@@ -56,6 +78,15 @@ public class Message {
             databaseReference.removeValue();
         }
     }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String userName) {
+        this.nick = userName;
+    }
+
     public int getTypeMessage() {
         return typeMessage;
     }

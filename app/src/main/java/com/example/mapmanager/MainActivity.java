@@ -3,6 +3,7 @@ package com.example.mapmanager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -10,12 +11,15 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
+import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,11 +32,13 @@ import com.yandex.mapkit.directions.DirectionsFactory;
 import com.yandex.mapkit.transport.Transport;
 import com.yandex.mapkit.transport.TransportFactory;
 
-public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat, ProfileFragment.ProfileChangeEnterListener {
+public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat, ProfileFragment.ProfileChangeEnterListener, HomeFragment.HomeFragmentListener {
     public static User user = new User();
     private FirebaseAuth jAuth;
     private DatabaseReference databaseReference;
     private ImageButton homeButton, profileButton, chatButton, mapButton;
+    private TextView homeText, profileText, chatText, mapText;
+    private ConstraintLayout homeLayout, profileLayout, chatLayout, mapLayout;
     private Drawable homeDrawable, profileDrawable, chatDrawable, mapDrawable;
     private HomeFragment homeFragment;
     private ProfileFragment profileFragment;
@@ -58,6 +64,16 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         chatButton = findViewById(R.id.chatButton);
         mapButton = findViewById(R.id.mapButton);
 
+        homeLayout = findViewById(R.id.homeLayout);
+        profileLayout = findViewById(R.id.profileLayout);
+        chatLayout = findViewById(R.id.chatLayout);
+        mapLayout = findViewById(R.id.mapLayout);
+
+        homeText = findViewById(R.id.homeText);
+        profileText = findViewById(R.id.profileText);
+        chatText = findViewById(R.id.chatText);
+        mapText = findViewById(R.id.mapText);
+
         homeDrawable = homeButton.getDrawable();
         profileDrawable = profileButton.getDrawable();
         chatDrawable = chatButton.getDrawable();
@@ -75,19 +91,19 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         jAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(jAuth.getCurrentUser().getUid());
 
-        homeButton.setOnClickListener(v -> {
+        homeLayout.setOnClickListener(v -> {
             setCurrentFragment(homeFragment);
         });
 
-        profileButton.setOnClickListener(v -> {
+        profileLayout.setOnClickListener(v -> {
             setCurrentFragment(profileFragment);
         });
 
-        mapButton.setOnClickListener(v -> {
+        mapLayout.setOnClickListener(v -> {
             setCurrentFragment(mapFragment);
         });
 
-        chatButton.setOnClickListener(v -> {
+        chatLayout.setOnClickListener(v -> {
             setCurrentFragment(messengerFragment);
         });
     }
@@ -118,20 +134,28 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
 
     private void resetButtonsColor() {
         homeDrawable.setColorFilter(getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_IN);
+        homeText.setTextColor(getResources().getColor(R.color.grey));
         profileDrawable.setColorFilter(getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_IN);
+        profileText.setTextColor(getResources().getColor(R.color.grey));
         chatDrawable.setColorFilter(getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_IN);
+        chatText.setTextColor(getResources().getColor(R.color.grey));
         mapDrawable.setColorFilter(getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_IN);
+        mapText.setTextColor(getResources().getColor(R.color.grey));
     }
     private void setCurrentFragment(Fragment fragment) {
         resetButtonsColor();
         if (fragment == homeFragment) {
             homeDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+            homeText.setTextColor(getResources().getColor(R.color.black));
         } else if (fragment == profileFragment) {
             profileDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+            profileText.setTextColor(getResources().getColor(R.color.black));
         } else if (fragment == messengerFragment) {
             chatDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+            chatText.setTextColor(getResources().getColor(R.color.black));
         } else if (fragment == mapFragment) {
             mapDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+            mapText.setTextColor(getResources().getColor(R.color.black));
         }
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
@@ -158,5 +182,14 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         fragmentTransaction.replace(R.id.fragment_container, profileChangeFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void showInMap(Route route) {
+        Bundle args = new Bundle();
+        args.putSerializable("ROUTE_TO_SHOW", route);
+        mapFragment.setArguments(args);
+        setCurrentFragment(mapFragment);
+//        mapFragment.routeOnMap(route);
     }
 }

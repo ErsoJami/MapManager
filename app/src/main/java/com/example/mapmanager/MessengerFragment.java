@@ -2,6 +2,7 @@ package com.example.mapmanager;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapmanager.adapters.ChatListAdapter;
 import com.example.mapmanager.models.Chat;
+import com.example.mapmanager.models.ChatsData;
+import com.example.mapmanager.models.Route;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class MessengerFragment extends Fragment {
@@ -75,26 +79,29 @@ public class MessengerFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.VISIBLE);
         dataLoad();
-
     }
     public void dataLoad() {
         chats.clear();
-        for (Map.Entry<String, String> item : MainActivity.user.getChatList().entrySet()) {
-            String chatId = item.getKey();
-            String lastReadMessageId = item.getValue();
-            chatsReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId);
-            chatsReference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-                @Override
-                public void onSuccess(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        Chat chat = dataSnapshot.getValue(Chat.class);
-                        chat.setLastReadMessageId(lastReadMessageId);
-                        chat.setId(chatId);
-                        chats.add(chat);
-                        adapter.notifyDataSetChanged();
-                    }
+        if (MainActivity.user.getUserChatsData() != null) {
+            for (HashMap.Entry<String, ChatsData> item : MainActivity.user.getUserChatsData().entrySet()) {
+                String chatId = item.getKey();
+                ChatsData chatsData = item.getValue();
+                if (chatId != null && chatsData != null) {
+                    chatsReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId);
+                    chatsReference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                        @Override
+                        public void onSuccess(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                Chat chat = dataSnapshot.getValue(Chat.class);
+                                chat.setLastReadMessageId(chatsData.getLastMessageId());
+                                chat.setId(chatId);
+                                chats.add(chat);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                    });
                 }
-            });
+            }
         }
     }
     @Override

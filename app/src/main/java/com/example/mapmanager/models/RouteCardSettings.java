@@ -5,7 +5,6 @@ import com.google.firebase.Timestamp;
 public class RouteCardSettings {
     private int minAge;
     private int maxAge;
-    private Timestamp timeStart;
 
     public RouteCardSettings() {}
 
@@ -23,20 +22,6 @@ public class RouteCardSettings {
 
     public void setMaxAge(int maxAge) {
         this.maxAge = maxAge;
-    }
-
-    public Timestamp getTimeStart() {
-        return timeStart;
-    }
-
-    public void setTimeStart(Timestamp timeStart) {
-        this.timeStart = timeStart;
-    }
-
-    public RouteCardSettings(int minAge, int maxAge, Timestamp timeStart) {
-        this.minAge = minAge;
-        this.maxAge = maxAge;
-        this.timeStart = timeStart;
     }
 
 }
