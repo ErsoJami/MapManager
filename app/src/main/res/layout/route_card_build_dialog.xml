@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded"
+    android:backgroundTint="#F6F4F4"
+    android:translationZ="-1dp">
+
+    <View
+        android:id="@+id/routeCardBuildingDescriptionView"
+        android:layout_width="0dp"
+        android:layout_height="116dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="17dp"
+        android:background="@drawable/rounded"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/routeCardBuildingNameEnter" />
+
+    <EditText
+        android:id="@+id/routeCardBuildingDescriptionEnter"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/small_rounded"
+        android:backgroundTint="@color/grey"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:padding="8dp"
+        android:scrollbars="vertical"
+        android:scrollHorizontally="false"
+        android:textColor="#000000"
+        android:textColorHint="@color/white2"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/routeCardBuildingDescriptionView"
+        app:layout_constraintEnd_toEndOf="@+id/routeCardBuildingDescriptionView"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingDescriptionView"
+        app:layout_constraintTop_toTopOf="@+id/routeCardBuildingDescriptionView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingDescriptionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:elevation="2dp"
+        android:text="Description"
+        android:textColor="@color/dark_grey"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:translationZ="3dp"
+        app:layout_constraintBottom_toTopOf="@+id/routeCardBuildingDescriptionEnter"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingDescriptionEnter"
+        app:layout_constraintTop_toTopOf="@+id/routeCardBuildingDescriptionView" />
+
+    <EditText
+        android:id="@+id/routeCardBuildingNameEnter"
+        android:layout_width="200dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/small_rounded"
+        android:backgroundTint="@color/white"
+        android:elevation="3dp"
+        android:ems="10"
+        android:gravity="top"
+        android:inputType="text"
+        android:padding="4dp"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:translationZ="-1dp"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingDescriptionView"
+        app:layout_constraintTop_toBottomOf="@+id/routeCardBuildingNameText" />
+
+    <ImageView
+        android:id="@+id/routeCardBuildingCloseImage"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:backgroundTint="@color/white"
+        android:translationZ="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/cross" />
+
+    <TextView
+        android:id="@+id/addRouteCardView"
+        android:layout_width="60dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/small_rounded"
+        android:backgroundTint="@color/green_light"
+        android:elevation="2dp"
+        android:gravity="center"
+        android:text="Add"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/routeCardBuildingStartTimeEditText"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingDateEditText"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/small_rounded"
+        android:elevation="3dp"
+        android:ems="10"
+        android:gravity="center"
+        android:translationZ="-1dp"
+        app:layout_constraintEnd_toStartOf="@+id/routeCardBuildingStartTimeEditText"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingDescriptionView"
+        app:layout_constraintTop_toBottomOf="@+id/routeCardBuildingDateText" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingDateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:elevation="1dp"
+        android:text="Date"
+        android:textColor="@color/dark_grey"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/routeCardBuildingDateEditText"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingDateEditText"
+        app:layout_constraintTop_toBottomOf="@+id/routeCardBuildingDescriptionView" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingStartTimeEditText"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="14dp"
+        android:background="@drawable/small_rounded"
+        android:elevation="3dp"
+        android:ems="10"
+        android:gravity="center"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/routeCardBuildingDateEditText"
+        app:layout_constraintEnd_toStartOf="@+id/routeCardBuildingEndTimeEditText"
+        app:layout_constraintTop_toTopOf="@+id/routeCardBuildingDateEditText" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingEndTimeEditText"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:background="@drawable/small_rounded"
+        android:elevation="3dp"
+        android:ems="10"
+        android:gravity="center"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/routeCardBuildingStartTimeEditText"
+        app:layout_constraintEnd_toEndOf="@+id/routeCardBuildingDescriptionView"
+        app:layout_constraintTop_toTopOf="@+id/routeCardBuildingStartTimeEditText"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingDashText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="1dp"
+        android:text="Time"
+        android:textColor="@color/dark_grey"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/routeCardBuildingDateText"
+        app:layout_constraintEnd_toEndOf="@+id/routeCardBuildingEndTimeEditText"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingStartTimeEditText"
+        app:layout_constraintTop_toTopOf="@+id/routeCardBuildingDateText" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingDashText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="1dp"
+        android:text="–"
+        android:textColor="@color/material_dynamic_neutral40"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/routeCardBuildingStartTimeEditText"
+        app:layout_constraintEnd_toEndOf="@+id/routeCardBuildingEndTimeEditText"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingStartTimeEditText"
+        app:layout_constraintTop_toTopOf="@+id/routeCardBuildingEndTimeEditText" />
+
+    <TextView
+        android:id="@+id/routeCardBuildingNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:elevation="1dp"
+        android:text="Name"
+        android:textColor="@color/dark_grey"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/routeCardBuildingNameEnter"
+        app:layout_constraintTop_toBottomOf="@+id/buildRouteCardHeading" />
+
+    <TextView
+        android:id="@+id/buildRouteCardHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="7dp"
+        android:fontFamily="cursive"
+        android:text="Создание путешествия"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:textSize="20sp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

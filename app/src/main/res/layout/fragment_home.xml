@@ -13,10 +13,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/routeListView"
             android:layout_width="0dp"
-            android:layout_height="194dp"
+            android:layout_height="324dp"
             android:layout_marginTop="5dp"
-            app:layout_constraintEnd_toEndOf="@+id/routeSearch"
-            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginEnd="50dp"
+            android:background="@drawable/rounded"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/routeSearch"
             app:layout_constraintTop_toBottomOf="@id/routeSearch" />
 
