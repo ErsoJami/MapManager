@@ -23,6 +23,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -54,9 +55,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.yandex.mapkit.search.search_layer.RequestType;
+import com.yandex.runtime.Error;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -82,32 +86,12 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private FirebaseAuth mAuth;
     private Calendar startTime, endTime;
     private HomeFragmentListener homeFragmentListener;
-    @Override
-    public void acceptRouteButton(int position) {
-        RouteCard routeCard = routeList.get(position);
-        FirebaseDatabase.getInstance().getReference().child("chats").child(routeCard.getChatId()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-            @Override
-            public void onSuccess(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Chat chat = dataSnapshot.getValue(Chat.class);
-                    chat.setId(dataSnapshot.getKey());
-                    chat.addNewMember(mAuth.getUid());
-                }
-            }
-        });
-    }
-
-    @Override
-    public void showInMapButton(int position) {
-        FirebaseDatabase.getInstance().getReference().child("routes").child(routeList.get(position).getRoute()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-            @Override
-            public void onSuccess(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    homeFragmentListener.showInMap(dataSnapshot.getValue(Route.class));
-                }
-            }
-        });
-
+    private SearchView searchView;
+    private DatabaseReference routeCardReference;
+    private Query query;
+    private interface SearchResultListener {
+        void onResultsFound(List<RouteCard> results);
+        void onError(DatabaseError error);
     }
 
     interface HomeFragmentListener {
@@ -207,6 +191,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             }
         });
         homeFragmentListener = (HomeFragmentListener) context;
+        routeCardReference = FirebaseDatabase.getInstance().getReference().child("routeCards");
     }
 
     @Override
@@ -214,6 +199,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         routeListView = view.findViewById(R.id.routeListView);
         plusView = view.findViewById(R.id.imageView3);
+        searchView = view.findViewById(R.id.routeSearch);
         adapter = new RouteDisplayAdapter(getContext(), routeList, this);
         selectAdapter = new RouteSelectAdapter(localRouteList, this);
         routeListView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -236,6 +222,27 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             selectingRouteListView.setAdapter(selectAdapter);
             selectingRouteListView.setVisibility(View.VISIBLE);
             dialog.show();
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                searchRoutesByNamePrefix(s, new SearchResultListener() {
+                    @Override
+                    public void onResultsFound(List<RouteCard> results) {
+                        routeList = results;
+                        adapter.notifyDataSetChanged();
+                    }
+                    @Override
+                    public void onError(DatabaseError error) {
+                    }
+                });
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String s) {
+
+                return false;
+            }
         });
     }
     @Override
@@ -345,6 +352,58 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         routeCardBuildingDateEditText.setText(DateUtils.formatDateTime(requireContext(),
                 startTime.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+    }
+    @Override
+    public void acceptRouteButton(int position) {
+        RouteCard routeCard = routeList.get(position);
+        FirebaseDatabase.getInstance().getReference().child("chats").child(routeCard.getChatId()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Chat chat = dataSnapshot.getValue(Chat.class);
+                    chat.setId(dataSnapshot.getKey());
+                    chat.addNewMember(mAuth.getUid());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void showInMapButton(int position) {
+        FirebaseDatabase.getInstance().getReference().child("routes").child(routeList.get(position).getRoute()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    homeFragmentListener.showInMap(dataSnapshot.getValue(Route.class));
+                }
+            }
+        });
+
+    }
+
+    private void searchRoutesByNamePrefix(String prefix, @NonNull SearchResultListener listener) {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            listener.onResultsFound(new ArrayList<RouteCard>());
+            return;
+        }
+        query = routeCardReference.orderByChild("name").startAt(prefix).endAt(prefix + "\uf8ff");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<RouteCard> results = new ArrayList<>();
+                if (snapshot.exists()) {
+                    for (DataSnapshot routeShot : snapshot.getChildren()) {
+                        RouteCard routeCard = routeShot.getValue(RouteCard.class);
+                        results.add(routeCard);
+                    }
+                }
+                listener.onResultsFound(results);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
 }
