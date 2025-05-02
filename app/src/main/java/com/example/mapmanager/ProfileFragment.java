@@ -170,13 +170,13 @@ public class ProfileFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(requireContext(), "Pass change", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Пароль изменён", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(requireContext(), "Pass don't change", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Пароль не изменён", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -195,14 +195,14 @@ public class ProfileFragment extends Fragment {
                             startActivity(intent);
                             requireActivity().finish();
                         } else {
-                            Toast.makeText(requireContext(), "Account deletion failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "Удаление акаунта прервано.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Toast.makeText(requireContext(), "Account deletion failed: " + e.getLocalizedMessage(),
+                        Toast.makeText(requireContext(), "Удаление акаунта прервано: " + e.getLocalizedMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
