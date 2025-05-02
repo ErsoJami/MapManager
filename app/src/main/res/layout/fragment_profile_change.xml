@@ -78,6 +78,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Сохранить"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
                     android:translationZ="3dp"
                     app:layout_constraintBottom_toBottomOf="@+id/saveData"
                     app:layout_constraintEnd_toEndOf="@+id/saveData"
@@ -85,82 +88,96 @@
                     app:layout_constraintTop_toTopOf="@+id/saveData" />
 
                 <View
-                    android:id="@+id/view12"
+                    android:id="@+id/changeView"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
-                    android:layout_marginTop="64dp"
-                    android:background="@color/light_grey"
-                    android:translationZ="1dp"
+                    android:layout_height="440dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/rounded"
+                    android:backgroundTint="@color/white"
+                    android:elevation="1dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/view11" />
+                    app:layout_constraintTop_toBottomOf="@+id/ProfileIconChangingButton" />
 
                 <View
-                    android:id="@+id/view13"
+                    android:id="@+id/divider1"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="64dp"
-                    android:background="@color/light_grey"
-                    android:translationZ="1dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/view12" />
-
-                <View
-                    android:id="@+id/view14"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
-                    android:layout_marginTop="64dp"
-                    android:background="@color/light_grey"
-                    android:translationZ="1dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/view13" />
-
-                <View
-                    android:id="@+id/view5"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
-                    android:layout_marginTop="64dp"
-                    android:background="@color/light_grey"
+                    android:layout_marginRight="20dp"
+                    android:background="@color/grey"
                     android:translationZ="1dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/changeView" />
 
                 <View
-                    android:id="@+id/view10"
+                    android:id="@+id/divider2"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="64dp"
-                    android:background="@color/light_grey"
+                    android:layout_marginRight="20dp"
+                    android:background="@color/grey"
                     android:translationZ="1dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/view5" />
+                    app:layout_constraintTop_toTopOf="@+id/divider1" />
 
                 <View
-                    android:id="@+id/view11"
+                    android:id="@+id/divider3"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="64dp"
-                    android:background="@color/light_grey"
+                    android:layout_marginRight="20dp"
+                    android:background="@color/grey"
                     android:translationZ="1dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/view10" />
+                    app:layout_constraintTop_toTopOf="@+id/divider2" />
+
+                <View
+                    android:id="@+id/divider4"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="64dp"
+                    android:background="@color/grey"
+                    android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/divider3" />
+
+                <View
+                    android:id="@+id/divider5"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="64dp"
+                    android:background="@color/grey"
+                    android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/divider4" />
+
+                <View
+                    android:id="@+id/divider6"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="64dp"
+                    android:background="@color/grey"
+                    android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/divider5" />
 
                 <ImageView
                     android:id="@+id/ProfileIconChangingButton"
@@ -172,28 +189,15 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/main_photo" />
 
-                <View
-                    android:id="@+id/changeView"
-                    android:layout_width="0dp"
-                    android:layout_height="440dp"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="40dp"
-                    android:background="@drawable/rounded"
-                    android:backgroundTint="@color/white"
-                    android:elevation="1dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ProfileIconChangingButton" />
-
                 <TextView
                     android:id="@+id/changeNickText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Никнейм:"
+                    android:layout_marginEnd="10dp"
+                    android:text="Никнейм"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view5"
+                    app:layout_constraintBottom_toTopOf="@+id/divider1"
+                    app:layout_constraintEnd_toStartOf="@+id/nickInput"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toTopOf="@+id/changeView" />
 
@@ -201,106 +205,117 @@
                     android:id="@+id/changeRealNameText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Полное имя:"
+                    android:layout_marginEnd="10dp"
+                    android:text="Полное имя"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view10"
+                    app:layout_constraintBottom_toTopOf="@+id/divider2"
+                    app:layout_constraintEnd_toStartOf="@+id/realNameInput"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view5" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider1" />
 
                 <TextView
                     android:id="@+id/changeBirthDateText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="10dp"
-                    android:text="Дата рождения:"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="center"
+                    android:text="Дата рождения"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view12"
+                    app:layout_constraintBottom_toTopOf="@+id/divider4"
+                    app:layout_constraintEnd_toStartOf="@+id/dateText"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view11" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider3" />
 
                 <TextView
                     android:id="@+id/changePhoneNumberText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Телефон:"
+                    android:layout_marginEnd="10dp"
+                    android:text="Телефон"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view11"
+                    app:layout_constraintBottom_toTopOf="@+id/divider3"
+                    app:layout_constraintEnd_toStartOf="@+id/phoneInput"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view10" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
                 <TextView
                     android:id="@+id/changeEmailText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Почта:"
+                    android:layout_marginEnd="10dp"
+                    android:text="Почта"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view13"
+                    app:layout_constraintBottom_toTopOf="@+id/divider5"
+                    app:layout_constraintEnd_toStartOf="@+id/emailInput"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view12" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
                 <TextView
                     android:id="@+id/changeCountryText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Страна:"
+                    android:layout_marginEnd="10dp"
+                    android:text="Страна"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view14"
+                    app:layout_constraintBottom_toTopOf="@+id/divider6"
+                    app:layout_constraintEnd_toStartOf="@+id/countryInput"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view13" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider5" />
 
                 <TextView
                     android:id="@+id/changeCityText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Город:"
+                    android:layout_marginEnd="10dp"
+                    android:text="Город"
                     android:translationZ="1dp"
                     app:layout_constraintBottom_toBottomOf="@+id/changeView"
+                    app:layout_constraintEnd_toStartOf="@+id/cityInput"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view14" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider6" />
 
                 <TextView
                     android:id="@+id/dateText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="136dp"
+                    android:layout_width="162dp"
+                    android:layout_height="39dp"
+                    android:layout_marginStart="130dp"
                     android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/material_dynamic_neutral50"
                     android:hint="Выберите дату"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view12"
+                    app:layout_constraintBottom_toTopOf="@+id/divider4"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view11" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider3" />
 
                 <ImageView
                     android:id="@+id/dateChangeIcon"
                     android:layout_width="18dp"
                     android:layout_height="21dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="20dp"
                     android:translationZ="1dp"
-                    app:layout_constraintBottom_toTopOf="@+id/view12"
+                    app:layout_constraintBottom_toTopOf="@+id/divider4"
                     app:layout_constraintEnd_toEndOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view11"
+                    app:layout_constraintTop_toBottomOf="@+id/divider3"
                     app:srcCompat="@drawable/date_icon" />
 
                 <EditText
                     android:id="@+id/nickInput"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="100dp"
-                    android:backgroundTint="@color/material_dynamic_neutral50"
+                    android:layout_marginStart="130dp"
+                    android:background="@null"
                     android:ems="10"
                     android:hint="Введите ник"
                     android:inputType="text"
-                    android:textColor="@color/material_dynamic_neutral50"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
+                    app:layout_constraintBottom_toTopOf="@+id/divider1"
                     app:layout_constraintEnd_toEndOf="@+id/changeView"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintBottom_toTopOf="@+id/view5"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toTopOf="@+id/changeView" />
 
@@ -308,92 +323,97 @@
                     android:id="@+id/realNameInput"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="100dp"
-                    android:backgroundTint="@color/material_dynamic_neutral50"
+                    android:layout_marginStart="130dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/material_dynamic_neutral50"
+                    android:background="@null"
                     android:ems="10"
                     android:hint="Введите имя"
                     android:inputType="text"
-                    android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
                     app:layout_constraintEnd_toEndOf="@+id/changeView"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintBottom_toTopOf="@+id/view10"
+                    app:layout_constraintBottom_toTopOf="@+id/divider2"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view5" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider1" />
 
                 <EditText
                     android:id="@+id/phoneInput"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="100dp"
-                    android:backgroundTint="@color/material_dynamic_neutral50"
+                    android:layout_marginStart="130dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/material_dynamic_neutral50"
+                    android:background="@null"
                     android:ems="10"
                     android:hint="Введите телефон"
                     android:inputType="text"
-                    android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
                     app:layout_constraintEnd_toEndOf="@+id/changeView"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintBottom_toTopOf="@+id/view11"
+                    app:layout_constraintBottom_toTopOf="@+id/divider3"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view10" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
                 <EditText
                     android:id="@+id/emailInput"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="100dp"
-                    android:backgroundTint="@color/material_dynamic_neutral50"
+                    android:layout_marginStart="130dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/material_dynamic_neutral50"
+                    android:background="@null"
                     android:ems="10"
                     android:hint="Введите email"
                     android:inputType="text"
-                    android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
                     app:layout_constraintEnd_toEndOf="@+id/changeView"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintBottom_toTopOf="@+id/view13"
+                    app:layout_constraintBottom_toTopOf="@+id/divider5"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view12" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
                 <EditText
                     android:id="@+id/countryInput"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="100dp"
-                    android:backgroundTint="@color/material_dynamic_neutral50"
+                    android:layout_marginStart="130dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/material_dynamic_neutral50"
+                    android:background="@null"
                     android:ems="10"
                     android:hint="Укажите страну"
                     android:inputType="text"
-                    android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
                     app:layout_constraintEnd_toEndOf="@+id/changeView"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintBottom_toTopOf="@+id/view14"
+                    app:layout_constraintBottom_toTopOf="@+id/divider6"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view13" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider5" />
 
                 <EditText
                     android:id="@+id/cityInput"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_marginStart="100dp"
+                    android:layout_marginStart="130dp"
                     android:layout_marginEnd="67dp"
-                    android:backgroundTint="@color/material_dynamic_neutral50"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/material_dynamic_neutral50"
+                    android:background="@null"
                     android:ems="10"
                     android:hint="Укажите город"
                     android:inputType="text"
-                    android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
                     app:layout_constraintBottom_toBottomOf="@+id/changeView"
                     app:layout_constraintEnd_toEndOf="@+id/changeView"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
-                    app:layout_constraintTop_toBottomOf="@+id/view14" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider6" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

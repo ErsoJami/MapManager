@@ -1,23 +1,18 @@
 package com.example.mapmanager;
 
-import static com.google.android.material.internal.ViewUtils.dpToPx;
-
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -28,10 +23,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapmanager.adapters.ChatAdapter;
-import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.models.ChatsData;
 import com.example.mapmanager.models.Message;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,8 +40,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.zip.Inflater;
 
 public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterListener {
 
@@ -363,7 +354,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         deleteMessageText.setVisibility(View.GONE);
         View view1, view2;
         view1 = itemView.findViewById(R.id.view2);
-        view2 = itemView.findViewById(R.id.view5);
+        view2 = itemView.findViewById(R.id.divider1);
         view1.setVisibility(View.GONE);
         view2.setVisibility(View.GONE);
         ImageView imageView = itemView.findViewById(R.id.view3), imageView1 = itemView.findViewById(R.id.view17);

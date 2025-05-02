@@ -4,10 +4,7 @@ import android.app.DatePickerDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,24 +58,24 @@ public class ProfileChangeFragment extends Fragment {
         changeCountryText = view.findViewById(R.id.countryInput);
         changeCityText = view.findViewById(R.id.cityInput);
         saveData = view.findViewById(R.id.saveData);
-        view1 = view.findViewById(R.id.view5);
-        view2 = view.findViewById(R.id.view10);
-        view3 = view.findViewById(R.id.view11);
-        view4 = view.findViewById(R.id.view12);
-        view5 = view.findViewById(R.id.view13);
-        view6 = view.findViewById(R.id.view14);
+        view1 = view.findViewById(R.id.divider1);
+        view2 = view.findViewById(R.id.divider2);
+        view3 = view.findViewById(R.id.divider3);
+        view4 = view.findViewById(R.id.divider4);
+        view5 = view.findViewById(R.id.divider5);
+        view6 = view.findViewById(R.id.divider6);
         view7 = view.findViewById(R.id.changeView);
-        view7.post(new Runnable() {
-            @Override
-            public void run() {
-                view1.bringToFront();
-                view2.bringToFront();
-                view3.bringToFront();
-                view4.bringToFront();
-                view5.bringToFront();
-                view6.bringToFront();
-            }
-        });
+//        view7.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                view1.bringToFront();
+//                view2.bringToFront();
+//                view3.bringToFront();
+//                view4.bringToFront();
+//                view5.bringToFront();
+//                view6.bringToFront();
+//            }
+//        });
         return view;
     }
 

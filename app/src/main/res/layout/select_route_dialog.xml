@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="330dp"
-    android:layout_height="300dp">
+    android:layout_height="300dp"
+    android:background="@drawable/small_rounded"
+    android:backgroundTint="@color/light_grey">
 
     <TextView
         android:id="@+id/selectRouteTitle"
@@ -30,8 +32,6 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="7dp"
-        android:background="@drawable/rounded"
-        android:backgroundTint="#FFFFFF"
         android:padding="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
