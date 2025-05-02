@@ -2,12 +2,14 @@ package com.example.mapmanager.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,17 +50,25 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
         if (route != null) {
             holder.text1.setText(route.getName());
             holder.text2.setText(route.getDescription());
-            holder.checkUp.setOnClickListener(v -> {
-                String text = holder.text1.getText().toString();
-                holder.text1.clearFocus();
-                imm.hideSoftInputFromWindow(holder.text1.getWindowToken(), 0);
-                routeAdapterListener.onRouteNameChanged(text, position);
+            holder.text1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                    String text = holder.text1.getText().toString();
+                    holder.text1.clearFocus();
+                    imm.hideSoftInputFromWindow(holder.text1.getWindowToken(), 0);
+                    routeAdapterListener.onRouteNameChanged(text, position);
+                    return true;
+                }
             });
-            holder.checkDown.setOnClickListener(v -> {
-                String text = holder.text2.getText().toString();
-                holder.text2.clearFocus();
-                imm.hideSoftInputFromWindow(holder.text2.getWindowToken(), 0);
-                routeAdapterListener.onRouteDescriptionChanged(text, position);
+            holder.text2.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                    String text = holder.text2.getText().toString();
+                    holder.text2.clearFocus();
+                    imm.hideSoftInputFromWindow(holder.text2.getWindowToken(), 0);
+                    routeAdapterListener.onRouteDescriptionChanged(text, position);
+                    return true;
+                }
             });
             holder.deleteRoute.setOnClickListener(v -> {
                 routeAdapterListener.onDeleteRoute(position);
@@ -75,13 +85,11 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
     }
     public static class ViewHolder extends RecyclerView.ViewHolder {
         final EditText text1, text2;
-        final ImageView checkUp, checkDown, focusToRoute, deleteRoute;
+        final ImageView focusToRoute, deleteRoute;
         ViewHolder(View view){
             super(view);
             text1 = view.findViewById(R.id.editNameText);
             text2 = view.findViewById(R.id.editDescriptionText);
-            checkUp = view.findViewById(R.id.checkUp);
-            checkDown = view.findViewById(R.id.checkDown);
             focusToRoute = view.findViewById(R.id.focusToRoute);
             deleteRoute = view.findViewById(R.id.deleteRoute);
         }

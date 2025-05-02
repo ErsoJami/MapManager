@@ -10,10 +10,12 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +32,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editTextPassword;
     private Button buttonLogin;
     private TextView registerTextView;
-
+    private ImageView passStatusView;
     private TextView passRecoveryTextView;
+    private boolean showPass = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        passStatusView = findViewById(R.id.passStatusView);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
@@ -117,6 +121,18 @@ public class LoginActivity extends AppCompatActivity {
         passRecoveryTextView.setText(pr);
         passRecoveryTextView.setMovementMethod(LinkMovementMethod.getInstance());
         passRecoveryTextView.setHighlightColor(Color.TRANSPARENT);
+        passStatusView.setOnClickListener(v -> {
+            if (!showPass) {
+                passStatusView.setImageResource(R.drawable.hide_pass);
+                showPass = true;
+                editTextPassword.setTransformationMethod(null);
+            } else {
+                passStatusView.setImageResource(R.drawable.show_pass);
+                showPass = false;
+                editTextPassword.setTransformationMethod(new PasswordTransformationMethod());
+            }
+            editTextPassword.setSelection(editTextPassword.getText().length());
+        });
     }
 
     private void loginUser(String email, String password) {

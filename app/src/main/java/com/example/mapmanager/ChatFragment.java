@@ -51,6 +51,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     private DatabaseReference messageListReference;
     private EditText sendTextEdit;
     private TextView chatNameText;
+    private ImageView leaveChatButton;
     private ImageView sendView;
     private FirebaseAuth mAuth;
     private InputMethodManager imm;
@@ -97,6 +98,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             }
         });
         messageListView = view.findViewById(R.id.messageListView);
+        leaveChatButton = view.findViewById(R.id.leaveChatButton);
         sendTextEdit = view.findViewById(R.id.sendTextEdit);
         sendView = view.findViewById(R.id.sendButton);
         mAuth = FirebaseAuth.getInstance();
@@ -234,6 +236,9 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 focusOnMessage(adapter.getItemCount() - 1);
             }
         });
+        leaveChatButton.setOnClickListener(v -> {
+            requireActivity().getOnBackPressedDispatcher().onBackPressed();
+        });
 
     }
     private void focusOnMessage(int position) {
@@ -278,6 +283,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
     @Override
     public void onMyMessageClick(int position) {
+        Message message = messageList.get(position);
         LinearLayoutManager layoutManager = (LinearLayoutManager) messageListView.getLayoutManager();
         View view = layoutManager.findViewByPosition(position);
         LayoutInflater inflater = LayoutInflater.from(requireContext());
@@ -290,7 +296,6 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         PopupWindow popupWindow = new PopupWindow(itemView, weight, height, false);
         changeMessageText.setOnClickListener(v -> {
-            Message message = messageList.get(position);
             String text = sendTextEdit.getText().toString();
             sendTextEdit.setText(message.getMessage());
             sendView.setImageResource(R.drawable.check);
@@ -320,7 +325,6 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             });
         });
         deleteMessageText.setOnClickListener(v -> {
-            Message message = messageList.get(position);
             message.deleteMessage(chatId);
             HashMap<String, ChatsData> map = MainActivity.user.getUserChatsData();
             ChatsData chatsData = map.get(chatId);
@@ -333,7 +337,6 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             popupWindow.dismiss();
         });
         copyMessageText.setOnClickListener(v -> {
-            Message message = messageList.get(position);
             copyMessage(message.getMessage());
             popupWindow.dismiss();
         });

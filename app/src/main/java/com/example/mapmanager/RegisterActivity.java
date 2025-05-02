@@ -7,11 +7,13 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +43,9 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText editTextConfirmPassword;
     private Button buttonRegister;
     private TextView loginTextView;
+    private ImageView passStatusView1, passStatusView2;
+    private boolean showPass1 = false;
+    private boolean showPass2 = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,8 @@ public class RegisterActivity extends AppCompatActivity {
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
         loginTextView = findViewById(R.id.loginTextView);
+        passStatusView1 = findViewById(R.id.passStatusView1);
+        passStatusView2 = findViewById(R.id.passStatusView2);
 
         buttonRegister.setOnClickListener(v -> {
             String email = editTextEmail.getText().toString();
@@ -88,6 +95,30 @@ public class RegisterActivity extends AppCompatActivity {
         loginTextView.setText(ss);
         loginTextView.setMovementMethod(LinkMovementMethod.getInstance());
         loginTextView.setHighlightColor(Color.TRANSPARENT);
+        passStatusView1.setOnClickListener(v -> {
+            if (!showPass1) {
+                passStatusView1.setImageResource(R.drawable.hide_pass);
+                showPass1 = true;
+                editTextPassword.setTransformationMethod(null);
+            } else {
+                passStatusView1.setImageResource(R.drawable.show_pass);
+                showPass1 = false;
+                editTextPassword.setTransformationMethod(new PasswordTransformationMethod());
+            }
+            editTextPassword.setSelection(editTextPassword.getText().length());
+        });
+        passStatusView2.setOnClickListener(v -> {
+            if (!showPass2) {
+                passStatusView2.setImageResource(R.drawable.hide_pass);
+                showPass2 = true;
+                editTextConfirmPassword.setTransformationMethod(null);
+            } else {
+                passStatusView2.setImageResource(R.drawable.show_pass);
+                showPass2 = false;
+                editTextConfirmPassword.setTransformationMethod(new PasswordTransformationMethod());
+            }
+            editTextConfirmPassword.setSelection(editTextConfirmPassword.getText().length());
+        });
     }
     @Override
     protected void onStart() {

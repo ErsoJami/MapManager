@@ -1,6 +1,7 @@
 package com.example.mapmanager.models;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -121,6 +122,10 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     public MapManager(Context context, MapView mapView, MapManagerSearchListener searchListener, MapManagerSuggestListener suggestListener, MapLongTapListener mapLongTapListener) {
         this.context = context;
         this.mapView = mapView;
+        int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            mapView.getMap().setNightModeEnabled(true);
+        }
         mapView.getMap().addInputListener(this);
         this.searchListener = searchListener;
         this.suggestListener = suggestListener;

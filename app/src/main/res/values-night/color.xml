@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#E0E0E0</color>
+    <color name="white">#121212</color>
+    <color name="white2">#1E1E1E</color>
+    <color name="grey">#333333</color>
+    <color name="grey_white">#4F4F4F</color>
+    <color name="light_grey">#444444</color>
+    <color name="dark_grey">#BDBDBD</color>
+    <color name="blue">#82B1FF</color>
+    <color name="red">#C52727</color>
+    <color name="dark_red">#900A0A</color>
+    <color name="green_dark">#308500</color>
+    <color name="green">#489D00</color>
+    <color name="green_light">#47C900</color>
+    <color name="green_ultra_dark">#005205</color>
+    <color name="myMessageBackground">#4C90C9</color>
+    <color name="otherMessageBackground">#1D3957</color>
+    <color name="myMessageTextColor">#FFFFFF</color>
+    <color name="otherMessageTextColor">#E0E0E0</color>
+    <color name="otherMessageUsernameColor">#A0A0A0</color>
+
+</resources>

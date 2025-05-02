@@ -41,7 +41,7 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="50dp"
         android:background="@drawable/rounded"
-        android:backgroundTint="@color/green_dark"
+        android:backgroundTint="@color/red"
         android:clickable="true"
         android:elevation="1dp"
         android:paddingTop="8dp"
@@ -64,7 +64,6 @@
         app:layout_constraintBottom_toBottomOf="@id/accountDeleteView"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="@id/accountDeleteView"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@id/accountDeleteView"
         app:layout_constraintTop_toTopOf="@+id/accountDeleteView" />
 
@@ -77,7 +76,7 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/rounded"
-        android:backgroundTint="#EDEDED"
+        android:backgroundTint="@color/white2"
         android:clickable="true"
         android:elevation="1dp"
         app:layout_constraintBottom_toBottomOf="parent"

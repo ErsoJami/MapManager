@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -104,6 +105,9 @@ public class ProfileChangeFragment extends Fragment {
                 for (HashMap.Entry<String, ChatsData> item : MainActivity.user.getUserChatsData().entrySet()) {
                     String chatId = item.getKey();
                     ChatsData chatsData = item.getValue();
+                    if (chatsData.getMessageList() == null) {
+                        chatsData.setMessageList(new ArrayList<>());
+                    }
                     for (String messageId : chatsData.getMessageList()) {
                         data2.put("/" + chatId + "/messages/" + messageId + "/nick", changeNicknameText.getText().toString());
                     }
@@ -118,6 +122,7 @@ public class ProfileChangeFragment extends Fragment {
             MainActivity.user.setCity(changeCityText.getText().toString());
             MainActivity.user.setBirthDayTime(date.getTimeInMillis());
             MainActivity.user.changeData(databaseReference);
+            requireActivity().getOnBackPressedDispatcher().onBackPressed();
         });
     }
 

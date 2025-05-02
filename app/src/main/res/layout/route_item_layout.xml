@@ -65,40 +65,24 @@
 
 
     <ImageView
-        android:id="@+id/checkUp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@+id/editNameText"
-        app:layout_constraintTop_toTopOf="@+id/editNameText"
-        android:clickable="true"
-        app:srcCompat="@drawable/check" />
-
-    <ImageView
-        android:id="@+id/checkDown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@+id/editDescriptionText"
-        app:layout_constraintTop_toTopOf="@+id/editDescriptionText"
-        android:clickable="true"
-        app:srcCompat="@drawable/check" />
-
-    <ImageView
         android:id="@+id/deleteRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/checkDown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toEndOf="@+id/editNameText"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/delete_account_icon"
         app:tint="@color/red" />
 
     <ImageView
         android:id="@+id/focusToRoute"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="15dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/deleteRoute"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/region_icon"

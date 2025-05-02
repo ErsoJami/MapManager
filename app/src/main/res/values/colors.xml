@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFF</color>
     <color name="white2">#F0F0F0</color>
+    <color name="grey_white">#b5b5b5</color>
     <color name="grey">#C6C5C5C5</color>
     <color name="light_grey">#A7E6E6E6</color>
     <color name="dark_grey">#666666</color>
@@ -12,4 +13,10 @@
     <color name="green_dark">#58cc02</color>
     <color name="green">#5dff01</color>
     <color name="green_light">#6eff02</color>
+    <color name="green_ultra_dark">#20a620</color>
+    <color name="myMessageBackground">#2B5377</color>
+    <color name="otherMessageBackground">#18293B</color>
+    <color name="myMessageTextColor">#FFFFFF</color>
+    <color name="otherMessageTextColor">#E0E0E0</color>
+    <color name="otherMessageUsernameColor">#A0A0A0</color>
 </resources>

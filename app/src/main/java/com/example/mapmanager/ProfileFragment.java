@@ -3,6 +3,8 @@ package com.example.mapmanager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -15,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,6 +42,7 @@ public class ProfileFragment extends Fragment {
     private DatabaseReference databaseReference;
     private TextView userTextView, emailTextView, dateTextView, quitAccountText, deleteAccountText, changePassText, changePersonalDataText;
     private View view1, view2, view3, view6, view7, view8, view9;
+    private ImageView profileImage;
     private ImageView deleteAccountView;
     @Override
     public void onAttach(@NonNull Context context) {
@@ -49,6 +54,8 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         userTextView = view.findViewById(R.id.userTextView);
         emailTextView = view.findViewById(R.id.emailTextView);
+        profileImage = view.findViewById(R.id.ProfileIconChangingButton);
+        CropImage();
         dateTextView = view.findViewById(R.id.dateTextView);
         deleteAccountView = view.findViewById(R.id.deleteAccountView);
         quitAccountText = view.findViewById(R.id.quitAccountText);
@@ -228,5 +235,12 @@ public class ProfileFragment extends Fragment {
         if (MainActivity.user.getBirthDayTime() != 0)
             dateTextView.setText(DateUtils.formatDateTime( requireActivity(), MainActivity.user.getBirthDayTime(),
                     DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_DATE));
+    }
+    void CropImage() {
+        Bitmap bt = BitmapFactory.decodeResource(getResources(), R.drawable.main_photo);
+        RoundedBitmapDrawable btm = RoundedBitmapDrawableFactory.create(getResources(), bt);
+        float radius = Math.min(bt.getWidth(), bt.getHeight()) / 2f;
+        btm.setCornerRadius(radius);
+        profileImage.setImageDrawable(btm);
     }
 }

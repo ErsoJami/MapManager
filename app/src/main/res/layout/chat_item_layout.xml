@@ -28,7 +28,6 @@
         android:translationZ="2dp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView" />
-ф
 
     <TextView
         android:id="@+id/textView2"
@@ -48,7 +47,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:tint="#010101"
+        app:tint="@color/black"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/view15"
         app:layout_constraintStart_toStartOf="@+id/view15"
