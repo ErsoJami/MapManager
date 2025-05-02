@@ -67,30 +67,31 @@
 
     <View
         android:id="@+id/postButtonView"
-        android:layout_width="50dp"
+        android:layout_width="0dp"
         android:layout_height="24dp"
-        android:layout_marginEnd="9dp"
         android:background="@drawable/small_rounded"
         android:backgroundTint="@color/green_light"
         android:elevation="3dp"
         android:translationZ="-1dp"
-        app:layout_constraintBottom_toBottomOf="@+id/RouteNameText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/RouteNameText" />
+        app:layout_constraintBottom_toBottomOf="@+id/postButtonText"
+        app:layout_constraintEnd_toEndOf="@+id/postButtonText"
+        app:layout_constraintStart_toStartOf="@+id/postButtonText"
+        app:layout_constraintTop_toTopOf="@+id/postButtonText" />
 
     <TextView
         android:id="@+id/postButtonText"
-        android:layout_width="38dp"
-        android:layout_height="22dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="9dp"
         android:gravity="center"
-        android:text="post"
+        android:padding="4dp"
+        android:text="Выложить"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:textStyle="bold"
         android:translationZ="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/postButtonView"
-        app:layout_constraintEnd_toEndOf="@+id/postButtonView"
-        app:layout_constraintStart_toStartOf="@+id/postButtonView"
-        app:layout_constraintTop_toTopOf="@+id/postButtonView" />
+        app:layout_constraintBottom_toBottomOf="@+id/RouteNameText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/RouteNameText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
