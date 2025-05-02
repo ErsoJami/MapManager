@@ -280,6 +280,9 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         ValueAnimator valueAnimator;
         ViewGroup.LayoutParams params = menuView.getLayoutParams();
         int screenWidth = getScreenWidth(requireContext());
+        if (screenWidth == -1) {
+            screenWidth = (int) DpToPx(400f, requireContext());
+        }
         if (isCloseMenuView) {
             menuView.setVisibility(View.VISIBLE);
             routeText.setVisibility(View.VISIBLE);
@@ -301,6 +304,9 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         ValueAnimator valueAnimator;
         ViewGroup.LayoutParams params = menuView.getLayoutParams();
         int screenWidth = getScreenWidth(requireContext());
+        if (screenWidth == -1) {
+            screenWidth = (int) DpToPx(400f, requireContext());
+        }
         if (!isCloseMenuView) {
             valueAnimator = ValueAnimator.ofInt(Math.min((int) DpToPx(400f, requireContext()), screenWidth), 1);
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
