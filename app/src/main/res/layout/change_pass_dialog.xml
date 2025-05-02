@@ -22,9 +22,11 @@
 
     <View
         android:id="@+id/applyChangePassView"
-        android:layout_width="312dp"
+        android:layout_width="0dp"
         android:layout_height="36dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/green_dark"
         android:clickable="true"
@@ -47,14 +49,15 @@
         app:layout_constraintBottom_toBottomOf="@+id/applyChangePassView"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="@+id/applyChangePassView"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/applyChangePassView" />
 
     <View
         android:id="@+id/cancelView"
-        android:layout_width="312dp"
+        android:layout_width="0dp"
         android:layout_height="36dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/rounded"
         android:backgroundTint="#EDEDED"
         android:clickable="true"
@@ -74,15 +77,16 @@
         android:translationZ="1dp"
         app:layout_constraintBottom_toBottomOf="@+id/cancelView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/cancelView" />
 
     <EditText
         android:id="@+id/editPasswordText"
-        android:layout_width="305dp"
+        android:layout_width="0dp"
         android:layout_height="45dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="5dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/rounded"
         android:backgroundTint="#EDEDED"
         android:elevation="1dp"
@@ -97,9 +101,11 @@
 
     <EditText
         android:id="@+id/confirmPasswordText"
-        android:layout_width="305dp"
+        android:layout_width="0dp"
         android:layout_height="45dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="5dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/rounded"
         android:backgroundTint="#EDEDED"
         android:elevation="1dp"

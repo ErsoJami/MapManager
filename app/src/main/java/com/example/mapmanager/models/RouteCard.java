@@ -9,6 +9,16 @@ import java.util.HashMap;
 public class RouteCard {
     private String route;
     private String id;
+    private String chatId;
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
+
     private String name;
     private String description;
     private long startTime, endTime;
@@ -37,6 +47,7 @@ public class RouteCard {
         HashMap<String, Object> data = new HashMap<>();
         data.put("route", route);
         data.put("name", name);
+        data.put("chatId", chatId);
         data.put("description", description);
         data.put("startTime", startTime);
         data.put("endTime", endTime);

@@ -112,7 +112,8 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     }
     public interface MapLongTapListener {
         void onMapLongTap(PlacemarkMapObject placemarkMapObject);
-        void OnDragWaypoint();
+        void onDragWaypoint();
+        void onFocusToPolyline();
     }
     private final MapManagerSearchListener searchListener;
     private final MapLongTapListener mapLongTapListener;
@@ -354,6 +355,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
             mapWaypointObjectCollection.clear();
             PolylineMapObject routePolyline = mapWaypointObjectCollection.addPolyline(route.getGeometry());
             lastRoutePolyline = routePolyline;
+            mapLongTapListener.onFocusToPolyline();
         } else {
             mapWaypointObjectCollection.clear();
             Toast.makeText(context, "Некорректный маршрут", Toast.LENGTH_SHORT).show();
@@ -391,7 +393,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
 
     @Override
     public void onMapObjectDragEnd(@NonNull MapObject mapObject) {
-        mapLongTapListener.OnDragWaypoint();
+        mapLongTapListener.onDragWaypoint();
     }
     @Override
     public void onMapLongTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {

@@ -82,10 +82,19 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private FirebaseAuth mAuth;
     private Calendar startTime, endTime;
     private HomeFragmentListener homeFragmentListener;
-
     @Override
     public void acceptRouteButton(int position) {
-
+        RouteCard routeCard = routeList.get(position);
+        FirebaseDatabase.getInstance().getReference().child("chats").child(routeCard.getChatId()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Chat chat = dataSnapshot.getValue(Chat.class);
+                    chat.setId(dataSnapshot.getKey());
+                    chat.addNewMember(mAuth.getUid());
+                }
+            }
+        });
     }
 
     @Override
@@ -249,7 +258,12 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             if (!routeCardBuildingNameEnter.getText().toString().isEmpty() &&
                     initialStartTimeMillis > startTime.getTimeInMillis() && initialEndTimeMillis > endTime.getTimeInMillis()) {
                 RouteCard routeCard = new RouteCard(curRoute.getId(), routeCardBuildingNameEnter.getText().toString(), routeCardBuildingDescriptionEnter.getText().toString(),
-                        new RouteCardSettings(), startTime.getTimeInMillis(), endTime.getTimeInMillis());
+                        new RouteCardSettings(), initialStartTimeMillis, initialEndTimeMillis);
+
+                ArrayList<String> memberList = new ArrayList<>();
+                Chat chat = new Chat(startTime.getTimeInMillis(), memberList, routeCardBuildingNameEnter.getText().toString(), "");
+                chat.addNewMember(mAuth.getUid());
+                routeCard.setChatId(chat.getId());
                 routeCard.createRoutCard();
                 buildDialog.dismiss();
                 startTime = Calendar.getInstance();

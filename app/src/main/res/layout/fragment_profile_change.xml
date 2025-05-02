@@ -62,13 +62,16 @@
                     android:layout_width="180dp"
                     android:layout_height="35dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginBottom="40dp"
                     android:background="@drawable/rounded"
                     android:backgroundTint="@color/green_light"
                     android:clickable="true"
                     android:translationZ="2dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/changeView" />
+                    app:layout_constraintTop_toBottomOf="@+id/changeView"
+                    app:layout_constraintVertical_bias="0.0" />
 
                 <TextView
                     android:id="@+id/textView16"
@@ -285,7 +288,7 @@
 
                 <EditText
                     android:id="@+id/nickInput"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginStart="100dp"
                     android:backgroundTint="@color/material_dynamic_neutral50"
@@ -295,13 +298,15 @@
                     android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="@+id/changeView"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintBottom_toTopOf="@+id/view5"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toTopOf="@+id/changeView" />
 
                 <EditText
                     android:id="@+id/realNameInput"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginStart="100dp"
                     android:backgroundTint="@color/material_dynamic_neutral50"
@@ -311,13 +316,15 @@
                     android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="@+id/changeView"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintBottom_toTopOf="@+id/view10"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toBottomOf="@+id/view5" />
 
                 <EditText
                     android:id="@+id/phoneInput"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginStart="100dp"
                     android:backgroundTint="@color/material_dynamic_neutral50"
@@ -327,13 +334,15 @@
                     android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="@+id/changeView"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintBottom_toTopOf="@+id/view11"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toBottomOf="@+id/view10" />
 
                 <EditText
                     android:id="@+id/emailInput"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginStart="100dp"
                     android:backgroundTint="@color/material_dynamic_neutral50"
@@ -343,13 +352,15 @@
                     android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="@+id/changeView"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintBottom_toTopOf="@+id/view13"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toBottomOf="@+id/view12" />
 
                 <EditText
                     android:id="@+id/countryInput"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginStart="100dp"
                     android:backgroundTint="@color/material_dynamic_neutral50"
@@ -359,15 +370,18 @@
                     android:textColor="@color/material_dynamic_neutral50"
                     android:textSize="14sp"
                     android:translationZ="1dp"
+                    app:layout_constraintEnd_toEndOf="@+id/changeView"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintBottom_toTopOf="@+id/view14"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toBottomOf="@+id/view13" />
 
                 <EditText
                     android:id="@+id/cityInput"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginStart="100dp"
+                    android:layout_marginEnd="67dp"
                     android:backgroundTint="@color/material_dynamic_neutral50"
                     android:ems="10"
                     android:hint="Укажите город"
@@ -376,6 +390,8 @@
                     android:textSize="14sp"
                     android:translationZ="1dp"
                     app:layout_constraintBottom_toBottomOf="@+id/changeView"
+                    app:layout_constraintEnd_toEndOf="@+id/changeView"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toBottomOf="@+id/view14" />
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,11 +1,14 @@
 package com.example.mapmanager.models;
 
+import android.widget.Toast;
+
 import com.example.mapmanager.MainActivity;
 import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,18 +39,25 @@ public class Chat {
         this.groupAvatarUrl = groupAvatarUrl;
     }
     public void addNewMember(String userId) {
-//        membersList.add(userId);
-//        HashMap<String, String> chatList = MainActivity.user.getChatList();
-//        chatList.replace(id, "0");
-//        MainActivity.user.setChatList(chatList);
-//        MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(userId));
-//        databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(id);
-//        Map<String, Object> data = new HashMap<>();
-//        data.put("groupName", this.groupName);
-//        data.put("groupAvatarUrl", this.groupAvatarUrl);
-//        data.put("lastMessageTime", this.lastMessageTime);
-//        data.put("membersList", this.membersList);
-//        databaseReference.updateChildren(data);
+        int position = Collections.binarySearch(membersList, userId);
+        if (position >= 0 && position < membersList.size()) {
+            return;
+        }
+        membersList.add(userId);
+        HashMap<String, ChatsData> chatList = MainActivity.user.getUserChatsData();
+        if (chatList == null) {
+            chatList = new HashMap<>();
+        }
+        chatList.put(id, new ChatsData(new ArrayList<>(), ""));
+        MainActivity.user.setUserChatsData(chatList);
+        MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(userId));
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(id);
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("groupName", this.groupName);
+        data.put("groupAvatarUrl", this.groupAvatarUrl);
+        data.put("lastMessageTime", this.lastMessageTime);
+        data.put("membersList", this.membersList);
+        databaseReference.updateChildren(data);
     }
 
     public String getLastReadMessageId() {

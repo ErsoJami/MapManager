@@ -1,11 +1,13 @@
 package com.example.mapmanager.models;
 
+import com.example.mapmanager.MainActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,8 +47,8 @@ public class Message {
         data.put("userId", this.userId);
         data.put("time", this.time);
         data.put("message", this.message);
-        DatabaseReference newChat = databaseReference.push();
-        this.messageId = newChat.getKey();
+        DatabaseReference newMessage = databaseReference.push();
+        this.messageId = newMessage.getKey();
         FirebaseDatabase.getInstance().getReference().child("users").child(this.userId).child("nick").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
@@ -54,11 +56,22 @@ public class Message {
                     String userName = dataSnapshot.getValue(String.class);
                     setNick(userName);
                     data.put("nick", userName);
-                    newChat.setValue(data);
-
+                    newMessage.setValue(data);
+                    HashMap<String, ChatsData> chatList = MainActivity.user.getUserChatsData();
+                    ChatsData chatsData = chatList.get(chatId);
+                    ArrayList<String> messageList = chatsData.getMessageList();
+                    if (messageList == null) {
+                        messageList = new ArrayList<>();
+                    }
+                    messageList.add(messageId);
+                    chatsData.setMessageList(messageList);
+                    chatList.replace(chatId, chatsData);
+                    MainActivity.user.setUserChatsData(chatList);
+                    MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(userId));
                 }
             }
         });
+
     }
     public void updateMessage(String chatId) {
         if (this.messageId != null) {

@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -87,6 +88,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private Boolean isClosePointsView = true, isCloseMenuView = true;
 
     private Route routeToShowOnReady = null;
+    private boolean needToFocusOnPolyline = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -277,11 +279,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private void openMenuView() {
         ValueAnimator valueAnimator;
         ViewGroup.LayoutParams params = menuView.getLayoutParams();
+        int screenWidth = getScreenWidth(requireContext());
         if (isCloseMenuView) {
             menuView.setVisibility(View.VISIBLE);
             routeText.setVisibility(View.VISIBLE);
             routeRecyclerView.setVisibility(View.VISIBLE);
-            valueAnimator = ValueAnimator.ofInt( 1, (int) DpToPx(400f, requireContext()));
+            valueAnimator = ValueAnimator.ofInt( 1, Math.min((int) DpToPx(400f, requireContext()), screenWidth));
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -297,8 +300,9 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     private void closeMenuView() {
         ValueAnimator valueAnimator;
         ViewGroup.LayoutParams params = menuView.getLayoutParams();
+        int screenWidth = getScreenWidth(requireContext());
         if (!isCloseMenuView) {
-            valueAnimator = ValueAnimator.ofInt((int) DpToPx(400f, requireContext()), 1);
+            valueAnimator = ValueAnimator.ofInt(Math.min((int) DpToPx(400f, requireContext()), screenWidth), 1);
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
@@ -318,6 +322,16 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 }
             });
             isCloseMenuView = true;
+        }
+    }
+    public static int getScreenWidth(Context context) {
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        if (windowManager != null) {
+            windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+            return displayMetrics.widthPixels;
+        } else {
+            return -1;
         }
     }
     private void openRouteView() {
@@ -484,7 +498,15 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     }
 
     @Override
-    public void OnDragWaypoint() {
+    public void onFocusToPolyline() {
+        if (needToFocusOnPolyline) {
+            mapManager.focusOnPolyline();
+            needToFocusOnPolyline = false;
+        }
+    }
+
+    @Override
+    public void onDragWaypoint() {
         mapManager.getRoute(placemarkMapObjectArrayList);
     }
 
@@ -561,12 +583,14 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             mark.setUserData(new Waypoint(waypoint.getName(), waypoint.getDescription()));
             placemarkMapObjectArrayList.add(mark);
         }
+        needToFocusOnPolyline = true;
         mapManager.getRoute(placemarkMapObjectArrayList);
         mapManager.setUserInCreateMode(true);
         closeMenuView();
         newRouteImageView.setImageResource(R.drawable.arrow_up);
         openRouteView();
         waypointAdapter.notifyDataSetChanged();
+        mapManager.focusOnPolyline();
     }
     public void routeOnMap(Route route) {
         hintText.setVisibility(View.GONE);
@@ -578,6 +602,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             mark.setUserData(new Waypoint(waypoint.getName(), waypoint.getDescription()));
             placemarkMapObjectArrayList.add(mark);
         }
+        needToFocusOnPolyline = true;
         mapManager.getRoute(placemarkMapObjectArrayList);
         mapManager.setUserInCreateMode(true);
         closeMenuView();

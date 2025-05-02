@@ -337,6 +337,8 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             messageList.remove(message.getMessageId());
             chatsData.setMessageList(messageList);
             map.replace(chatId, chatsData);
+            MainActivity.user.setUserChatsData(map);
+            MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()));
             popupWindow.dismiss();
         });
         copyMessageText.setOnClickListener(v -> {
