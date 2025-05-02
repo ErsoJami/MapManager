@@ -1,9 +1,11 @@
 package com.example.mapmanager.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -20,6 +22,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
     private final LayoutInflater inflater;
     private final ArrayList<Route> routeArrayList;
     private RouteAdapterListener routeAdapterListener;
+    private InputMethodManager imm;
     public interface RouteAdapterListener {
         void onRouteNameChanged(String text, int position);
         void onRouteDescriptionChanged(String text, int position);
@@ -30,6 +33,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
         this.routeArrayList = routeArrayList;
         this.inflater = LayoutInflater.from(context);
         this.routeAdapterListener = routeAdapterListener;
+        imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
     }
     @NonNull
     @Override
@@ -46,10 +50,14 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
             holder.text2.setText(route.getDescription());
             holder.checkUp.setOnClickListener(v -> {
                 String text = holder.text1.getText().toString();
+                holder.text1.clearFocus();
+                imm.hideSoftInputFromWindow(holder.text1.getWindowToken(), 0);
                 routeAdapterListener.onRouteNameChanged(text, position);
             });
             holder.checkDown.setOnClickListener(v -> {
                 String text = holder.text2.getText().toString();
+                holder.text2.clearFocus();
+                imm.hideSoftInputFromWindow(holder.text2.getWindowToken(), 0);
                 routeAdapterListener.onRouteDescriptionChanged(text, position);
             });
             holder.deleteRoute.setOnClickListener(v -> {

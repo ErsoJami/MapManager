@@ -77,6 +77,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private RouteDisplayAdapter adapter;
     private RouteSelectAdapter selectAdapter;
     private List<RouteCard> routeList;
+    private List<RouteCard> displayedRouteList;
     private List<Route> localRouteList;
     private ImageView routeCardBuildingCloseImage;
     private TextView addRouteCardView, routeCardBuildingDateEditText, routeCardBuildingStartTimeEditText, routeCardBuildingEndTimeEditText;
@@ -89,9 +90,10 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private SearchView searchView;
     private DatabaseReference routeCardReference;
     private Query query;
+    private boolean isSearching = false;
     private interface SearchResultListener {
         void onResultsFound(List<RouteCard> results);
-        void onError(DatabaseError error);
+        void onError();
     }
 
     interface HomeFragmentListener {
@@ -102,6 +104,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         routeList = new ArrayList<RouteCard>();
+        displayedRouteList = new ArrayList<RouteCard>();
         localRouteList = new ArrayList<Route>();
         startTime = Calendar.getInstance();
         endTime = Calendar.getInstance();
@@ -111,8 +114,12 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if (snapshot.exists()) {
+
                     routeList.add(snapshot.getValue(RouteCard.class));
-                    adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                    if (!isSearching) {
+                        displayedRouteList.add(snapshot.getValue(RouteCard.class));
+                        adapter.notifyItemInserted(displayedRouteList.size() - 1);
+                    }
                 }
             }
 
@@ -129,7 +136,18 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                     if (position != -1) {
                         routeList.set(position, routeCard);
                     }
-                    adapter.notifyItemChanged(position);
+                    if (!isSearching) {
+                        int position1 = Collections.binarySearch(displayedRouteList, routeCard, new Comparator<RouteCard>() {
+                            @Override
+                            public int compare(RouteCard routeCard, RouteCard routeCard1) {
+                                return routeCard.getId().compareTo(routeCard1.getId());
+                            }
+                        });
+                        if (position != -1) {
+                            displayedRouteList.set(position1, routeCard);
+                            adapter.notifyItemChanged(position1);
+                        }
+                    }
                 }
             }
 
@@ -145,7 +163,18 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 if (position != -1) {
                     routeList.remove(position);
                 }
-                adapter.notifyItemRemoved(position);
+                if (!isSearching) {
+                    int position1 = Collections.binarySearch(displayedRouteList, routeCard, new Comparator<RouteCard>() {
+                        @Override
+                        public int compare(RouteCard routeCard, RouteCard routeCard1) {
+                            return routeCard.getId().compareTo(routeCard1.getId());
+                        }
+                    });
+                    if (position != -1) {
+                        displayedRouteList.remove(position1);
+                        adapter.notifyItemRemoved(position);
+                    }
+                }
             }
 
             @Override
@@ -200,11 +229,14 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         routeListView = view.findViewById(R.id.routeListView);
         plusView = view.findViewById(R.id.imageView3);
         searchView = view.findViewById(R.id.routeSearch);
-        adapter = new RouteDisplayAdapter(getContext(), routeList, this);
+        adapter = new RouteDisplayAdapter(getContext(), displayedRouteList, this);
         selectAdapter = new RouteSelectAdapter(localRouteList, this);
         routeListView.setLayoutManager(new LinearLayoutManager(getContext()));
         routeListView.setAdapter(adapter);
         routeListView.setVisibility(View.VISIBLE);
+        if (displayedRouteList.isEmpty() && !routeList.isEmpty()) {
+            displayedRouteList.addAll(routeList);
+        }
         return view;
     }
 
@@ -226,24 +258,41 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                isSearching = true;
                 searchRoutesByNamePrefix(s, new SearchResultListener() {
                     @Override
                     public void onResultsFound(List<RouteCard> results) {
-                        routeList = results;
+                        displayedRouteList.clear();
+                        displayedRouteList.addAll(results);
                         adapter.notifyDataSetChanged();
                     }
                     @Override
-                    public void onError(DatabaseError error) {
+                    public void onError() {
+                        showAllRoutes();
                     }
                 });
-                return false;
+                return true;
             }
             @Override
             public boolean onQueryTextChange(String s) {
-
-                return false;
+                String text = s != null ? s.trim() : "";
+                if (text.isEmpty()) {
+                    showAllRoutes();
+                    isSearching = false;
+                } else {
+                    isSearching = true;
+                }
+                return true;
             }
         });
+    }
+    private void showAllRoutes() {
+        displayedRouteList.clear();
+        displayedRouteList.addAll(routeList);
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+        isSearching = false;
     }
     @Override
     public void postRouteCard(Route curRoute) {
@@ -383,7 +432,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
 
     private void searchRoutesByNamePrefix(String prefix, @NonNull SearchResultListener listener) {
         if (prefix == null || prefix.trim().isEmpty()) {
-            listener.onResultsFound(new ArrayList<RouteCard>());
+            listener.onError();
             return;
         }
         query = routeCardReference.orderByChild("name").startAt(prefix).endAt(prefix + "\uf8ff");

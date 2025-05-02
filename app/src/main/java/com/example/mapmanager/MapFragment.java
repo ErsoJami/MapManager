@@ -7,6 +7,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -89,6 +91,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
     private Route routeToShowOnReady = null;
     private boolean needToFocusOnPolyline = false;
+    private InputMethodManager imm;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,6 +106,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         });
         mAuth = FirebaseAuth.getInstance();
+        imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
     }
 
     @Override
@@ -497,7 +501,10 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     }
     @Override
     public void onMapLongTap(PlacemarkMapObject placemarkMapObject) {
+        placemarkMapObject.setText(String.valueOf(placemarkMapObjectArrayList.size() + 1));
+        placemarkMapObject.setUserData(new Waypoint(String.valueOf(placemarkMapObjectArrayList.size() + 1), ""));
         placemarkMapObjectArrayList.add(placemarkMapObject);
+
         mapManager.getRoute(placemarkMapObjectArrayList);
         hintText.setVisibility(View.GONE);
         waypointAdapter.notifyDataSetChanged();
@@ -533,6 +540,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     @Override
     public void onNameChanged(String text, int position) {
         PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
+        placemarkMapObject.setText(text);
         Waypoint waypoint = (Waypoint) placemarkMapObject.getUserData();
         waypoint.setName(text);
         placemarkMapObject.setUserData(waypoint);

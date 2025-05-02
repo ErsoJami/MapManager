@@ -1,6 +1,7 @@
 package com.example.mapmanager.adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,15 +43,18 @@ public class WaypointsAdapter extends RecyclerView.Adapter<WaypointsAdapter.View
     private final LayoutInflater inflater;
     private final WaypointsAdapterListener waypointsAdapterListener;
     private final ArrayList<PlacemarkMapObject> placemarkMapObjectArrayList;
+    private InputMethodManager imm;
     public WaypointsAdapter(Context context, ArrayList<PlacemarkMapObject> placemarkMapObjectArrayList, WaypointsAdapterListener waypointsAdapterListener) {
         this.placemarkMapObjectArrayList = placemarkMapObjectArrayList;
         this.inflater = LayoutInflater.from(context);
         this.waypointsAdapterListener = waypointsAdapterListener;
+        imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
     }
     @NonNull
     @Override
     public WaypointsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.waypoint_item_layout, parent, false);
+
         return new ViewHolder(view);
     }
     @Override
@@ -71,10 +76,14 @@ public class WaypointsAdapter extends RecyclerView.Adapter<WaypointsAdapter.View
             }
             holder.checkUp.setOnClickListener(v -> {
                 String text = holder.text1.getText().toString();
+                holder.text1.clearFocus();
+                imm.hideSoftInputFromWindow(holder.text1.getWindowToken(), 0);
                 waypointsAdapterListener.onNameChanged(text, position);
             });
             holder.checkDown.setOnClickListener(v -> {
                 String text = holder.text2.getText().toString();
+                holder.text2.clearFocus();
+                imm.hideSoftInputFromWindow(holder.text2.getWindowToken(), 0);
                 waypointsAdapterListener.onDescriptionChanged(text, position);
             });
             holder.arrowDown.setOnClickListener(v -> {

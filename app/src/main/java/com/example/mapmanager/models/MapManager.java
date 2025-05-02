@@ -417,7 +417,6 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         mark.setIcon(pinProvider);
         mark.setDraggable(true);
         mark.setDragListener(this);
-        mark.setUserData(new Waypoint("Имя", "Описание..."));
         return mark;
     }
 }

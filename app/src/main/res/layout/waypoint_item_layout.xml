@@ -42,9 +42,9 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="10dp"
         android:ems="10"
+        android:hint="Описание..."
         android:inputType="text"
         android:paddingTop="3dp"
-        android:text="Описание"
         android:textSize="15sp"
         app:layout_constraintStart_toEndOf="@+id/textView15"
         app:layout_constraintTop_toBottomOf="@+id/textView15" />
@@ -56,9 +56,9 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="7dp"
         android:ems="10"
+        android:hint="Название"
         android:inputType="text"
         android:paddingTop="3dp"
-        android:text="Название"
         android:textSize="15sp"
         app:layout_constraintStart_toEndOf="@+id/textView15"
         app:layout_constraintTop_toTopOf="parent" />

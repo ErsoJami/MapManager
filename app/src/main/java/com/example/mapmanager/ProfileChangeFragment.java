@@ -101,7 +101,7 @@ public class ProfileChangeFragment extends Fragment {
         });
         dataLoad();
         saveData.setOnClickListener(v -> {
-            if (!changeNicknameText.getText().toString().equals(MainActivity.user.getNick())) {
+            if (MainActivity.user.getNick() != null && !changeNicknameText.getText().toString().equals(MainActivity.user.getNick()) && !MainActivity.user.getNick().isEmpty()) {
                 HashMap<String, Object> data2 = new HashMap<>();
                 DatabaseReference chatReference = FirebaseDatabase.getInstance().getReference().child("chats");
                 for (HashMap.Entry<String, ChatsData> item : MainActivity.user.getUserChatsData().entrySet()) {
