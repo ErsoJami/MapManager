@@ -3,26 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/rounded"
-    android:backgroundTint="@color/white"
-    android:elevation="2dp"
-    android:translationZ="1dp"
-    android:layout_marginBottom="10dp"
-    android:layout_marginStart="2dp"
-    android:layout_marginEnd="2dp">
+    android:layout_height="108dp">
+
+    <View
+        android:id="@+id/view16"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:background="@drawable/rounded"
+        android:elevation="2dp"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/RouteNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="9dp"
         android:text="Not stated"
         android:textColor="@color/black"
         android:textSize="19sp"
         android:textStyle="bold"
-        android:translationZ="1dp"
+        android:translationZ="2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -30,34 +35,31 @@
         android:id="@+id/RouteTimeIntervalText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="4dp"
         android:text="14:88 - 52:42"
         android:textColor="@color/dark_grey"
-        android:textSize="19sp"
-        android:translationZ="1dp"
-        app:layout_constraintStart_toEndOf="@+id/RouteNameText"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="14sp"
+        android:translationZ="2dp"
+        app:layout_constraintStart_toStartOf="@+id/RouteNameText"
+        app:layout_constraintTop_toTopOf="@+id/RouteDescriptionTable" />
 
     <View
         android:id="@+id/AcceptRouteButton"
-        android:layout_width="79dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="10dp"
+        android:layout_width="82dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="3dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/rounded"
         android:backgroundTint="#3262FF"
         android:clickable="true"
         android:elevation="2dp"
-        android:translationZ="2dp"
+        android:translationZ="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/AcceptRouteText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:elevation="2dp"
         android:fontFamily="sans-serif-black"
         android:text="Accept"
         android:textAllCaps="false"
@@ -71,34 +73,34 @@
 
     <ImageView
         android:id="@+id/ShowInMapButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="10dp"
         android:clickable="true"
         android:elevation="2dp"
-        app:layout_constraintBottom_toTopOf="@+id/AcceptRouteButton"
+        app:layout_constraintBottom_toTopOf="@+id/RouteDescriptionTable"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/RouteDescriptionTable"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.63"
         app:srcCompat="@drawable/region_icon" />
 
     <View
         android:id="@+id/RouteDescriptionTable"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/grey"
-        android:elevation="1dp"
-        android:translationZ="-1dp"
+        android:elevation="-1dp"
+        android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/AcceptRouteButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/RouteTimeIntervalText" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/AcceptRouteButton"
+        app:layout_constraintTop_toBottomOf="@+id/RouteNameText"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/DescriptionTextView"
@@ -108,9 +110,10 @@
         android:layout_marginTop="3dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
-        android:text="ZZZ"
+        android:text="ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"
         android:textColor="@color/black"
         android:textSize="12sp"
+        android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/RouteDescriptionTable"
         app:layout_constraintEnd_toEndOf="@+id/RouteDescriptionTable"
         app:layout_constraintStart_toStartOf="@+id/RouteDescriptionTable"
