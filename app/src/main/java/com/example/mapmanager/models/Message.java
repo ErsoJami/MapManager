@@ -1,5 +1,7 @@
 package com.example.mapmanager.models;
 
+import android.net.Uri;
+
 import com.example.mapmanager.MainActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
@@ -19,6 +21,17 @@ public class Message {
     private long time;
     private String message;
     private DatabaseReference databaseReference;
+    private ArrayList<Uri> mediaList;
+
+    public ArrayList<String> getMediaUrisAsStrings() {
+        return mediaUrisAsStrings;
+    }
+
+    public void setMediaUrisAsStrings(ArrayList<String> mediaUrisAsStrings) {
+        this.mediaUrisAsStrings = mediaUrisAsStrings;
+    }
+
+    private ArrayList<String> mediaUrisAsStrings;
     public Message() {
         this.typeMessage = 0;
         this.userId = null;
@@ -32,6 +45,13 @@ public class Message {
         this.time = time;
         this.message = message;
     }
+    public Message(int typeMessage, String userId, long time, String message, ArrayList<Uri> mediaList) {
+        this.typeMessage = typeMessage;
+        this.userId = userId;
+        this.time = time;
+        this.message = message;
+        this.mediaList = mediaList;
+    }
     public Message(int typeMessage, String userId, String nick, long time, String message) {
         this.typeMessage = typeMessage;
         this.userId = userId;
@@ -39,7 +59,33 @@ public class Message {
         this.nick = nick;
         this.message = message;
     }
+    @com.google.firebase.database.Exclude
+    public ArrayList<Uri> getMediaList() {
+        if (mediaUrisAsStrings == null) {
+            return new ArrayList<>();
+        }
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (String s : mediaUrisAsStrings) {
+            if (s != null) {
+                uris.add(Uri.parse(s));
+            }
+        }
+        return uris;
+    }
 
+    @com.google.firebase.database.Exclude
+    public void setMediaList(ArrayList<Uri> mediaListUris) {
+        if (mediaListUris == null || mediaListUris.isEmpty()) {
+            this.mediaUrisAsStrings = null;
+            return;
+        }
+        this.mediaUrisAsStrings = new ArrayList<>();
+        for (Uri uri : mediaListUris) {
+            if (uri != null) {
+                this.mediaUrisAsStrings.add(uri.toString());
+            }
+        }
+    }
     public void createNewMessage(String chatId) {
         databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages");
         Map<String, Object> data = new HashMap<>();
@@ -47,6 +93,8 @@ public class Message {
         data.put("userId", this.userId);
         data.put("time", this.time);
         data.put("message", this.message);
+        setMediaList(this.mediaList);
+        data.put("mediaUrisAsStrings", this.mediaUrisAsStrings);
         DatabaseReference newMessage = databaseReference.push();
         this.messageId = newMessage.getKey();
         FirebaseDatabase.getInstance().getReference().child("users").child(this.userId).child("nick").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {

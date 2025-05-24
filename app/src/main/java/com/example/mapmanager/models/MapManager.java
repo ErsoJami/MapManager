@@ -369,18 +369,22 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     }
     public void focusOnPolyline() {
         if (lastRoutePolyline != null) {
-            CameraPosition userPosition = mapView.getMap().cameraPosition(Geometry.fromPolyline(lastRoutePolyline.getGeometry()));
-            CameraPosition zoomedOutPosition = new CameraPosition(
-                    userPosition.getTarget(),
-                    Math.max(0.0f, userPosition.getZoom() - 0.5f),
-                    userPosition.getAzimuth(),
-                    userPosition.getTilt()
-            );
-            mapView.getMap().move(
-                    zoomedOutPosition,
-                    new Animation(Animation.Type.SMOOTH, 0.5f),
-                    null
-            );
+            try {
+                CameraPosition userPosition = mapView.getMap().cameraPosition(Geometry.fromPolyline(lastRoutePolyline.getGeometry()));
+                CameraPosition zoomedOutPosition = new CameraPosition(
+                        userPosition.getTarget(),
+                        Math.max(0.0f, userPosition.getZoom() - 0.5f),
+                        userPosition.getAzimuth(),
+                        userPosition.getTilt()
+                );
+                mapView.getMap().move(
+                        zoomedOutPosition,
+                        new Animation(Animation.Type.SMOOTH, 0.5f),
+                        null
+                );
+            } catch (Exception e) {
+
+            }
         }
     }
     @Override

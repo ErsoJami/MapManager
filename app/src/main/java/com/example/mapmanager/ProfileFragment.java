@@ -37,6 +37,7 @@ public class ProfileFragment extends Fragment {
     public static interface ProfileChangeEnterListener {
         void startChangingProfile();
     }
+//    TODO: добавить Яндекс в о приложении.
     private ProfileChangeEnterListener profileChangeEnterListener;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;

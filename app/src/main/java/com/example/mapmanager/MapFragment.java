@@ -106,7 +106,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         });
         mAuth = FirebaseAuth.getInstance();
-        imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+
     }
 
     @Override
@@ -595,6 +595,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         for (Waypoint waypoint : waypointArrayList) {
             PlacemarkMapObject mark = mapManager.addPlacemarkMapObject(waypoint.getPoint());
             mark.setUserData(new Waypoint(waypoint.getName(), waypoint.getDescription()));
+            mark.setText(waypoint.getName());
             placemarkMapObjectArrayList.add(mark);
         }
         needToFocusOnPolyline = true;
@@ -614,6 +615,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         for (Waypoint waypoint : waypointArrayList) {
             PlacemarkMapObject mark = mapManager.addPlacemarkMapObject(waypoint.getPoint());
             mark.setUserData(new Waypoint(waypoint.getName(), waypoint.getDescription()));
+            mark.setText(waypoint.getName());
             placemarkMapObjectArrayList.add(mark);
         }
         needToFocusOnPolyline = true;

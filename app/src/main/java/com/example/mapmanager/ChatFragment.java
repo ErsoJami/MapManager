@@ -1,9 +1,16 @@
 package com.example.mapmanager;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,14 +22,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
+import android.Manifest;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.mapmanager.adapters.ChatAdapter;
+import com.example.mapmanager.adapters.MessageMediaAdapter;
 import com.example.mapmanager.models.ChatsData;
 import com.example.mapmanager.models.Message;
 
@@ -35,13 +48,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterListener {
+public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterListener, MessageMediaAdapter.OnMediaListener {
 
     private String chatId;
     private RecyclerView messageListView;
@@ -58,6 +75,13 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     private String lastReadMessageId;
     private DatabaseReference messageReference;
     private String lastMessageId;
+    private ImageView mediaButton;
+    private ArrayList<Uri> mediaList;
+    private ActivityResultLauncher<String[]> getMediaPermissions;
+    private ActivityResultLauncher<String[]> mediaPicker;
+    private MessageMediaAdapter mediaLoaderAdapter;
+    private RecyclerView mediaLoaderView;
+    private StorageReference storageReference;
     static ChatFragment updateChat(String chatId, String lastReadMessageId) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
@@ -77,6 +101,26 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         databaseReference = FirebaseDatabase.getInstance().getReference();
         messageReference = databaseReference.child("chats").child(chatId).child("messages");
+        mediaList = new ArrayList<>();
+        storageReference = FirebaseStorage.getInstance().getReference().child(chatId);
+        mediaPicker = registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(), new ActivityResultCallback<List<Uri>>() {
+            @Override
+            public void onActivityResult(List<Uri> uris) {
+                if (uris != null && !uris.isEmpty()) {
+                    mediaList.addAll(uris);
+                    mediaLoaderAdapter.notifyDataSetChanged();
+                    mediaLoaderView.setVisibility(View.VISIBLE);
+                } else if (mediaList.isEmpty()) {
+                    mediaLoaderView.setVisibility(View.GONE);
+                }
+            }
+        });
+        getMediaPermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+            @Override
+            public void onActivityResult(Map<String, Boolean> o) {
+                mediaPicker.launch(new String[]{"image/*", "video/*"});
+            }
+        });
     }
 
     @Nullable
@@ -101,6 +145,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         leaveChatButton = view.findViewById(R.id.leaveChatButton);
         sendTextEdit = view.findViewById(R.id.sendTextEdit);
         sendView = view.findViewById(R.id.sendButton);
+        mediaButton = view.findViewById(R.id.mediaButton);
         mAuth = FirebaseAuth.getInstance();
         messageList = new ArrayList<>();
         adapter = new ChatAdapter(requireContext(), messageList, this);
@@ -108,6 +153,13 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         messageListView.setAdapter(adapter);
         messageListView.setVisibility(View.VISIBLE);
 
+        mediaLoaderView = view.findViewById(R.id.mediaPreviewView);
+        mediaLoaderAdapter = new MessageMediaAdapter(requireContext(), mediaList, this, false);
+        mediaLoaderView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        mediaLoaderView.setAdapter(mediaLoaderAdapter);
+        if (mediaList == null || mediaList.isEmpty()) {
+            mediaLoaderView.setVisibility(View.GONE);
+        }
         String key1 = new String(lastReadMessageId);
         final String[] key = {new String()};
         final Boolean[] isFocus = {new Boolean(false)};
@@ -227,17 +279,24 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         super.onViewCreated(view, savedInstanceState);
         sendView.setOnClickListener(v -> {
             String text = sendTextEdit.getText().toString();
-            if (!text.isEmpty()) {
-                Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text);
+            if (!text.isEmpty() || !mediaList.isEmpty()) {
+                Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text, mediaList);
+                mediaLoaderView.setVisibility(View.GONE);
                 message.createNewMessage(chatId);
                 sendTextEdit.setText("");
                 sendTextEdit.clearFocus();
                 imm.hideSoftInputFromWindow(sendTextEdit.getWindowToken(), 0);
                 focusOnMessage(adapter.getItemCount() - 1);
+                mediaList.clear();
+                adapter.notifyDataSetChanged();
             }
         });
         leaveChatButton.setOnClickListener(v -> {
             requireActivity().getOnBackPressedDispatcher().onBackPressed();
+        });
+        mediaButton.setOnClickListener(v -> {
+            mediaLoaderView.setVisibility(View.VISIBLE);
+            openMediaPicker();
         });
 
     }
@@ -380,5 +439,35 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("Скопированное сообщение", text);
         clipboard.setPrimaryClip(clip);
+    }
+    private void openMediaPicker() {
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (permissionsToRequest.isEmpty()) {
+            mediaPicker.launch(new String[]{"image/*", "video/*"});
+        } else {
+            getMediaPermissions.launch(permissionsToRequest.toArray(new String[0]));
+        }
+    }
+
+    @Override
+    public void onDeleteMedia(int position) {
+        mediaList.remove(position);
+        mediaLoaderAdapter.notifyDataSetChanged();
+        if (mediaList.isEmpty()) {
+            mediaLoaderView.setVisibility(View.GONE);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.mapmanager.models;
 
+import android.net.Uri;
 import android.widget.Toast;
 
 import com.example.mapmanager.MainActivity;
@@ -38,6 +39,7 @@ public class Chat {
         this.groupName = groupName;
         this.groupAvatarUrl = groupAvatarUrl;
     }
+
     public void addNewMember(String userId) {
         int position = Collections.binarySearch(membersList, userId);
         if (position >= 0 && position < membersList.size()) {

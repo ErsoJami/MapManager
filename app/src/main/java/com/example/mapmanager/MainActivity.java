@@ -6,15 +6,14 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.mapmanager.adapters.ChatAdapter;
 import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,8 +26,11 @@ import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.directions.DirectionsFactory;
 import com.yandex.mapkit.transport.TransportFactory;
 
-public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat, ProfileFragment.ProfileChangeEnterListener, HomeFragment.HomeFragmentListener {
-    public static User user = new User();
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements MessengerFragment.OnChatSelectChat, ProfileFragment.ProfileChangeEnterListener, HomeFragment.HomeFragmentListener, ChatAdapter.OnSelectMedia {
+    public static User user;
     private FirebaseAuth jAuth;
     private DatabaseReference databaseReference;
     private ImageButton homeButton, profileButton, chatButton, mapButton;
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
 
         }
 
-
+        user = new User();
         homeButton = findViewById(R.id.homeButton);
         profileButton = findViewById(R.id.profileButton);
         chatButton = findViewById(R.id.chatButton);
@@ -186,5 +188,22 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         mapFragment.setArguments(args);
         setCurrentFragment(mapFragment);
 //        mapFragment.routeOnMap(route);
+    }
+
+    @Override
+    public void onSelectMedia(Uri uri) {
+        PlayerViewFragment playerViewFragment = PlayerViewFragment.updatePlayerViewFragment(uri);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, playerViewFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+    @Override
+    public void onSelectViewAllMedia(ArrayList<Uri> uriArrayList) {
+        MediaViewFragment mediaViewFragment = MediaViewFragment.updateMediaViewFragment(uriArrayList);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, mediaViewFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 }

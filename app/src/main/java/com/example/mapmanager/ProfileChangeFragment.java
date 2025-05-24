@@ -1,9 +1,15 @@
 package com.example.mapmanager;
 
+import static android.app.Activity.RESULT_OK;
+import static com.yandex.mapkit.search.SortOrigin.REQUEST;
+
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +25,14 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.mapmanager.models.ChatsData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -124,6 +133,25 @@ public class ProfileChangeFragment extends Fragment {
             MainActivity.user.changeData(databaseReference);
             requireActivity().getOnBackPressedDispatcher().onBackPressed();
         });
+        profileImage.setOnClickListener(v -> {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, 1);
+        });
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        Bitmap bitmap = null;
+        switch(requestCode) {
+            case 1:
+                if(resultCode == RESULT_OK){
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    Glide.with(this)
+                            .load(selectedImage)
+                            .into(profileImage);
+                }
+        }
     }
 
     private void setInitialDateTime() {
