@@ -64,8 +64,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         void onOtherMessageClick(int position);
     }
     public interface OnSelectMedia {
-        void onSelectMedia(Uri uri);
-        void onSelectViewAllMedia(ArrayList<Uri> uri);
+        void onSelectMedia(String url, Uri uri);
+        void onSelectViewAllMedia(ArrayList<String> uri);
     }
     private OnSelectMedia onSelectMedia;
     private ChatAdapterListener chatAdapterListener;
@@ -87,8 +87,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ChatAdapter.ViewHolder holder, int position) {
         Message message = messageList.get(position);
+        holder.gridLayout.removeAllViews();
         if (message != null) {
-            ArrayList<Uri> mediaUris = message.getMediaList();
+            ArrayList<String> mediaUris = message.getMediaList();
             holder.gridLayout.removeAllViews();
             if (mediaUris != null && !mediaUris.isEmpty()) {
                 holder.gridLayout.setVisibility(VISIBLE);
@@ -104,15 +105,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                     holder.gridLayout.setRowCount(2);
                     for (int i = 0; i < 2; i++) {
                         ShapeableImageView imageView = createImageView(holder.itemView.getContext());
-                        Uri uri = mediaUris.get(i);
+                        String url = mediaUris.get(i);
                         Glide.with(holder.itemView.getContext())
-                                .load(uri)
+                                .load(url)
                                 .into(imageView);
                         holder.gridLayout.addView(imageView);
                         imageView.setOnClickListener(v -> {
-                            Log.d("Chat", "Клик! " + uri);
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(uri);
+                                onSelectMedia.onSelectMedia(url, null);
                             }
                         });
                     }
@@ -121,35 +121,33 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                     holder.gridLayout.setRowCount(2);
                     for (int i = 0; i < 3; i++) {
                         ShapeableImageView imageView = createImageView(holder.itemView.getContext());
-                        Uri uri = mediaUris.get(i);
+                        String url = mediaUris.get(i);
                         if (i == 2) {
                             GridLayout.LayoutParams params = (GridLayout.LayoutParams) imageView.getLayoutParams();
                             params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 2, 1f);
                             imageView.setLayoutParams(params);
                         }
                         Glide.with(holder.itemView.getContext())
-                                .load(uri)
+                                .load(url)
                                 .into(imageView);
                         holder.gridLayout.addView(imageView);
                         imageView.setOnClickListener(v -> {
-                            Log.d("Chat", "Клик! " + uri);
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(uri);
+                                onSelectMedia.onSelectMedia(url, null);
                             }
                         });
                     }
                 } else if (mediaUris.size() <= 4) {
                     holder.gridLayout.setColumnCount(mediaUris.size() == 1 ? 1 : 2);
                     holder.gridLayout.setRowCount(mediaUris.size() == 1 || mediaUris.size() == 2 ? 1 : 2);
-                    for (Uri uri : mediaUris) {
+                    for (String url : mediaUris) {
                         ShapeableImageView imageView = createImageView(holder.itemView.getContext());
                         Glide.with(holder.itemView.getContext())
-                                .load(uri)
+                                .load(url)
                                 .into(imageView);
                         imageView.setOnClickListener(v -> {
-                            Log.d("Chat", "Клик! " + uri);
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(uri);
+                                onSelectMedia.onSelectMedia(url, null);
                             }
                         });
                         holder.gridLayout.addView(imageView);
@@ -159,22 +157,20 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                     holder.gridLayout.setRowCount(2);
                     for (int i = 0; i < 3; i++) {
                         ShapeableImageView imageView = createImageView(holder.itemView.getContext());
-                        Uri uri = mediaUris.get(i);
+                        String url = mediaUris.get(i);
                         Glide.with(holder.itemView.getContext())
-                                .load(uri)
+                                .load(url)
                                 .into(imageView);
                         holder.gridLayout.addView(imageView);
                         imageView.setOnClickListener(v -> {
-                            Log.d("Chat", "Клик! " + uri);
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(uri);
+                                onSelectMedia.onSelectMedia(url, null);
                             }
                         });
                     }
-                    Uri uri = mediaUris.get(3);
-                    FrameLayout imageView = createImageViewWithText(holder.itemView.getContext(), uri, "+ " + (mediaUris.size() - 4));
+                    String url = mediaUris.get(3);
+                    FrameLayout imageView = createImageViewWithText(holder.itemView.getContext(), url, "+ " + (mediaUris.size() - 4));
                     imageView.setOnClickListener(v -> {
-                        Log.d("Chat", "Клик!" + uri);
                         if (onSelectMedia != null) {
                             onSelectMedia.onSelectViewAllMedia(mediaUris);
                         }
@@ -276,7 +272,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         );
         return shapeableImageView;
     }
-    private FrameLayout createImageViewWithText(Context context, Uri imageUri, String text) {
+    private FrameLayout createImageViewWithText(Context context, String imageUri, String text) {
         FrameLayout frameLayout = new FrameLayout(context);
         GridLayout.LayoutParams frameLayoutParams = new GridLayout.LayoutParams();
         frameLayoutParams.width = 0;

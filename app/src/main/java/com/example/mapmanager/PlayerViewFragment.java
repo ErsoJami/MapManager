@@ -26,15 +26,20 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 public class PlayerViewFragment extends Fragment {
 
     private Uri uri;
+    private String url;
     private ExoPlayer player;
     private PlayerView playerView;
     private ImageView backImageView;
     private SubsamplingScaleImageView subsamplingScaleImageView;
     private int mediaType = -1; // 0 - image, 1 - video;
-    static PlayerViewFragment updatePlayerViewFragment(Uri uri) {
+    static PlayerViewFragment updatePlayerViewFragment(String url, Uri uri) {
         PlayerViewFragment fragment = new PlayerViewFragment();
         Bundle args = new Bundle();
-        args.putString("uri", String.valueOf(uri));
+        if (url != null) {
+            args.putString("url", url);
+        } else {
+            args.putString("uri", String.valueOf(uri));
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -43,11 +48,19 @@ public class PlayerViewFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            uri = Uri.parse(getArguments().getString("uri"));
-            if (isVideoFile(requireContext(), uri)) {
-                mediaType = 1;
-            } else if (isImageFile(requireContext(), uri)) {
-                mediaType = 0;
+            String s = getArguments().getString("uri");
+            if (s != null) {
+                uri = Uri.parse(s);
+            }
+            url = getArguments().getString("url");
+            if (uri != null) {
+                if (isVideoFile(requireContext(), uri)) {
+                    mediaType = 1;
+                } else if (isImageFile(requireContext(), uri)) {
+                    mediaType = 0;
+                }
+            } else if (url != null) {
+
             }
         }
     }

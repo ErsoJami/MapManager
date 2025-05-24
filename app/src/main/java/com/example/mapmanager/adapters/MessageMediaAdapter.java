@@ -67,7 +67,7 @@ public class MessageMediaAdapter extends RecyclerView.Adapter<MessageMediaAdapte
         Uri uri = mediaList.get(position);
         Glide.with(holder.itemView.getContext()).load(uri).into(holder.image);
         holder.itemView.setOnClickListener(v -> {
-            onSelectMedia.onSelectMedia(uri);
+            onSelectMedia.onSelectMedia(null, uri);
         });
         holder.deleteImage.setOnClickListener(v -> {
             onMediaListener.onDeleteMedia(position);

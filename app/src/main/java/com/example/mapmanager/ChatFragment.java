@@ -5,6 +5,7 @@ import static android.app.Activity.RESULT_OK;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,17 +13,21 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.Manifest;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -39,6 +44,8 @@ import com.example.mapmanager.adapters.MessageMediaAdapter;
 import com.example.mapmanager.models.ChatsData;
 import com.example.mapmanager.models.Message;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -50,6 +57,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +65,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterListener, MessageMediaAdapter.OnMediaListener {
 
@@ -209,6 +218,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                         Message message1 = snapshot.getValue(Message.class);
                         message1.setMessageId(snapshot.getKey());
                         messageList.add(message1);
+                        Log.d("Chat", "add " + message1.toString());
                         adapter.notifyItemInserted(adapter.getItemCount() - 1);
                         if (!isFocus[0] && message1.getMessageId().compareTo(key1) > 0) {
                             if (messageList.size() > 1) {
@@ -279,16 +289,20 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         super.onViewCreated(view, savedInstanceState);
         sendView.setOnClickListener(v -> {
             String text = sendTextEdit.getText().toString();
-            if (!text.isEmpty() || !mediaList.isEmpty()) {
-                Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text, mediaList);
-                mediaLoaderView.setVisibility(View.GONE);
-                message.createNewMessage(chatId);
+            ArrayList<Uri> mediaUris = new ArrayList<>(mediaList);
+            if (!text.isEmpty() || !mediaUris.isEmpty()) {
                 sendTextEdit.setText("");
                 sendTextEdit.clearFocus();
                 imm.hideSoftInputFromWindow(sendTextEdit.getWindowToken(), 0);
-                focusOnMessage(adapter.getItemCount() - 1);
                 mediaList.clear();
                 adapter.notifyDataSetChanged();
+                mediaLoaderView.setVisibility(View.GONE);
+                if (!mediaUris.isEmpty()) {
+                    uploadMediaAndSendMessage(mediaUris, text);
+                } else {
+                    Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text, new ArrayList<>());
+                    message.createNewMessage(chatId);
+                }
             }
         });
         leaveChatButton.setOnClickListener(v -> {
@@ -469,5 +483,56 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         if (mediaList.isEmpty()) {
             mediaLoaderView.setVisibility(View.GONE);
         }
+    }
+    private void uploadMediaAndSendMessage(ArrayList<Uri> localUris, String messageText) {
+        ArrayList<Task<Uri>> uploadTasks = new ArrayList<>();
+        ArrayList<String> uploadedMediaUrls = new ArrayList<>();
+
+        for (Uri uri : localUris) {
+            if (uri == null) continue;
+            final String fileName = UUID.randomUUID().toString() + "." + getFileExtension(uri);
+            StorageReference fileReference = storageReference.child(fileName);
+
+            UploadTask uploadTask = fileReference.putFile(uri);
+            Task<Uri> urlTask = uploadTask.continueWithTask((Task<UploadTask.TaskSnapshot> task) -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return fileReference.getDownloadUrl();
+            }).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    if (downloadUri != null) {
+                        uploadedMediaUrls.add(downloadUri.toString());
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Ошибка загрузки файла: " + uri.getLastPathSegment(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            uploadTasks.add(urlTask);
+        }
+        Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(results -> {
+            Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), messageText, uploadedMediaUrls);
+            message.createNewMessage(chatId);
+        }).addOnFailureListener(e -> {
+            Toast.makeText(getContext(), "Ошибка при загрузке медиа: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        });
+    }
+
+    private String getFileExtension(Uri uri) {
+        if (uri == null) return null;
+        ContentResolver cR = requireContext().getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        String extension = mime.getExtensionFromMimeType(cR.getType(uri));
+        if (extension == null) {
+            String path = uri.getPath();
+            if (path != null) {
+                int lastDot = path.lastIndexOf(".");
+                if (lastDot != -1 && lastDot < path.length() - 1) {
+                    extension = path.substring(lastDot + 1);
+                }
+            }
+        }
+        return extension != null ? extension : "tmp";
     }
 }

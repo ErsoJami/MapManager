@@ -23,10 +23,10 @@ public class MediaViewFragment extends Fragment implements MessageMediaAdapter.O
     private ImageView backImageView;
     private ArrayList<Uri> mediaList;
     private MessageMediaAdapter mediaLoaderAdapter;
-    static MediaViewFragment updateMediaViewFragment(ArrayList<Uri> uriArrayList) {
+    static MediaViewFragment updateMediaViewFragment(ArrayList<String> uriArrayList) {
         MediaViewFragment fragment = new MediaViewFragment();
         Bundle args = new Bundle();
-        args.putParcelableArrayList("uri", uriArrayList);
+        args.putStringArrayList("uri", uriArrayList);
         fragment.setArguments(args);
         return fragment;
     }
