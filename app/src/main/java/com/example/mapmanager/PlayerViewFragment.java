@@ -4,9 +4,11 @@ import static android.view.View.VISIBLE;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +22,13 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.ui.PlayerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+
+import java.io.File;
 
 public class PlayerViewFragment extends Fragment {
 
@@ -32,13 +39,13 @@ public class PlayerViewFragment extends Fragment {
     private ImageView backImageView;
     private SubsamplingScaleImageView subsamplingScaleImageView;
     private int mediaType = -1; // 0 - image, 1 - video;
-    static PlayerViewFragment updatePlayerViewFragment(String url, Uri uri) {
+    static PlayerViewFragment updatePlayerViewFragment(Object url) {
         PlayerViewFragment fragment = new PlayerViewFragment();
         Bundle args = new Bundle();
-        if (url != null) {
-            args.putString("url", url);
-        } else {
-            args.putString("uri", String.valueOf(uri));
+        if (url instanceof Uri){
+            args.putString("url", String.valueOf(url));
+        } else if (url instanceof String) {
+            args.putString("url", (String) url);
         }
         fragment.setArguments(args);
         return fragment;
@@ -48,11 +55,12 @@ public class PlayerViewFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            String s = getArguments().getString("uri");
-            if (s != null) {
-                uri = Uri.parse(s);
+            String url = getArguments().getString("url");
+            try {
+                uri = Uri.parse(url);
+            } catch (Exception e) {
+                uri = null;
             }
-            url = getArguments().getString("url");
             if (uri != null) {
                 if (isVideoFile(requireContext(), uri)) {
                     mediaType = 1;
@@ -60,7 +68,11 @@ public class PlayerViewFragment extends Fragment {
                     mediaType = 0;
                 }
             } else if (url != null) {
-
+                if (isVideoFile(requireContext(), url)) {
+                    mediaType = 1;
+                } else if (isImageFile(requireContext(), url)) {
+                    mediaType = 0;
+                }
             }
         }
     }
@@ -74,18 +86,88 @@ public class PlayerViewFragment extends Fragment {
         backImageView = view.findViewById(R.id.imageView2);
         subsamplingScaleImageView = view.findViewById(R.id.subsampling_image);
         if (mediaType == 1) {
+            CustomTarget<File> glideFileTarget = new CustomTarget<File>() {
+                @Override
+                public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                    MediaItem mediaItem = MediaItem.fromUri(Uri.fromFile(resource));
+                    if (mediaItem != null) {
+                        player.setMediaItem(mediaItem);
+                        player.prepare();
+                        player.setPlayWhenReady(true);
+                    }
+                }
+
+                @Override
+                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                }
+                @Override
+                public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                    super.onLoadFailed(errorDrawable);
+                    MediaItem mediaItem = MediaItem.fromUri(uri);
+                    if (mediaItem != null) {
+                        player.setMediaItem(mediaItem);
+                        player.prepare();
+                        player.setPlayWhenReady(true);
+                    }
+                }
+            };
             playerView.setVisibility(VISIBLE);
             player = new ExoPlayer.Builder(requireContext()).build();
             playerView.setPlayer(player);
-            MediaItem mediaItem = MediaItem.fromUri(uri);
-            player.setMediaItem(mediaItem);
-            player.prepare();
-            player.setPlayWhenReady(true);
+            if (uri != null) {
+                if (getContext() != null) {
+                    Glide.with(getContext().getApplicationContext())
+                            .asFile()
+                            .load(uri)
+                            .into(glideFileTarget);
+                }
+            } else if (url != null) {
+                if (getContext() != null) {
+                    Glide.with(getContext().getApplicationContext())
+                            .asFile()
+                            .load(url)
+                            .into(glideFileTarget);
+                }
+            }
         } else if (mediaType == 0) {
-            subsamplingScaleImageView.setVisibility(VISIBLE);
-            subsamplingScaleImageView.setMaxScale(8f);
-            subsamplingScaleImageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE);
-            subsamplingScaleImageView.setImage(ImageSource.uri(uri));
+            CustomTarget<File> glideFileTarget = new CustomTarget<File>() {
+                @Override
+                public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                    subsamplingScaleImageView.setVisibility(VISIBLE);
+                    subsamplingScaleImageView.setMaxScale(8f);
+                    subsamplingScaleImageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE);
+                    subsamplingScaleImageView.setImage(ImageSource.uri(Uri.fromFile(resource)));
+                }
+
+                @Override
+                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                }
+                @Override
+                public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                    super.onLoadFailed(errorDrawable);
+                    subsamplingScaleImageView.setVisibility(VISIBLE);
+                    subsamplingScaleImageView.setMaxScale(8f);
+                    subsamplingScaleImageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE);
+                    subsamplingScaleImageView.setImage(ImageSource.uri(uri));
+                }
+            };
+            if (url != null) {
+                if (getContext() != null) {
+                    Glide.with(getContext().getApplicationContext())
+                            .asFile()
+                            .load(url)
+                            .into(glideFileTarget);
+                }
+            } else if (uri != null) {
+                if (getContext() != null) {
+                    Glide.with(getContext().getApplicationContext())
+                            .asFile()
+                            .load(uri)
+                            .into(glideFileTarget);
+                }
+            }
         }
         return view;
     }
@@ -97,36 +179,52 @@ public class PlayerViewFragment extends Fragment {
             requireActivity().getOnBackPressedDispatcher().onBackPressed();
         });
     }
-    public static String getMimeType(Context context, Uri uri) {
-        if (uri == null) {
+    public static String getMimeType(Context context, Object uriOrUrl) {
+        if (uriOrUrl == null) {
+            return null;
+        }
+        Uri uri = null;
+        String url = null;
+        if (uriOrUrl instanceof Uri) {
+            uri = (Uri) uriOrUrl;
+            url = uri.toString();
+        } else if (uriOrUrl instanceof String) {
+            url = (String) uriOrUrl;
+            try {
+                uri = Uri.parse(url);
+            } catch (Exception e) {
+                uri = null;
+            }
+        } else {
             return null;
         }
         String mimeType = null;
-        String scheme = uri.getScheme();
+        String scheme = (uri != null) ? uri.getScheme() : null;
 
-        if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
+        if (uri != null && ContentResolver.SCHEME_CONTENT.equals(scheme)) {
             ContentResolver cr = context.getContentResolver();
             mimeType = cr.getType(uri);
-        } else {
-            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
+        }
+        if (mimeType == null && url != null) {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(url);
             if (!TextUtils.isEmpty(fileExtension)) {
                 mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.toLowerCase());
             }
         }
         return mimeType;
     }
-    public static boolean isVideoFile(Context context, Uri uri) {
-        if (uri == null) {
+    public static boolean isVideoFile(Context context, Object url) {
+        if (url == null) {
             return false;
         }
-        String mimeType = getMimeType(context, uri);
+        String mimeType = getMimeType(context, url);
         return mimeType != null && mimeType.startsWith("video/");
     }
-    public static boolean isImageFile(Context context, Uri uri) {
-        if (uri == null) {
+    public static boolean isImageFile(Context context, Object url) {
+        if (url == null) {
             return false;
         }
-        String mimeType = getMimeType(context, uri);
+        String mimeType = getMimeType(context, url);
         return mimeType != null && mimeType.startsWith("image/");
     }
 }

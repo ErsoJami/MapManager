@@ -42,8 +42,13 @@ import com.bumptech.glide.Glide;
 import com.example.mapmanager.adapters.ChatAdapter;
 import com.example.mapmanager.adapters.MessageMediaAdapter;
 import com.example.mapmanager.models.ChatsData;
+import com.example.mapmanager.models.LoadMedia;
 import com.example.mapmanager.models.Message;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
@@ -56,6 +61,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -65,6 +71,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterListener, MessageMediaAdapter.OnMediaListener {
@@ -85,7 +92,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     private DatabaseReference messageReference;
     private String lastMessageId;
     private ImageView mediaButton;
-    private ArrayList<Uri> mediaList;
+    private ArrayList<LoadMedia> mediaList;
     private ActivityResultLauncher<String[]> getMediaPermissions;
     private ActivityResultLauncher<String[]> mediaPicker;
     private MessageMediaAdapter mediaLoaderAdapter;
@@ -116,7 +123,9 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             @Override
             public void onActivityResult(List<Uri> uris) {
                 if (uris != null && !uris.isEmpty()) {
-                    mediaList.addAll(uris);
+                    for (Uri uri : uris) {
+                        mediaList.add(new LoadMedia(uri, 0));
+                    }
                     mediaLoaderAdapter.notifyDataSetChanged();
                     mediaLoaderView.setVisibility(View.VISIBLE);
                 } else if (mediaList.isEmpty()) {
@@ -163,7 +172,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         messageListView.setVisibility(View.VISIBLE);
 
         mediaLoaderView = view.findViewById(R.id.mediaPreviewView);
-        mediaLoaderAdapter = new MessageMediaAdapter(requireContext(), mediaList, this, false);
+        mediaLoaderAdapter = new MessageMediaAdapter(requireContext(), mediaList, this, 1, true);
         mediaLoaderView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         mediaLoaderView.setAdapter(mediaLoaderAdapter);
         if (mediaList == null || mediaList.isEmpty()) {
@@ -215,24 +224,35 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     if (snapshot.exists()) {
-                        Message message1 = snapshot.getValue(Message.class);
-                        message1.setMessageId(snapshot.getKey());
-                        messageList.add(message1);
-                        Log.d("Chat", "add " + message1.toString());
-                        adapter.notifyItemInserted(adapter.getItemCount() - 1);
-                        if (!isFocus[0] && message1.getMessageId().compareTo(key1) > 0) {
-                            if (messageList.size() > 1) {
-                                focusOnMessage(messageList.size() - 2);
+                        if (previousChildName == null || !previousChildName.equals(snapshot.getKey())) {
+                            Message message1 = snapshot.getValue(Message.class);
+                            message1.setMessageId(snapshot.getKey());
+                            int position = Collections.binarySearch(messageList, message1, new Comparator<Message>() {
+                                @Override
+                                public int compare(Message message, Message t1) {
+                                    return message.getMessageId().compareTo(t1.getMessageId());
+                                }
+                            });
+                            if (position >= 0 && position < messageList.size()) {
+                                messageList.set(position, message1);
                             } else {
-                                focusOnMessage(messageList.size() - 1);
+                                messageList.add(message1);
                             }
-                            isFocus[0] = true;
-                        } else if (!isFocus[0] && message1.getMessageId().compareTo(key1) == 0) {
-                            focusOnMessage(messageList.size() - 1);
-                            isFocus[0] = true;
-                        } else if (!isFocus[0] && key[0] == message1.getMessageId()) {
-                            focusOnMessage(messageList.size() - 1);
-                            isFocus[0] = true;
+                            adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                            if (!isFocus[0] && message1.getMessageId().compareTo(key1) > 0) {
+                                if (messageList.size() > 1) {
+                                    focusOnMessage(messageList.size() - 2);
+                                } else {
+                                    focusOnMessage(messageList.size() - 1);
+                                }
+                                isFocus[0] = true;
+                            } else if (!isFocus[0] && message1.getMessageId().compareTo(key1) == 0) {
+                                focusOnMessage(messageList.size() - 1);
+                                isFocus[0] = true;
+                            } else if (!isFocus[0] && key[0].equals(message1.getMessageId())) {
+                                focusOnMessage(messageList.size() - 1);
+                                isFocus[0] = true;
+                            }
                         }
                     }
                 }
@@ -247,7 +267,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                             return message.getMessageId().compareTo(t1.getMessageId());
                         }
                     });
-                    if (position != -1) {
+                    if (position >= 0 && position < messageList.size()) {
                         messageList.set(position, message);
                     }
                     adapter.notifyItemChanged(position);
@@ -264,7 +284,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                                 return message.getMessageId().compareTo(t1.getMessageId());
                             }
                         });
-                        if (position != -1) {
+                        if (position >= 0 && position < messageList.size()) {
                             messageList.remove(position);
                         }
                         adapter.notifyItemRemoved(position);
@@ -289,17 +309,23 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         super.onViewCreated(view, savedInstanceState);
         sendView.setOnClickListener(v -> {
             String text = sendTextEdit.getText().toString();
-            ArrayList<Uri> mediaUris = new ArrayList<>(mediaList);
+            ArrayList<Uri> mediaUris = new ArrayList<>();
+            for (LoadMedia loadMedia : mediaList) {
+                mediaUris.add(loadMedia.getUri());
+            }
             if (!text.isEmpty() || !mediaUris.isEmpty()) {
                 sendTextEdit.setText("");
                 sendTextEdit.clearFocus();
                 imm.hideSoftInputFromWindow(sendTextEdit.getWindowToken(), 0);
-                mediaList.clear();
-                adapter.notifyDataSetChanged();
-                mediaLoaderView.setVisibility(View.GONE);
+//                mediaList.clear();
+//                adapter.notifyDataSetChanged();
+//                mediaLoaderView.setVisibility(View.GONE);
                 if (!mediaUris.isEmpty()) {
                     uploadMediaAndSendMessage(mediaUris, text);
                 } else {
+                    mediaList.clear();
+                    mediaLoaderView.setVisibility(View.GONE);
+                    mediaLoaderAdapter.notifyDataSetChanged();
                     Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text, new ArrayList<>());
                     message.createNewMessage(chatId);
                 }
@@ -487,35 +513,70 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     private void uploadMediaAndSendMessage(ArrayList<Uri> localUris, String messageText) {
         ArrayList<Task<Uri>> uploadTasks = new ArrayList<>();
         ArrayList<String> uploadedMediaUrls = new ArrayList<>();
-
-        for (Uri uri : localUris) {
+        mediaLoaderAdapter.setModeType(2);
+        for (int i = 0; i < localUris.size(); i++) {
+            Uri uri = localUris.get(i);
             if (uri == null) continue;
             final String fileName = UUID.randomUUID().toString() + "." + getFileExtension(uri);
             StorageReference fileReference = storageReference.child(fileName);
 
             UploadTask uploadTask = fileReference.putFile(uri);
-            Task<Uri> urlTask = uploadTask.continueWithTask((Task<UploadTask.TaskSnapshot> task) -> {
-                if (!task.isSuccessful()) {
-                    throw task.getException();
+
+            int finalI = i;
+            uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                    mediaList.set(finalI, new LoadMedia(uri, progress));
+                    mediaLoaderAdapter.notifyItemChanged(finalI, null);
                 }
-                return fileReference.getDownloadUrl();
-            }).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Uri downloadUri = task.getResult();
-                    if (downloadUri != null) {
-                        uploadedMediaUrls.add(downloadUri.toString());
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
                     }
-                } else {
-                    Toast.makeText(getContext(), "Ошибка загрузки файла: " + uri.getLastPathSegment(), Toast.LENGTH_SHORT).show();
+                    return fileReference.getDownloadUrl();
+                }
+            } ).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        if (downloadUri != null) {
+                            uploadedMediaUrls.add(downloadUri.toString());
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Ошибка загрузки файла: " + uri.getLastPathSegment(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
             uploadTasks.add(urlTask);
         }
-        Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(results -> {
-            Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), messageText, uploadedMediaUrls);
-            message.createNewMessage(chatId);
-        }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Ошибка при загрузке медиа: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+            @Override
+            public void onSuccess(List<Object> objects) {
+                mediaList.clear();
+                mediaLoaderAdapter.notifyDataSetChanged();
+                mediaLoaderView.setVisibility(View.GONE);
+                Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), messageText, uploadedMediaUrls);
+                message.createNewMessage(chatId);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                mediaList.clear();
+                mediaLoaderView.setVisibility(View.GONE);
+                mediaLoaderAdapter.notifyDataSetChanged();
+                mediaLoaderAdapter.setModeType(1);
+                Toast.makeText(getContext(), "Ошибка при загрузке медиа: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
     }
 

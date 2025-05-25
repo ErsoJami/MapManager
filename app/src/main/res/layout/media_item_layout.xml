@@ -34,16 +34,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/cross"
         app:tint="@color/white" />
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone"
+        android:translationZ="2dp"
+        app:indicatorColor="@color/green_ultra_dark"
+        app:trackColor="@color/white2"
         app:layout_constraintBottom_toBottomOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView"
+        tools:progress="50"
         tools:visibility="visible" />
 
 

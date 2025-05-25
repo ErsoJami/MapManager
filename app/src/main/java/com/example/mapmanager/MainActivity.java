@@ -191,8 +191,8 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
     }
 
     @Override
-    public void onSelectMedia(String url, Uri uri) {
-        PlayerViewFragment playerViewFragment = PlayerViewFragment.updatePlayerViewFragment(url, uri);
+    public void onSelectMedia(Object url) {
+        PlayerViewFragment playerViewFragment = PlayerViewFragment.updatePlayerViewFragment(url);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, playerViewFragment);
         fragmentTransaction.addToBackStack(null);

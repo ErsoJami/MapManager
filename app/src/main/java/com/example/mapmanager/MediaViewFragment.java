@@ -52,7 +52,7 @@ public class MediaViewFragment extends Fragment implements MessageMediaAdapter.O
         View view = inflater.inflate(R.layout.fragment_media_view, container, false);
         recyclerView = view.findViewById(R.id.recycleView);
         backImageView = view.findViewById(R.id.imageView2);
-        mediaLoaderAdapter = new MessageMediaAdapter(requireContext(), mediaList, this, true);
+        mediaLoaderAdapter = new MessageMediaAdapter(requireContext(), mediaList, this, 0);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(mediaLoaderAdapter);
 

@@ -64,7 +64,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         void onOtherMessageClick(int position);
     }
     public interface OnSelectMedia {
-        void onSelectMedia(String url, Uri uri);
+        void onSelectMedia(Object url);
         void onSelectViewAllMedia(ArrayList<String> uri);
     }
     private OnSelectMedia onSelectMedia;
@@ -112,7 +112,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                         holder.gridLayout.addView(imageView);
                         imageView.setOnClickListener(v -> {
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url, null);
+                                onSelectMedia.onSelectMedia(url);
                             }
                         });
                     }
@@ -133,7 +133,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                         holder.gridLayout.addView(imageView);
                         imageView.setOnClickListener(v -> {
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url, null);
+                                onSelectMedia.onSelectMedia(url);
                             }
                         });
                     }
@@ -147,7 +147,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                 .into(imageView);
                         imageView.setOnClickListener(v -> {
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url, null);
+                                onSelectMedia.onSelectMedia(url);
                             }
                         });
                         holder.gridLayout.addView(imageView);
@@ -164,7 +164,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                         holder.gridLayout.addView(imageView);
                         imageView.setOnClickListener(v -> {
                             if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url, null);
+                                onSelectMedia.onSelectMedia(url);
                             }
                         });
                     }
