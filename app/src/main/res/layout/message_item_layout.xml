@@ -7,11 +7,26 @@
     android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.77" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.23" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/otherMessageContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/otherMessageBackground"
         android:paddingStart="3dp"
@@ -22,20 +37,24 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/myMessageContainer"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/otherUsernameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:layout_marginEnd="4dp"
+            android:elevation="0dp"
             android:text="Имя Пользователя"
             android:textColor="@color/otherMessageUsernameColor"
             android:textSize="12sp"
+            android:translationZ="1dp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -43,65 +62,73 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
-        <androidx.gridlayout.widget.GridLayout
-            android:id="@+id/otherMediaGridLayout"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/otherUsernameTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/otherUsernameTextView">
 
-        <TextView
-            android:id="@+id/otherTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="4dp"
-            android:text="Чужое сообщение."
-            android:textColor="@color/otherMessageTextColor"
-            android:visibility="gone"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/otherUsernameTextView"
-            app:layout_constraintWidth_default="wrap"
-            tools:visibility="visible" />
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/otherMediaGridLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/otherTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:paddingTop="4dp"
+                android:text="Чужое сообщение."
+                android:textColor="@color/otherMessageTextColor"
+                android:visibility="gone"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/otherMediaGridLayout"
+                app:layout_constraintWidth_default="wrap"
+                tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.77" />
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/myMessageContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="20dp"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/myMessageBackground"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
         android:paddingStart="3dp"
+        android:paddingTop="3dp"
         android:paddingEnd="3dp"
+        android:paddingBottom="3dp"
         android:visibility="gone"
-        tools:visibility="visible" >
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/otherMessageContainer"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
 
-        <androidx.gridlayout.widget.GridLayout
+            <androidx.gridlayout.widget.GridLayout
             android:id="@+id/myMediaGridLayout"
             android:layout_width="200dp"
             android:layout_height="200dp"
@@ -111,7 +138,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
-        <TextView
+            <TextView
             android:id="@+id/myTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -119,7 +146,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:text="Моё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщениеМоё сообщение"
+            android:text="моё сообщение"
             android:textColor="@color/myMessageTextColor"
             android:visibility="gone"
             app:layout_constrainedWidth="true"
@@ -131,11 +158,5 @@
             app:layout_constraintWidth_default="wrap"
             tools:visibility="visible" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.23" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

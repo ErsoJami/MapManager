@@ -46,15 +46,17 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ProfileIconChangingButton"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_marginTop="20dp"
+                    android:scaleType="centerCrop"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/main_photo" />
+                    app:shapeAppearance="@style/Circle"
+                    app:srcCompat="@drawable/user_icon" />
                 <View
                     android:id="@+id/view6"
                     android:layout_width="0dp"

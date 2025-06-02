@@ -16,25 +16,24 @@ import java.util.Map;
 public class User {
     private String email;
     private String name;
+    private String userId;
     private String nick;
     private String phoneNumber;
     private String country;
     private String city;
+    private String avatarUrl;
     private ArrayList<String> routeList;
     private HashMap<String, ChatsData> userChatsData;
     private long birthDayTime;
     public User() {
         this.routeList = new ArrayList<>();
     }
-
     public HashMap<String, ChatsData> getUserChatsData() {
         return userChatsData;
     }
-
     public void setUserChatsData(HashMap<String, ChatsData> userChatsData) {
         this.userChatsData = userChatsData;
     }
-
     public ArrayList<String> getRouteList() {
         return routeList;
     }
@@ -98,6 +97,22 @@ public class User {
         return birthDayTime;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public void changeData(DatabaseReference databaseReference) {
         HashMap<String, Object> data = new HashMap<>();
         data.put("name", name);
@@ -109,9 +124,11 @@ public class User {
         data.put("city", city);
         data.put("birthDate", birthDayTime);
         data.put("routeList", routeList);
+        data.put("avatarUrl", avatarUrl);
         databaseReference.updateChildren(data);
     }
     public void loadData(DataSnapshot ashot) {
+        if (ashot.exists()) userId = ashot.getKey();
         if (ashot.child("name").exists()) name = ashot.child("name").getValue(String.class);
         if (ashot.child("nick").exists()) nick = ashot.child("nick").getValue(String.class);
         if (ashot.child("email").exists()) email = ashot.child("email").getValue(String.class);
@@ -119,9 +136,12 @@ public class User {
         if (ashot.child("country").exists()) country = ashot.child("country").getValue(String.class);
         if (ashot.child("city").exists()) city = ashot.child("city").getValue(String.class);
         if (ashot.child("birthDate").exists()) birthDayTime = ashot.child("birthDate").getValue(long.class);
+        if (ashot.child("avatarUrl").exists()) avatarUrl = ashot.child("avatarUrl").getValue(String.class);
         GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
         GenericTypeIndicator<HashMap<String, ChatsData>> t1 = new GenericTypeIndicator<>() {};
         if (ashot.child("routeList").exists()) routeList = ashot.child("routeList").getValue(t);
+        else routeList = new ArrayList<>();
         if (ashot.child("chatList").exists()) userChatsData = ashot.child("chatList").getValue(t1);
+        else userChatsData = new HashMap<>();
     }
 }

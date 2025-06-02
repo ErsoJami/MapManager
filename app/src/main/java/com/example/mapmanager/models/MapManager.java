@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat;
 
 import androidx.core.graphics.drawable.DrawableCompat;
 
+import com.example.mapmanager.MapFragment;
 import com.example.mapmanager.R;
 import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.GeoObject;
@@ -21,15 +23,22 @@ import com.yandex.mapkit.GeoObjectCollection;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.RequestPoint;
 import com.yandex.mapkit.RequestPointType;
+import com.yandex.mapkit.ScreenPoint;
+import com.yandex.mapkit.ScreenRect;
 import com.yandex.mapkit.directions.DirectionsFactory;
 import com.yandex.mapkit.directions.driving.DrivingOptions;
 import com.yandex.mapkit.directions.driving.DrivingRoute;
+import com.yandex.mapkit.directions.driving.DrivingRouter;
+import com.yandex.mapkit.directions.driving.DrivingRouterType;
 import com.yandex.mapkit.directions.driving.DrivingSession;
+import com.yandex.mapkit.directions.driving.VehicleOptions;
 import com.yandex.mapkit.geometry.BoundingBox;
 import com.yandex.mapkit.geometry.Direction;
 import com.yandex.mapkit.geometry.Geometry;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.geometry.Polyline;
+import com.yandex.mapkit.geometry.PolylinePosition;
+import com.yandex.mapkit.geometry.SubpolylineHelper;
 import com.yandex.mapkit.layers.GeoObjectTapEvent;
 import com.yandex.mapkit.layers.GeoObjectTapListener;
 import com.yandex.mapkit.layers.ObjectEvent;
@@ -59,12 +68,22 @@ import com.yandex.mapkit.search.SuggestResponse;
 import com.yandex.mapkit.search.SuggestSession;
 import com.yandex.mapkit.search.SuggestSession.SuggestListener;
 import com.yandex.mapkit.search.ToponymObjectMetadata;
+import com.yandex.mapkit.transport.masstransit.BicycleRouterV2;
+import com.yandex.mapkit.transport.masstransit.SectionMetadata;
+import com.yandex.mapkit.transport.masstransit.Transport;
 import com.yandex.mapkit.transport.TransportFactory;
+import com.yandex.mapkit.transport.masstransit.FilterVehicleTypes;
+import com.yandex.mapkit.transport.masstransit.Fitness;
+import com.yandex.mapkit.transport.masstransit.FitnessOptions;
 import com.yandex.mapkit.transport.masstransit.MasstransitRouteSerializer;
+import com.yandex.mapkit.transport.masstransit.MasstransitRouter;
 import com.yandex.mapkit.transport.masstransit.PedestrianRouter;
 import com.yandex.mapkit.transport.masstransit.Route;
+import com.yandex.mapkit.transport.masstransit.RouteOptions;
+import com.yandex.mapkit.transport.masstransit.Section;
 import com.yandex.mapkit.transport.masstransit.SummarySession;
 import com.yandex.mapkit.transport.masstransit.TimeOptions;
+import com.yandex.mapkit.transport.masstransit.TransitOptions;
 import com.yandex.mapkit.transport.masstransit.internal.PedestrianRouterBinding;
 import com.yandex.mapkit.uri.Uri;
 import com.yandex.mapkit.uri.UriObjectMetadata;
@@ -78,8 +97,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class MapManager implements UserLocationObjectListener, SearchListener, SuggestListener, InputListener, com.yandex.mapkit.transport.masstransit.Session.RouteListener, MapObjectDragListener {
+public class MapManager implements UserLocationObjectListener, SearchListener, SuggestListener, InputListener, MapObjectDragListener {
     private final MapView mapView;
     private final Context context;
     private UserLocationLayer userLocationLayer;
@@ -96,6 +116,10 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     private Session searchSession;
     private com.yandex.mapkit.transport.masstransit.Session session;
     private final PedestrianRouter pedestrianRouter;
+    private final DrivingRouter drivingRouter;
+    private final BicycleRouterV2 bicycleRouter;
+    private DrivingSession drivingSession;
+    private final MasstransitRouter masstransitRouter;
     private boolean userGetLocation = false;
 
     private boolean userInCreateMode = false;
@@ -147,13 +171,15 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         this.suggestOptions = new SuggestOptions()
                 .setSuggestTypes(SearchType.GEO.value | SearchType.BIZ.value);
         this.pedestrianRouter = TransportFactory.getInstance().createPedestrianRouter();
+        this.masstransitRouter = TransportFactory.getInstance().createMasstransitRouter();
+        this.bicycleRouter = TransportFactory.getInstance().createBicycleRouterV2();
+        this.drivingRouter = DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED);
     }
     public void createUserLayer() {
         userLocationLayer = MapKitFactory.getInstance().createUserLocationLayer(mapView.getMapWindow());
         userLocationLayer.setVisible(true);
         userLocationLayer.setHeadingEnabled(true);
         userLocationLayer.setObjectListener(this);
-
     }
     public void onStart() {
         MapKitFactory.getInstance().onStart();
@@ -163,13 +189,26 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         MapKitFactory.getInstance().onStop();
         mapView.onStop();
     }
-    public void getRoute(ArrayList<PlacemarkMapObject> placemarkMapObjects) {
+    public void getRoute(ArrayList<PlacemarkMapObject> placemarkMapObjects, com.yandex.mapkit.transport.masstransit.Session.RouteListener busListener,
+                         com.yandex.mapkit.transport.masstransit.Session.RouteListener walkingListener, DrivingSession.DrivingRouteListener drivingRouteListener,
+                         com.yandex.mapkit.transport.masstransit.Session.RouteListener bicycleListener) {
+        if (placemarkMapObjects.size() == 1 || placemarkMapObjects.isEmpty()) {
+            mapRoutesObjectCollection.clear();
+            return;
+        }
         ArrayList<RequestPoint> requestPoints = new ArrayList<>();
         for (PlacemarkMapObject placemarkMapObject : placemarkMapObjects) {
             Point point = placemarkMapObject.getGeometry();
-            requestPoints.add(new RequestPoint(point, RequestPointType.WAYPOINT, null, null));
+            requestPoints.add(new RequestPoint(point, RequestPointType.WAYPOINT, null, null, null));
         }
-        session = pedestrianRouter.requestRoutes(requestPoints, new TimeOptions(), this);
+        TimeOptions timeOptions = new TimeOptions();
+        FitnessOptions fitnessOptions = new FitnessOptions();
+        DrivingOptions drivingOptions = new DrivingOptions();
+        VehicleOptions vehicleOptions = new VehicleOptions();
+        session = pedestrianRouter.requestRoutes(requestPoints, timeOptions, new RouteOptions(fitnessOptions), walkingListener);
+        session = masstransitRouter.requestRoutes(requestPoints, new TransitOptions(FilterVehicleTypes.NONE.value, timeOptions), new RouteOptions(fitnessOptions), busListener);
+        session = bicycleRouter.requestRoutes(requestPoints, timeOptions, new RouteOptions(fitnessOptions), bicycleListener);
+        drivingSession = drivingRouter.requestRoutes(requestPoints, drivingOptions, vehicleOptions, drivingRouteListener);
     }
     public void search(String search) {
         if (search.trim().isEmpty()) {
@@ -277,32 +316,6 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
                 Point firstPoint = firstGeoObject.getGeometry().get(0).getPoint();
                 if (firstPoint != null) {
                     moveCamera(firstPoint, 17.0f);
-                    Log.d("test", "--- First Search Result Details ---");
-                    Log.d("test", "Name: " + (firstGeoObject.getName() != null ? firstGeoObject.getName() : "N/A"));
-                    Log.d("test", "Description: " + (firstGeoObject.getDescriptionText() != null ? firstGeoObject.getDescriptionText() : "N/A"));
-                    Log.d("test", "Coordinates: " + firstPoint.getLatitude() + ", " + firstPoint.getLongitude());
-                    BusinessObjectMetadata businessData = firstGeoObject.getMetadataContainer().getItem(BusinessObjectMetadata.class);
-                    if (businessData != null) {
-                        Log.d("test", "[Business Metadata]");
-                        Log.d("test", "  OID: " + (businessData.getOid() != null ? businessData.getOid() : "N/A"));
-                        Log.d("test", "  Name: " + businessData.getName());
-                        Log.d("test", "  Address: " + (businessData.getAddress() != null ? businessData.getAddress().getFormattedAddress() : "N/A"));
-                        Log.d("test", "photo: ");
-                        Log.d("test", "  Categories: ");
-                        for (com.yandex.mapkit.search.Category category : businessData.getCategories()) Log.d("test", "    - " + category.getName());
-                        for (com.yandex.mapkit.search.Feature feature : businessData.getFeatures()) Log.d("test", "    - " + feature.getName() + feature.getValue().toString());
-                        for (com.yandex.mapkit.search.Phone phones : businessData.getPhones()) Log.d("test", "    - " + phones.getNumber());
-
-                        Log.d("test", "  Working Hours: " + (businessData.getWorkingHours() != null ? businessData.getWorkingHours().getText() : "N/A"));
-                    }
-                    ToponymObjectMetadata toponymData = firstGeoObject.getMetadataContainer().getItem(ToponymObjectMetadata.class);
-                    if (toponymData != null) {
-                        Log.d("test", "[Toponym Metadata]");
-                        Log.d("test", "  Address: " + (toponymData.getAddress() != null ? toponymData.getAddress().getFormattedAddress() : "N/A"));
-                        Log.d("test", "  Former Names: " + toponymData.getNativeName());
-                        Log.d("test", "  Point: " + (toponymData.getBalloonPoint() != null ? toponymData.getBalloonPoint().getLatitude()+","+toponymData.getBalloonPoint().getLongitude() : "N/A"));
-                    }
-
                 }
             }
         }
@@ -312,9 +325,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     @Override
     public void onSearchError(@NonNull Error error) {
         if (error instanceof com.yandex.runtime.network.NetworkError) {
-            Log.e("MapManager_SEARCH_ERROR", "Network error details: " + error.toString());
         }  else {
-            Log.e("MapManager_SEARCH_ERROR", "Other search error: " + error.toString());
         }
         mapObjectCollection.clear();
         searchListener.onSearchError(error.toString());
@@ -353,20 +364,6 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     public void onMapTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
 
     }
-    @Override
-    public void onMasstransitRoutes(@NonNull List<Route> list) {
-        if (list != null && list.size() != 0) {
-            Route route = list.get(0);
-            mapWaypointObjectCollection.clear();
-            PolylineMapObject routePolyline = mapWaypointObjectCollection.addPolyline(route.getGeometry());
-            lastRoutePolyline = routePolyline;
-            mapLongTapListener.onFocusToPolyline();
-        } else {
-            mapWaypointObjectCollection.clear();
-            Toast.makeText(context, "Некорректный маршрут", Toast.LENGTH_SHORT).show();
-        }
-
-    }
     public void focusOnPolyline() {
         if (lastRoutePolyline != null) {
             try {
@@ -387,11 +384,34 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
             }
         }
     }
-    @Override
-    public void onMasstransitRoutesError(@NonNull Error error) {
-        mapWaypointObjectCollection.clear();
-    }
+    public void focusOnPolyline(Polyline polyline) {
+        if (polyline != null) {
+            try {
+                CameraPosition userPosition = mapView.getMap().cameraPosition(
+                        Geometry.fromPolyline(polyline),
+                        0f,
+                        0f,
+                        new ScreenRect(
+                                new ScreenPoint(0f, 0f),
+                                new ScreenPoint(mapView.getMapWindow().width(), mapView.getMapWindow().height() - MapFragment.DpToPx(300f, context))
+                        )
+                );
+                CameraPosition zoomedOutPosition = new CameraPosition(
+                        userPosition.getTarget(),
+                        Math.max(0.0f, userPosition.getZoom() - 0.5f),
+                        userPosition.getAzimuth(),
+                        userPosition.getTilt()
+                );
+                mapView.getMap().move(
+                        zoomedOutPosition,
+                        new Animation(Animation.Type.SMOOTH, 0.5f),
+                        null
+                );
+            } catch (Exception e) {
 
+            }
+        }
+    }
     @Override
     public void onMapObjectDragStart(@NonNull MapObject mapObject) {
     }

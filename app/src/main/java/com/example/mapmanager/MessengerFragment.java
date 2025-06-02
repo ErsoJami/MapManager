@@ -82,6 +82,7 @@ public class MessengerFragment extends Fragment {
     }
     public void dataLoad() {
         chats.clear();
+        adapter.notifyDataSetChanged();
         if (MainActivity.user.getUserChatsData() != null) {
             for (HashMap.Entry<String, ChatsData> item : MainActivity.user.getUserChatsData().entrySet()) {
                 String chatId = item.getKey();

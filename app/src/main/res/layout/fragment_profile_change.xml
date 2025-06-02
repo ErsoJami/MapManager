@@ -180,15 +180,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/divider5" />
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ProfileIconChangingButton"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_marginTop="20dp"
+                    android:scaleType="centerCrop"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/main_photo" />
+                    app:shapeAppearance="@style/Circle"
+                    app:srcCompat="@drawable/user_icon" />
 
                 <TextView
                     android:id="@+id/changeNickText"
@@ -424,6 +426,20 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="@+id/changeView"
                     app:layout_constraintTop_toBottomOf="@+id/divider6" />
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:background="@drawable/circle"
+                    android:padding="5dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:elevation="1dp"
+                    android:translationZ="1dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/ProfileIconChangingButton"
+                    app:layout_constraintEnd_toEndOf="@+id/ProfileIconChangingButton"
+                    app:srcCompat="@drawable/plus" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

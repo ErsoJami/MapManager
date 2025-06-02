@@ -144,9 +144,6 @@ public class RegisterActivity extends AppCompatActivity {
                                 userData.put("email", email);
                                 userData.put("name", "123");
                                 userData.put("dateBirthday", "213");
-                                Map<String, String> data = new HashMap<>();
-                                data.put("1", "-OMHppsvY7m3rN5SrODh");
-                                userData.put("chatsList", data);
                                 usersRef.child(user.getUid()).setValue(userData)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
     private MessengerFragment messengerFragment;
     private ProfileChangeFragment profileChangeFragment;
     private MapFragment mapFragment;
+    private ValueEventListener userValueEventListener;
+    private ChatFragment chatFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +51,7 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
         try {
             MapKitFactory.setApiKey("83f579bc-1158-4bb1-895a-794de12cbf29");
             MapKitFactory.initialize(this);
-            DirectionsFactory.initialize(this);
-            TransportFactory.initialize(this);
+//            TransportFactory.initialize(this);
         } catch (AssertionError e) {
 
         }
@@ -108,16 +109,17 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
     @Override
     protected void onStart() {
         super.onStart();
-        databaseReference.addValueEventListener(
+        MapKitFactory.getInstance().onStart();
+        userValueEventListener = databaseReference.addValueEventListener(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-
                             user.loadData(snapshot);
                             if (profileChangeFragment.isAdded()) profileChangeFragment.dataLoad();
                             if (profileFragment.isAdded()) profileFragment.dataLoad();
                             if (mapFragment.isAdded()) mapFragment.dataLoad();
+                            if (chatFragment != null && chatFragment.isAdded()) chatFragment.dataLoad();
                             if (messengerFragment.isAdded()) messengerFragment.dataLoad();
                         }
                     }
@@ -128,7 +130,30 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
                 }
         );
     }
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        MapKitFactory.getInstance().onStop();
+        if (databaseReference != null && userValueEventListener != null) {
+            databaseReference.removeEventListener(userValueEventListener);
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing()) {
+            user = null;
+        }
+        homeDrawable = null;
+        profileDrawable = null;
+        chatDrawable = null;
+        mapDrawable = null;
+        homeFragment = null;
+        profileFragment = null;
+        messengerFragment = null;
+        profileChangeFragment = null;
+        mapFragment = null;
+    }
     private void resetButtonsColor() {
         homeDrawable.setColorFilter(getResources().getColor(R.color.grey), PorterDuff.Mode.SRC_IN);
         homeText.setTextColor(getResources().getColor(R.color.grey));
@@ -162,11 +187,12 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
 
     @Override
     public void onSelectChat(String id, String lastReadMessageId) {
-        ChatFragment chatFragment = ChatFragment.updateChat(id, lastReadMessageId);
+        chatFragment = ChatFragment.updateChat(id, lastReadMessageId);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, chatFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+        if (chatFragment != null && chatFragment.isAdded()) chatFragment.dataLoad();
     }
 
     @Override

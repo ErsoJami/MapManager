@@ -87,99 +87,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ChatAdapter.ViewHolder holder, int position) {
         Message message = messageList.get(position);
-        holder.gridLayout.removeAllViews();
         if (message != null) {
             ArrayList<String> mediaUris = message.getMediaList();
-            holder.gridLayout.removeAllViews();
-            if (mediaUris != null && !mediaUris.isEmpty()) {
-                holder.gridLayout.setVisibility(VISIBLE);
-                ViewGroup.LayoutParams params1 = holder.gridLayout.getLayoutParams();
-                WindowManager windowManager = (WindowManager) holder.itemView.getContext().getSystemService(Context.WINDOW_SERVICE);
-                DisplayMetrics displayMetrics = new DisplayMetrics();
-                windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
-                params1.width = (int) (displayMetrics.widthPixels * 0.7);
-                params1.height = params1.width;
-                holder.gridLayout.setLayoutParams(params1);
-                if (mediaUris.size() == 2) {
-                    holder.gridLayout.setColumnCount(1);
-                    holder.gridLayout.setRowCount(2);
-                    for (int i = 0; i < 2; i++) {
-                        ShapeableImageView imageView = createImageView(holder.itemView.getContext());
-                        String url = mediaUris.get(i);
-                        Glide.with(holder.itemView.getContext())
-                                .load(url)
-                                .into(imageView);
-                        holder.gridLayout.addView(imageView);
-                        imageView.setOnClickListener(v -> {
-                            if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url);
-                            }
-                        });
-                    }
-                } else if (mediaUris.size() == 3) {
-                    holder.gridLayout.setColumnCount(2);
-                    holder.gridLayout.setRowCount(2);
-                    for (int i = 0; i < 3; i++) {
-                        ShapeableImageView imageView = createImageView(holder.itemView.getContext());
-                        String url = mediaUris.get(i);
-                        if (i == 2) {
-                            GridLayout.LayoutParams params = (GridLayout.LayoutParams) imageView.getLayoutParams();
-                            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 2, 1f);
-                            imageView.setLayoutParams(params);
-                        }
-                        Glide.with(holder.itemView.getContext())
-                                .load(url)
-                                .into(imageView);
-                        holder.gridLayout.addView(imageView);
-                        imageView.setOnClickListener(v -> {
-                            if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url);
-                            }
-                        });
-                    }
-                } else if (mediaUris.size() <= 4) {
-                    holder.gridLayout.setColumnCount(mediaUris.size() == 1 ? 1 : 2);
-                    holder.gridLayout.setRowCount(mediaUris.size() == 1 || mediaUris.size() == 2 ? 1 : 2);
-                    for (String url : mediaUris) {
-                        ShapeableImageView imageView = createImageView(holder.itemView.getContext());
-                        Glide.with(holder.itemView.getContext())
-                                .load(url)
-                                .into(imageView);
-                        imageView.setOnClickListener(v -> {
-                            if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url);
-                            }
-                        });
-                        holder.gridLayout.addView(imageView);
-                    }
-                } else {
-                    holder.gridLayout.setColumnCount(2);
-                    holder.gridLayout.setRowCount(2);
-                    for (int i = 0; i < 3; i++) {
-                        ShapeableImageView imageView = createImageView(holder.itemView.getContext());
-                        String url = mediaUris.get(i);
-                        Glide.with(holder.itemView.getContext())
-                                .load(url)
-                                .into(imageView);
-                        holder.gridLayout.addView(imageView);
-                        imageView.setOnClickListener(v -> {
-                            if (onSelectMedia != null) {
-                                onSelectMedia.onSelectMedia(url);
-                            }
-                        });
-                    }
-                    String url = mediaUris.get(3);
-                    FrameLayout imageView = createImageViewWithText(holder.itemView.getContext(), url, "+ " + (mediaUris.size() - 4));
-                    imageView.setOnClickListener(v -> {
-                        if (onSelectMedia != null) {
-                            onSelectMedia.onSelectViewAllMedia(mediaUris);
-                        }
-                    });
-                    holder.gridLayout.addView(imageView);
-                }
-            } else {
-                holder.gridLayout.setVisibility(GONE);
-            }
             if (message.getUserId().equals(mAuth.getCurrentUser().getUid())) {
                 holder.myTextView.setText(message.getMessage());
                 holder.otherTextView.setText(message.getMessage());
@@ -191,18 +100,115 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                 }
                 holder.myMessageContainer.setVisibility(VISIBLE);
                 holder.myMessageContainer.setOnLongClickListener(v -> {
-                    chatAdapterListener.onMyMessageClick(position);
+                    int currentPosition = holder.getBindingAdapterPosition();
+                    if (currentPosition != RecyclerView.NO_POSITION) {
+                        chatAdapterListener.onMyMessageClick(currentPosition);
+                    }
                     return true;
                 });
                 holder.otherTextView.setVisibility(GONE);
                 holder.otherUsernameTextView.setVisibility(GONE);
                 holder.otherMessageContainer.setVisibility(GONE);
+                holder.myGridLayout.removeAllViews();
+                if (mediaUris != null && !mediaUris.isEmpty()) {
+                    holder.myGridLayout.setVisibility(VISIBLE);
+                    ViewGroup.LayoutParams params1 = holder.myGridLayout.getLayoutParams();
+                    WindowManager windowManager = (WindowManager) holder.itemView.getContext().getSystemService(Context.WINDOW_SERVICE);
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+                    params1.width = (int) (displayMetrics.widthPixels * 0.7);
+                    params1.height = params1.width;
+                    holder.myGridLayout.setLayoutParams(params1);
+                    if (mediaUris.size() == 2) {
+                        holder.myGridLayout.setColumnCount(1);
+                        holder.myGridLayout.setRowCount(2);
+                        for (int i = 0; i < 2; i++) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            String url = mediaUris.get(i);
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            holder.myGridLayout.addView(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                        }
+                    } else if (mediaUris.size() == 3) {
+                        holder.myGridLayout.setColumnCount(2);
+                        holder.myGridLayout.setRowCount(2);
+                        for (int i = 0; i < 3; i++) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            String url = mediaUris.get(i);
+                            if (i == 2) {
+                                GridLayout.LayoutParams params = (GridLayout.LayoutParams) imageView.getLayoutParams();
+                                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 2, 1f);
+                                imageView.setLayoutParams(params);
+                            }
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            holder.myGridLayout.addView(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                        }
+                    } else if (mediaUris.size() <= 4) {
+                        holder.myGridLayout.setColumnCount(mediaUris.size() == 1 ? 1 : 2);
+                        holder.myGridLayout.setRowCount(mediaUris.size() == 1 || mediaUris.size() == 2 ? 1 : 2);
+                        for (String url : mediaUris) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                            holder.myGridLayout.addView(imageView);
+                        }
+                    } else {
+                        holder.myGridLayout.setColumnCount(2);
+                        holder.myGridLayout.setRowCount(2);
+                        for (int i = 0; i < 3; i++) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            String url = mediaUris.get(i);
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            holder.myGridLayout.addView(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                        }
+                        String url = mediaUris.get(3);
+                        FrameLayout imageView = createImageViewWithText(holder.itemView.getContext(), url, "+ " + (mediaUris.size() - 4));
+                        imageView.setOnClickListener(v -> {
+                            if (onSelectMedia != null) {
+                                onSelectMedia.onSelectViewAllMedia(mediaUris);
+                            }
+                        });
+                        holder.myGridLayout.addView(imageView);
+                    }
+                } else {
+                    holder.myGridLayout.setVisibility(GONE);
+                }
             } else {
+                holder.otherGridLayout.removeAllViews();
                 holder.myTextView.setText(message.getMessage());
                 holder.otherTextView.setText(message.getMessage());
                 holder.otherUsernameTextView.setText(message.getNick());
                 holder.otherMessageContainer.setOnLongClickListener(v -> {
-                    chatAdapterListener.onOtherMessageClick(position);
+                    int currentPosition = holder.getBindingAdapterPosition();
+                    if (currentPosition != RecyclerView.NO_POSITION) {
+                        chatAdapterListener.onOtherMessageClick(currentPosition);
+                    }
                     return true;
                 });
                 holder.otherMessageContainer.setVisibility(VISIBLE);
@@ -215,8 +221,101 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                 holder.myMessageContainer.setVisibility(VISIBLE);
                 holder.myTextView.setVisibility(GONE);
                 holder.myMessageContainer.setVisibility(GONE);
+                if (mediaUris != null && !mediaUris.isEmpty()) {
+                    holder.otherGridLayout.setVisibility(VISIBLE);
+                    ViewGroup.LayoutParams params1 = holder.otherGridLayout.getLayoutParams();
+                    WindowManager windowManager = (WindowManager) holder.itemView.getContext().getSystemService(Context.WINDOW_SERVICE);
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+                    params1.width = (int) (displayMetrics.widthPixels * 0.7);
+                    params1.height = params1.width;
+                    holder.otherGridLayout.setLayoutParams(params1);
+                    if (mediaUris.size() == 2) {
+                        holder.otherGridLayout.setColumnCount(1);
+                        holder.otherGridLayout.setRowCount(2);
+                        for (int i = 0; i < 2; i++) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            String url = mediaUris.get(i);
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            holder.otherGridLayout.addView(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                        }
+                    } else if (mediaUris.size() == 3) {
+                        holder.otherGridLayout.setColumnCount(2);
+                        holder.otherGridLayout.setRowCount(2);
+                        for (int i = 0; i < 3; i++) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            String url = mediaUris.get(i);
+                            if (i == 2) {
+                                GridLayout.LayoutParams params = (GridLayout.LayoutParams) imageView.getLayoutParams();
+                                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 2, 1f);
+                                imageView.setLayoutParams(params);
+                            }
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            holder.otherGridLayout.addView(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                        }
+                    } else if (mediaUris.size() <= 4) {
+                        holder.otherGridLayout.setColumnCount(mediaUris.size() == 1 ? 1 : 2);
+                        holder.otherGridLayout.setRowCount(mediaUris.size() == 1 || mediaUris.size() == 2 ? 1 : 2);
+                        for (String url : mediaUris) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                            holder.otherGridLayout.addView(imageView);
+                        }
+                    } else {
+                        holder.otherGridLayout.setColumnCount(2);
+                        holder.otherGridLayout.setRowCount(2);
+                        for (int i = 0; i < 3; i++) {
+                            ShapeableImageView imageView = createImageView(holder.itemView.getContext());
+                            String url = mediaUris.get(i);
+                            Glide.with(holder.itemView.getContext())
+                                    .load(url)
+                                    .into(imageView);
+                            holder.otherGridLayout.addView(imageView);
+                            imageView.setOnClickListener(v -> {
+                                if (onSelectMedia != null) {
+                                    onSelectMedia.onSelectMedia(url);
+                                }
+                            });
+                        }
+                        String url = mediaUris.get(3);
+                        FrameLayout imageView = createImageViewWithText(holder.itemView.getContext(), url, "+ " + (mediaUris.size() - 4));
+                        imageView.setOnClickListener(v -> {
+                            if (onSelectMedia != null) {
+                                onSelectMedia.onSelectViewAllMedia(mediaUris);
+                            }
+                        });
+                        holder.otherGridLayout.addView(imageView);
+                    }
+                } else {
+                    holder.otherGridLayout.setVisibility(GONE);
+                }
             }
         }
+    }
+
+    public List<Message> getMessageList() {
+        return messageList;
     }
 
     @Override
@@ -229,7 +328,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         final DatabaseReference databaseReference;
 //        final RecyclerView recyclerViewMessageMedia;
 //        MessageMediaAdapter mediaAdapter;
-        final GridLayout gridLayout;
+        final GridLayout myGridLayout;
+        final GridLayout otherGridLayout;
         ViewHolder(View view){
             super(view);
             otherMessageContainer = view.findViewById(R.id.otherMessageContainer);
@@ -239,14 +339,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
             otherUsernameTextView = view.findViewById(R.id.otherUsernameTextView);
 //            recyclerViewMessageMedia = view.findViewById(R.id.otherMediaView);
 //            recyclerViewMessageMedia.setVisibility(VISIBLE);
-            gridLayout = view.findViewById(R.id.myMediaGridLayout);
-            ViewGroup.LayoutParams params = gridLayout.getLayoutParams();
+            myGridLayout = view.findViewById(R.id.myMediaGridLayout);
+            ViewGroup.LayoutParams params = myGridLayout.getLayoutParams();
             WindowManager windowManager = (WindowManager) itemView.getContext().getSystemService(Context.WINDOW_SERVICE);
             DisplayMetrics displayMetrics = new DisplayMetrics();
             windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
             params.width = (int) (displayMetrics.widthPixels * 0.7);
             params.height = params.width;
-            gridLayout.setLayoutParams(params);
+            myGridLayout.setLayoutParams(params);
+
+            otherGridLayout = view.findViewById(R.id.otherMediaGridLayout);
+            otherGridLayout.setLayoutParams(params);
 //            recyclerViewMessageMedia.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
             databaseReference = FirebaseDatabase.getInstance().getReference();
         }

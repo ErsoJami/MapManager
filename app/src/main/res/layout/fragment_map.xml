@@ -5,21 +5,221 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/routeBuilderLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:translationZ="2dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/pointsView"
+        app:layout_constraintEnd_toEndOf="@+id/pointsView"
+
+        app:layout_constraintStart_toStartOf="@+id/pointsView"
+        app:layout_constraintTop_toTopOf="@+id/pointsView"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/saveRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/rounded"
+            android:backgroundTint="@color/green"
+            android:padding="6dp"
+            android:text="Сохранить маршрут"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:translationZ="2dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/segmentInfoRecyclerView"
+            app:layout_constraintTop_toBottomOf="@+id/segmentInfoRecyclerView" />
+
+        <TextView
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/rounded"
+            android:backgroundTint="@color/red"
+            android:padding="6dp"
+            android:text="Назад"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:translationZ="2dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/segmentInfoRecyclerView"
+            app:layout_constraintTop_toBottomOf="@+id/segmentInfoRecyclerView" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/masstransitRouteRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/segmentInfoRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="132dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/masstransitRouteRecyclerView" />
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:fillViewport="true"
+            android:overScrollMode="always"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/linearLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/carTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/small_rounded"
+                    android:backgroundTint="@color/white"
+                    android:padding="5dp"
+                    android:paddingStart="30dp"
+                    android:text="15 мин"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/busTextView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/carImageView"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/carTextView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/car"
+                    app:tint="@color/black"
+                    tools:translationZ="3dp" />
+
+                <TextView
+                    android:id="@+id/busTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/small_rounded"
+                    android:backgroundTint="@color/white"
+                    android:padding="5dp"
+                    android:paddingStart="30dp"
+                    android:text="15 мин"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/walkingTextView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/busImageView"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/busTextView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/bus"
+                    app:tint="@color/black"
+                    tools:translationZ="3dp" />
+
+                <TextView
+                    android:id="@+id/walkingTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/small_rounded"
+                    android:backgroundTint="@color/white"
+                    android:padding="5dp"
+                    android:paddingStart="30dp"
+                    android:text="15 мин"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/walkingImageView"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/walkingTextView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/walking"
+                    app:tint="@color/black"
+                    tools:translationZ="3dp" />
+
+                <TextView
+                    android:id="@+id/bicycleTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/small_rounded"
+                    android:backgroundTint="@color/white"
+                    android:padding="5dp"
+                    android:paddingStart="30dp"
+                    android:text="15 мин"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/carTextView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/bicycleImageView"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/bicycleTextView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/bicycle"
+                    app:tint="@color/black"
+                    tools:translationZ="3dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </HorizontalScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/hintText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
-        app:layout_constraintHorizontal_bias="0.0"
         android:layout_marginEnd="5dp"
         android:text="Для создания точки нажмите и удерживайте нужное место на карте. Чтобы переместить точку, зажмите её и перетащите."
         android:textColor="@color/dark_grey"
         android:textSize="12sp"
         android:translationZ="2dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView14" />
+        app:layout_constraintTop_toBottomOf="@+id/textView14"
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/routeText"
@@ -34,8 +234,7 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/searchView"
         app:layout_constraintStart_toStartOf="@+id/menuView"
-        app:layout_constraintTop_toTopOf="@+id/searchView"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="@+id/searchView" />
 
     <View
         android:id="@+id/menuView"
@@ -69,9 +268,7 @@
         android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </com.yandex.mapkit.mapview.MapView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/menuButton"
@@ -81,67 +278,67 @@
         android:layout_weight="0"
         android:background="@drawable/circle"
         android:backgroundTint="@color/white"
-        android:padding="10dp"
-        app:tint="@color/black"
         android:clickable="true"
+        android:padding="10dp"
         android:translationZ="4dp"
         app:layout_constraintBottom_toTopOf="@+id/listView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/searchView"
-        app:srcCompat="@drawable/menu_icon" />
-
-
+        app:srcCompat="@drawable/menu_icon"
+        app:tint="@color/black" />
 
 
     <TextView
-        android:id="@+id/saveRoute"
+        android:id="@+id/continueRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Сохранить"
+        android:layout_marginRight="10dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/green"
-        android:textColor="@color/black"
-        android:translationZ="2dp"
-        android:layout_marginRight="10dp"
-        android:visibility="gone"
         android:padding="6dp"
-        tools:visibility="visible"
+        android:text="Дальше"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:translationZ="2dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/pointsView"
         app:layout_constraintEnd_toEndOf="@+id/pointsView"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView1"/>
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView1" />
+
     <TextView
         android:id="@+id/deleteRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Удалить"
-        android:textColor="@color/black"
+        android:layout_marginLeft="10dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/red"
-        android:translationZ="2dp"
-        android:layout_marginLeft="10dp"
-        android:visibility="gone"
         android:padding="6dp"
-        tools:visibility="visible"
+        android:text="Удалить"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:translationZ="2dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/pointsView"
         app:layout_constraintStart_toStartOf="@+id/pointsView"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView1"/>
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView1" />
+
     <TextView
         android:id="@+id/focusRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Сфокусироваться"
-        android:textColor="@color/black"
+        android:layout_marginLeft="10dp"
         android:background="@drawable/rounded"
         android:backgroundTint="@color/grey"
-        android:translationZ="2dp"
-        android:layout_marginLeft="10dp"
-        android:visibility="gone"
         android:padding="6dp"
-        tools:visibility="visible"
+        android:text="Сфокусироваться"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:translationZ="2dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/pointsView"
+        app:layout_constraintEnd_toStartOf="@+id/continueRoute"
         app:layout_constraintStart_toEndOf="@+id/deleteRoute"
-        app:layout_constraintEnd_toStartOf="@+id/saveRoute"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView1"/>
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView1" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView1"
@@ -163,8 +360,10 @@
         android:text="Список точек маршрута:"
         android:textStyle="bold"
         android:translationZ="2dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/pointsView" />
+        app:layout_constraintTop_toTopOf="@+id/pointsView"
+        tools:visibility="gone" />
 
     <View
         android:id="@+id/pointsView"
@@ -178,7 +377,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/mapview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 
     <ListView
         android:id="@+id/listView"
@@ -202,15 +401,15 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/circle"
         android:elevation="2dp"
-        android:translationZ="1dp"
-        app:srcCompat="@drawable/plus"
-        android:paddingRight="5dp"
-        android:paddingTop="4dp"
         android:paddingLeft="5dp"
+        android:paddingTop="4dp"
+        android:paddingRight="5dp"
         android:paddingBottom="1dp"
-        app:tint="@color/black"
+        android:translationZ="1dp"
         app:layout_constraintBottom_toTopOf="@+id/pointsView"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/plus"
+        app:tint="@color/black" />
 
     <ImageView
         android:id="@+id/userPosition"
@@ -220,15 +419,15 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/circle"
         android:elevation="2dp"
-        android:translationZ="1dp"
-        app:srcCompat="@drawable/arrow2_icon"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
         android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
         android:paddingBottom="5dp"
-        app:tint="@color/black"
+        android:translationZ="1dp"
         app:layout_constraintBottom_toTopOf="@+id/createNewRoute"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/arrow2_icon"
+        app:tint="@color/black" />
 
     <SearchView
         android:id="@+id/searchView"

@@ -3,11 +3,14 @@ package com.example.mapmanager;
 import static android.app.Activity.RESULT_OK;
 import static com.yandex.mapkit.search.SortOrigin.REQUEST;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
@@ -18,41 +21,142 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.mapmanager.models.ChatsData;
+import com.example.mapmanager.models.LoadMedia;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProfileChangeFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
-    ImageView profileImage;
-    ImageView leaveButton;
-    ImageView dateIcon;
-    View saveData;
-    TextView currentDate;
-    EditText changeNicknameText;
-    EditText changeRealNameText;
-    EditText changePhoneText;
-    EditText changeEmailText;
-    EditText changeCountryText;
-    EditText changeCityText;
+    private ImageView profileImage;
+    private ImageView leaveButton;
+    private ImageView dateIcon;
+    private View saveData;
+    private TextView currentDate;
+    private EditText changeNicknameText;
+    private EditText changeRealNameText;
+    private EditText changePhoneText;
+    private EditText changeEmailText;
+    private EditText changeCountryText;
+    private EditText changeCityText;
     private View view1, view2, view3, view4, view5, view6, view7;
+    private ActivityResultLauncher<String[]> getMediaPermissions;
+    private ActivityResultLauncher<String[]> mediaPicker;
     Calendar date = Calendar.getInstance();
+    private View.OnClickListener saveDataListener;
+    private Uri uri;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mediaPicker = registerForActivityResult(new ActivityResultContracts.OpenDocument(), new ActivityResultCallback<Uri>() {
+            @Override
+            public void onActivityResult(Uri o) {
+                uri = o;
+                Glide.with(requireContext())
+                        .load(uri)
+                        .placeholder(R.drawable.user_icon)
+                        .into(profileImage);
+            }
+        });
+        getMediaPermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+            @Override
+            public void onActivityResult(Map<String, Boolean> o) {
+                mediaPicker.launch(new String[]{"image/*"});
+            }
+        });
+        saveDataListener = v -> {
+            saveData.setOnClickListener(null);
+            if (MainActivity.user.getNick() != null && !changeNicknameText.getText().toString().equals(MainActivity.user.getNick()) && !MainActivity.user.getNick().isEmpty()) {
+                HashMap<String, Object> data2 = new HashMap<>();
+                DatabaseReference chatReference = FirebaseDatabase.getInstance().getReference().child("chats");
+                for (HashMap.Entry<String, ChatsData> item : MainActivity.user.getUserChatsData().entrySet()) {
+                    String chatId = item.getKey();
+                    ChatsData chatsData = item.getValue();
+                    if (chatsData.getMessageList() == null) {
+                        chatsData.setMessageList(new ArrayList<>());
+                    }
+                    for (String messageId : chatsData.getMessageList()) {
+                        data2.put("/" + chatId + "/messages/" + messageId + "/nick", changeNicknameText.getText().toString());
+                    }
+                }
+                chatReference.updateChildren(data2);
+            }
+            MainActivity.user.setNick(changeNicknameText.getText().toString());
+            MainActivity.user.setName(changeRealNameText.getText().toString());
+            MainActivity.user.setPhoneNumber(changePhoneText.getText().toString());
+            MainActivity.user.setEmail(changeEmailText.getText().toString());
+            MainActivity.user.setCountry(changeCountryText.getText().toString());
+            MainActivity.user.setCity(changeCityText.getText().toString());
+            MainActivity.user.setBirthDayTime(date.getTimeInMillis());
+            if (uri != null) {
+                StorageReference fileReference = FirebaseStorage.getInstance().getReference().child("avatars").child(MainActivity.user.getUserId());
+                UploadTask uploadTask = fileReference.putFile(uri);
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, com.google.android.gms.tasks.Task<Uri>>() {
+                    @Override
+                    public com.google.android.gms.tasks.Task<Uri> then(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+                        return fileReference.getDownloadUrl();
+                    }
+                } ).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            if (downloadUri != null) {
+                                uri = null;
+                                MainActivity.user.setAvatarUrl(String.valueOf(downloadUri));
+                                MainActivity.user.changeData(databaseReference);
+                                saveData.setOnClickListener(saveDataListener);
+                                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "Ошибка загрузки файла", Toast.LENGTH_SHORT).show();
+                            MainActivity.user.changeData(databaseReference);
+                            saveData.setOnClickListener(saveDataListener);
+                        }
+                    }
+                });
+            } else {
+                MainActivity.user.changeData(databaseReference);
+                saveData.setOnClickListener(saveDataListener);
+                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+            }
+        };
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -92,8 +196,6 @@ public class ProfileChangeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        CropImage();
         mAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
 
@@ -107,50 +209,30 @@ public class ProfileChangeFragment extends Fragment {
             requireActivity().getOnBackPressedDispatcher().onBackPressed();
         });
         dataLoad();
-        saveData.setOnClickListener(v -> {
-            if (MainActivity.user.getNick() != null && !changeNicknameText.getText().toString().equals(MainActivity.user.getNick()) && !MainActivity.user.getNick().isEmpty()) {
-                HashMap<String, Object> data2 = new HashMap<>();
-                DatabaseReference chatReference = FirebaseDatabase.getInstance().getReference().child("chats");
-                for (HashMap.Entry<String, ChatsData> item : MainActivity.user.getUserChatsData().entrySet()) {
-                    String chatId = item.getKey();
-                    ChatsData chatsData = item.getValue();
-                    if (chatsData.getMessageList() == null) {
-                        chatsData.setMessageList(new ArrayList<>());
-                    }
-                    for (String messageId : chatsData.getMessageList()) {
-                        data2.put("/" + chatId + "/messages/" + messageId + "/nick", changeNicknameText.getText().toString());
-                    }
-                }
-                chatReference.updateChildren(data2);
-            }
-            MainActivity.user.setNick(changeNicknameText.getText().toString());
-            MainActivity.user.setName(changeRealNameText.getText().toString());
-            MainActivity.user.setPhoneNumber(changePhoneText.getText().toString());
-            MainActivity.user.setEmail(changeEmailText.getText().toString());
-            MainActivity.user.setCountry(changeCountryText.getText().toString());
-            MainActivity.user.setCity(changeCityText.getText().toString());
-            MainActivity.user.setBirthDayTime(date.getTimeInMillis());
-            MainActivity.user.changeData(databaseReference);
-            requireActivity().getOnBackPressedDispatcher().onBackPressed();
-        });
+        saveData.setOnClickListener(saveDataListener);
         profileImage.setOnClickListener(v -> {
-            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-            photoPickerIntent.setType("image/*");
-            startActivityForResult(photoPickerIntent, 1);
+            openMediaPicker();
         });
     }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-        Bitmap bitmap = null;
-        switch(requestCode) {
-            case 1:
-                if(resultCode == RESULT_OK){
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    Glide.with(this)
-                            .load(selectedImage)
-                            .into(profileImage);
-                }
+    private void openMediaPicker() {
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(android.Manifest.permission.READ_MEDIA_IMAGES);
+            }
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(android.Manifest.permission.READ_MEDIA_VIDEO);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (permissionsToRequest.isEmpty()) {
+            mediaPicker.launch(new String[]{"image/*"});
+        } else {
+            getMediaPermissions.launch(permissionsToRequest.toArray(new String[0]));
         }
     }
 
@@ -168,15 +250,12 @@ public class ProfileChangeFragment extends Fragment {
         }
     };
 
-    void CropImage() {
-        Bitmap bt = BitmapFactory.decodeResource(getResources(), R.drawable.main_photo);
-        RoundedBitmapDrawable btm = RoundedBitmapDrawableFactory.create(getResources(), bt);
-        float radius = Math.min(bt.getWidth(), bt.getHeight()) / 2f;
-        btm.setCornerRadius(radius);
-        profileImage.setImageDrawable(btm);
-    }
-
     public void dataLoad() {
+        if (MainActivity.user.getName() != null && uri == null)
+            Glide.with(requireContext())
+                    .load(MainActivity.user.getAvatarUrl())
+                    .placeholder(R.drawable.user_icon)
+                    .into(profileImage);
         if (MainActivity.user.getName() != null)
             changeRealNameText.setText(MainActivity.user.getName());
         if (MainActivity.user.getNick() != null)

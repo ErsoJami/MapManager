@@ -17,10 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,18 +48,39 @@ public class ProfileFragment extends Fragment {
     private View view1, view2, view3, view6, view7, view8, view9;
     private ImageView profileImage;
     private ImageView deleteAccountView;
+    private FirebaseAuth.AuthStateListener authStateListener;
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         profileChangeEnterListener = (ProfileChangeEnterListener) context;
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null) {
+                    if (!isAdded() || getActivity() == null) {
+                        return;
+                    }
+                    Toast.makeText(requireActivity(), R.string.enter_success_text, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                    intent.putExtra("CLEAR_DATA", true);
+                    startActivity(intent);
+                    requireActivity().finish();
+                }
+            }
+        };
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         userTextView = view.findViewById(R.id.userTextView);
         emailTextView = view.findViewById(R.id.emailTextView);
         profileImage = view.findViewById(R.id.ProfileIconChangingButton);
-        CropImage();
         dateTextView = view.findViewById(R.id.dateTextView);
         deleteAccountView = view.findViewById(R.id.deleteAccountView);
         quitAccountText = view.findViewById(R.id.quitAccountText);
@@ -165,6 +189,21 @@ public class ProfileFragment extends Fragment {
             profileChangeEnterListener.startChangingProfile();
         });
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (authStateListener != null) {
+            mAuth.removeAuthStateListener(authStateListener);
+        }
+    }
+
     void changeUserPass(String newPass) {
         FirebaseUser user = mAuth.getCurrentUser();
         user.updatePassword(newPass)
@@ -210,18 +249,6 @@ public class ProfileFragment extends Fragment {
     }
     void signOut() {
         mAuth.signOut();
-        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null) {
-                    Toast.makeText(requireActivity(), R.string.enter_success_text, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(requireActivity(), LoginActivity.class);
-                    intent.putExtra("CLEAR_DATA", true);
-                    startActivity(intent);
-                    requireActivity().finish();
-                }
-            }
-        });
     }
 
     @Override
@@ -230,18 +257,16 @@ public class ProfileFragment extends Fragment {
     }
     public void dataLoad() {
         if (MainActivity.user.getName() != null)
+            Glide.with(requireContext())
+                    .load(MainActivity.user.getAvatarUrl())
+                    .placeholder(R.drawable.user_icon)
+                    .into(profileImage);
+        if (MainActivity.user.getName() != null)
             userTextView.setText(MainActivity.user.getName());
         if (MainActivity.user.getEmail() != null)
             emailTextView.setText(MainActivity.user.getEmail());
         if (MainActivity.user.getBirthDayTime() != 0)
             dateTextView.setText(DateUtils.formatDateTime( requireActivity(), MainActivity.user.getBirthDayTime(),
                     DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_DATE));
-    }
-    void CropImage() {
-        Bitmap bt = BitmapFactory.decodeResource(getResources(), R.drawable.main_photo);
-        RoundedBitmapDrawable btm = RoundedBitmapDrawableFactory.create(getResources(), bt);
-        float radius = Math.min(bt.getWidth(), bt.getHeight()) / 2f;
-        btm.setCornerRadius(radius);
-        profileImage.setImageDrawable(btm);
     }
 }

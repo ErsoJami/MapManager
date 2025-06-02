@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class Chat {
     private String id;
+    private String ownerId;
     private long lastMessageTime;
     private String lastReadMessageId;
     private ArrayList<String> membersList;
@@ -25,11 +26,12 @@ public class Chat {
     public Chat() {
         this.membersList = new ArrayList<>();
     }
-    public Chat(long lastMessageTime, ArrayList<String> membersList, String groupName, String groupAvatarUrl) {
+    public Chat(long lastMessageTime, ArrayList<String> membersList, String groupName, String groupAvatarUrl, String ownerId) {
         this.lastMessageTime = lastMessageTime;
         this.membersList = membersList;
         this.groupName = groupName;
         this.groupAvatarUrl = groupAvatarUrl;
+        this.ownerId = ownerId;
         createNewChat();
     }
     public Chat(String id, long lastMessageTime, ArrayList<String> membersList, String groupName, String groupAvatarUrl) {
@@ -41,8 +43,14 @@ public class Chat {
     }
 
     public void addNewMember(String userId) {
-        int position = Collections.binarySearch(membersList, userId);
-        if (position >= 0 && position < membersList.size()) {
+        boolean flag = true;
+        for (int i = 0; i < membersList.size(); i++) {
+            if (membersList.get(i).equals(userId)) {
+                flag = false;
+                break;
+            }
+        }
+        if (!flag) {
             return;
         }
         membersList.add(userId);
@@ -85,6 +93,7 @@ public class Chat {
         data.put("groupAvatarUrl", this.groupAvatarUrl);
         data.put("lastMessageTime", this.lastMessageTime);
         data.put("membersList", this.membersList);
+        data.put("ownerId", this.ownerId);
         DatabaseReference newChat = databaseReference.push();
         this.id = newChat.getKey();
         newChat.setValue(data);

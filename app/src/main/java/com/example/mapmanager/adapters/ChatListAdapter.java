@@ -5,13 +5,16 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.R;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
@@ -41,6 +44,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
         Chat chat = chats.get(position);
         if (chat != null) {
             holder.text1.setText(chat.getGroupName());
+            Glide.with(holder.itemView.getContext())
+                    .load(chat.getGroupAvatarUrl())
+                    .placeholder(R.drawable.account_icon)
+                    .into(holder.imageView);
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,10 +63,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     }
     public static class ViewHolder extends RecyclerView.ViewHolder {
         final TextView text1, text2;
+        final ShapeableImageView imageView;
         ViewHolder(View view){
             super(view);
             text1 = view.findViewById(R.id.textView);
             text2 = view.findViewById(R.id.textView2);
+            imageView = view.findViewById(R.id.imageView);
         }
     }
 }

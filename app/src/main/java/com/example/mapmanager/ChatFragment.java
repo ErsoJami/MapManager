@@ -33,6 +33,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,16 +42,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.mapmanager.adapters.ChatAdapter;
 import com.example.mapmanager.adapters.MessageMediaAdapter;
+import com.example.mapmanager.adapters.UserAdapter;
+import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.models.ChatsData;
 import com.example.mapmanager.models.LoadMedia;
 import com.example.mapmanager.models.Message;
 
+import com.example.mapmanager.models.User;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -58,6 +63,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -73,10 +79,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterListener, MessageMediaAdapter.OnMediaListener {
+public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterListener, MessageMediaAdapter.OnMediaListener, UserAdapter.OnDeleteUserListener {
 
     private String chatId;
+    private String groupAvatarUrl;
     private RecyclerView messageListView;
     private ChatAdapter adapter;
     private ArrayList<Message> messageList;
@@ -84,20 +92,34 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     private DatabaseReference messageListReference;
     private EditText sendTextEdit;
     private TextView chatNameText;
+    private TextView saveData;
     private ImageView leaveChatButton;
     private ImageView sendView;
+    private ImageView settingsChatButton;
     private FirebaseAuth mAuth;
     private InputMethodManager imm;
     private String lastReadMessageId;
     private DatabaseReference messageReference;
     private String lastMessageId;
     private ImageView mediaButton;
+    private ImageView leaveChatSettingsButton;
     private ArrayList<LoadMedia> mediaList;
     private ActivityResultLauncher<String[]> getMediaPermissions;
     private ActivityResultLauncher<String[]> mediaPicker;
     private MessageMediaAdapter mediaLoaderAdapter;
     private RecyclerView mediaLoaderView;
     private StorageReference storageReference;
+    private ConstraintLayout settingsLayout;
+    private ShapeableImageView shapeableImageView;
+    private RecyclerView peopleRecyclerView;
+    private UserAdapter userAdapter;
+    private ArrayList<User> userArrayList;
+    private String ownerId;
+    private ActivityResultLauncher<String[]> mediaSinglePicker;
+    private ActivityResultLauncher<String[]> getSingleMediaPermissions;
+    private boolean bim = true;
+    private Uri uri;
+    private View.OnClickListener saveDataListener;
     static ChatFragment updateChat(String chatId, String lastReadMessageId) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
@@ -133,12 +155,68 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 }
             }
         });
+        mediaSinglePicker = registerForActivityResult(new ActivityResultContracts.OpenDocument(), new ActivityResultCallback<Uri>() {
+            @Override
+            public void onActivityResult(Uri o) {
+                uri = o;
+                Glide.with(requireContext())
+                        .load(uri)
+                        .placeholder(R.drawable.user_icon)
+                        .into(shapeableImageView);
+            }
+        });
         getMediaPermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
             @Override
             public void onActivityResult(Map<String, Boolean> o) {
                 mediaPicker.launch(new String[]{"image/*", "video/*"});
             }
         });
+        getSingleMediaPermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+            @Override
+            public void onActivityResult(Map<String, Boolean> o) {
+                mediaSinglePicker.launch(new String[]{"image/*"});
+            }
+        });
+        userArrayList = new ArrayList<>();
+        saveDataListener = v -> {
+            saveData.setOnClickListener(null);
+            if (uri != null) {
+                StorageReference fileReference = FirebaseStorage.getInstance().getReference().child("chatAvatars").child(chatId);
+                UploadTask uploadTask = fileReference.putFile(uri);
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, com.google.android.gms.tasks.Task<Uri>>() {
+                    @Override
+                    public com.google.android.gms.tasks.Task<Uri> then(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+                        return fileReference.getDownloadUrl();
+                    }
+                } ).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            if (downloadUri != null) {
+                                uri = null;
+                                saveData.setOnClickListener(saveDataListener);
+                                FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("groupAvatarUrl").setValue(downloadUri.toString());
+                                Glide.with(requireContext())
+                                        .load(downloadUri)
+                                        .placeholder(R.drawable.account_icon)
+                                        .into(shapeableImageView);
+                                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "Ошибка загрузки файла", Toast.LENGTH_SHORT).show();
+                            saveData.setOnClickListener(saveDataListener);
+                        }
+                    }
+                });
+            } else {
+                MainActivity.user.changeData(databaseReference);
+                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+            }
+        };
     }
 
     @Nullable
@@ -159,11 +237,85 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
             }
         });
+        FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("ownerId").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    ownerId = snapshot.getValue(String.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         messageListView = view.findViewById(R.id.messageListView);
         leaveChatButton = view.findViewById(R.id.leaveChatButton);
         sendTextEdit = view.findViewById(R.id.sendTextEdit);
         sendView = view.findViewById(R.id.sendButton);
         mediaButton = view.findViewById(R.id.mediaButton);
+        saveData = view.findViewById(R.id.saveData);
+        leaveChatSettingsButton = view.findViewById(R.id.leaveChatSettingsButton);
+        settingsChatButton = view.findViewById(R.id.settingsChatButton);
+        settingsLayout = view.findViewById(R.id.settingsLayout);
+        shapeableImageView = view.findViewById(R.id.shapeableImageView);
+
+        peopleRecyclerView = view.findViewById(R.id.peopleRecyclerView);
+        userAdapter = new UserAdapter(requireContext(), userArrayList, false, this);
+        peopleRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        peopleRecyclerView.setAdapter(userAdapter);
+        FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("membersList")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userArrayList.clear();
+                        if (snapshot.exists()) {
+                            GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
+                            ArrayList<String> memberIds = snapshot.getValue(t);
+
+                            if (memberIds != null && !memberIds.isEmpty()) {
+                                for (String currentUserId : memberIds) {
+                                    FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId)
+                                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                                    if (userSnapshot.exists()) {
+                                                        User user = userSnapshot.getValue(User.class);
+                                                        if (user != null) {
+                                                            user.setUserId(currentUserId);
+                                                            userArrayList.add(user);
+                                                            userAdapter.notifyDataSetChanged();
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                }
+                                            });
+                                }
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+        FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("groupAvatarUrl").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    groupAvatarUrl = snapshot.getValue(String.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         mAuth = FirebaseAuth.getInstance();
         messageList = new ArrayList<>();
         adapter = new ChatAdapter(requireContext(), messageList, this);
@@ -317,9 +469,6 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 sendTextEdit.setText("");
                 sendTextEdit.clearFocus();
                 imm.hideSoftInputFromWindow(sendTextEdit.getWindowToken(), 0);
-//                mediaList.clear();
-//                adapter.notifyDataSetChanged();
-//                mediaLoaderView.setVisibility(View.GONE);
                 if (!mediaUris.isEmpty()) {
                     uploadMediaAndSendMessage(mediaUris, text);
                 } else {
@@ -338,7 +487,26 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             mediaLoaderView.setVisibility(View.VISIBLE);
             openMediaPicker();
         });
+        settingsChatButton.setOnClickListener(v -> {
+            if (ownerId.equals(mAuth.getUid())) {
+                userAdapter.setType(true);
+            } else {
+                userAdapter.setType(false);
+            }
+            settingsLayout.setVisibility(View.VISIBLE);
+            Glide.with(requireContext())
+                    .load(groupAvatarUrl)
+                    .placeholder(R.drawable.account_icon)
+                    .into(shapeableImageView);
 
+        });
+        leaveChatSettingsButton.setOnClickListener(v -> {
+            settingsLayout.setVisibility(View.GONE);
+        });
+        saveData.setOnClickListener(saveDataListener);
+        shapeableImageView.setOnClickListener(v -> {
+            openSingleMediaPicker();
+        });
     }
     private void focusOnMessage(int position) {
         if (position < 0 || position >= messageList.size()) {
@@ -412,13 +580,23 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 }
                 sendView.setOnClickListener(v2 -> {
                     String text2 = sendTextEdit.getText().toString();
-                    if (!text2.isEmpty()) {
-                        Message message1 = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text2);
-                        message1.createNewMessage(chatId);
+                    ArrayList<Uri> mediaUris = new ArrayList<>();
+                    for (LoadMedia loadMedia : mediaList) {
+                        mediaUris.add(loadMedia.getUri());
+                    }
+                    if (!text2.isEmpty() || !mediaUris.isEmpty()) {
                         sendTextEdit.setText("");
                         sendTextEdit.clearFocus();
                         imm.hideSoftInputFromWindow(sendTextEdit.getWindowToken(), 0);
-                        focusOnMessage(adapter.getItemCount() - 1);
+                        if (!mediaUris.isEmpty()) {
+                            uploadMediaAndSendMessage(mediaUris, text2);
+                        } else {
+                            mediaList.clear();
+                            mediaLoaderView.setVisibility(View.GONE);
+                            mediaLoaderAdapter.notifyDataSetChanged();
+                            Message message2 = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text2, new ArrayList<>());
+                            message2.createNewMessage(chatId);
+                        }
                     }
                 });
             });
@@ -501,6 +679,27 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             getMediaPermissions.launch(permissionsToRequest.toArray(new String[0]));
         }
     }
+    private void openSingleMediaPicker() {
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (permissionsToRequest.isEmpty()) {
+            mediaSinglePicker.launch(new String[]{"image/*"});
+        } else {
+            getSingleMediaPermissions.launch(permissionsToRequest.toArray(new String[0]));
+        }
+    }
 
     @Override
     public void onDeleteMedia(int position) {
@@ -511,6 +710,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         }
     }
     private void uploadMediaAndSendMessage(ArrayList<Uri> localUris, String messageText) {
+        sendView.setOnClickListener(null);
         ArrayList<Task<Uri>> uploadTasks = new ArrayList<>();
         ArrayList<String> uploadedMediaUrls = new ArrayList<>();
         mediaLoaderAdapter.setModeType(2);
@@ -553,7 +753,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                             uploadedMediaUrls.add(downloadUri.toString());
                         }
                     } else {
-                        Toast.makeText(getContext(), "Ошибка загрузки файла: " + uri.getLastPathSegment(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Ошибка загрузки файла", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -562,6 +762,27 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
             @Override
             public void onSuccess(List<Object> objects) {
+                sendView.setOnClickListener(v -> {
+                    String text = sendTextEdit.getText().toString();
+                    ArrayList<Uri> mediaUris = new ArrayList<>();
+                    for (LoadMedia loadMedia : mediaList) {
+                        mediaUris.add(loadMedia.getUri());
+                    }
+                    if (!text.isEmpty() || !mediaUris.isEmpty()) {
+                        sendTextEdit.setText("");
+                        sendTextEdit.clearFocus();
+                        imm.hideSoftInputFromWindow(sendTextEdit.getWindowToken(), 0);
+                        if (!mediaUris.isEmpty()) {
+                            uploadMediaAndSendMessage(mediaUris, text);
+                        } else {
+                            mediaList.clear();
+                            mediaLoaderView.setVisibility(View.GONE);
+                            mediaLoaderAdapter.notifyDataSetChanged();
+                            Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text, new ArrayList<>());
+                            message.createNewMessage(chatId);
+                        }
+                    }
+                });
                 mediaList.clear();
                 mediaLoaderAdapter.notifyDataSetChanged();
                 mediaLoaderView.setVisibility(View.GONE);
@@ -571,6 +792,30 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                sendView.setOnClickListener(v -> {
+                    String text = sendTextEdit.getText().toString();
+                    ArrayList<Uri> mediaUris = new ArrayList<>();
+                    for (LoadMedia loadMedia : mediaList) {
+                        mediaUris.add(loadMedia.getUri());
+                    }
+                    if (!text.isEmpty() || !mediaUris.isEmpty()) {
+                        sendTextEdit.setText("");
+                        sendTextEdit.clearFocus();
+                        imm.hideSoftInputFromWindow(sendTextEdit.getWindowToken(), 0);
+//                mediaList.clear();
+//                adapter.notifyDataSetChanged();
+//                mediaLoaderView.setVisibility(View.GONE);
+                        if (!mediaUris.isEmpty()) {
+                            uploadMediaAndSendMessage(mediaUris, text);
+                        } else {
+                            mediaList.clear();
+                            mediaLoaderView.setVisibility(View.GONE);
+                            mediaLoaderAdapter.notifyDataSetChanged();
+                            Message message = new Message(0, mAuth.getUid(), Timestamp.now().getSeconds(), text, new ArrayList<>());
+                            message.createNewMessage(chatId);
+                        }
+                    }
+                });
                 mediaList.clear();
                 mediaLoaderView.setVisibility(View.GONE);
                 mediaLoaderAdapter.notifyDataSetChanged();
@@ -595,5 +840,36 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             }
         }
         return extension != null ? extension : "tmp";
+    }
+
+    @Override
+    public void onDeleteUser(int position) {
+        User user = userArrayList.get(position);
+        FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("membersList").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
+                    ArrayList<String> userId = snapshot.getValue(t);
+                    userId.remove(user.getUserId());
+                    FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("membersList").setValue(userId);
+                    FirebaseDatabase.getInstance().getReference().child("users").child(user.getUserId()).child("chatList").child(chatId).removeValue();
+                    userArrayList.remove(position);
+                    userAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+    public void dataLoad() {
+        if (MainActivity.user.getUserChatsData() != null) {
+            if (!MainActivity.user.getUserChatsData().containsKey(chatId)) {
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
+            }
+        }
     }
 }

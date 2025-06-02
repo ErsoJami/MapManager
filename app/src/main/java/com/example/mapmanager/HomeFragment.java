@@ -381,7 +381,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                         settings, initialStartTimeMillis, initialEndTimeMillis);
 
                 ArrayList<String> memberList = new ArrayList<>();
-                Chat chat = new Chat(startTime.getTimeInMillis(), memberList, routeCardBuildingNameEnter.getText().toString(), "");
+                Chat chat = new Chat(startTime.getTimeInMillis(), memberList, routeCardBuildingNameEnter.getText().toString(), "", mAuth.getUid());
                 chat.addNewMember(mAuth.getUid());
                 routeCard.setChatId(chat.getId());
                 routeCard.createRoutCard();

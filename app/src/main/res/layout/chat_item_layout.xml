@@ -40,13 +40,15 @@
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
+        android:scaleType="centerCrop"
+        app:shapeAppearance="@style/Circle"
         app:tint="@color/black"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/view15"
