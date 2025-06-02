@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/small_rounded"
+    android:backgroundTint="#FAEEFF">
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/ageSlider"
+        android:layout_width="170dp"
+        android:layout_height="66dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="100"
+        app:labelBehavior="visible"
+        app:layout_constraintStart_toEndOf="@+id/ageText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:thumbColor="#46A006"
+        app:thumbHeight="20dp"
+        app:thumbStrokeWidth="0dp"
+        app:thumbWidth="4dp"
+        app:tickVisible="false"
+        app:trackColorActive="@color/green"
+        app:trackColorInactive="#B3B3F882"
+        app:trackHeight="8dp"
+        app:values="@array/initial_slider_values" />
+
+    <TextView
+        android:id="@+id/ageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Возраст"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/ageSlider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ageSlider"
+        app:layout_constraintVertical_bias="0.754" />
+
+    <TextView
+        android:id="@+id/cityText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="25dp"
+        android:text="Город"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ageText" />
+
+    <TextView
+        android:id="@+id/lenText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="25dp"
+        android:text="Длинна"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cityText" />
+
+    <EditText
+        android:id="@+id/lenStartTextInput"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/edittext_rounded"
+        android:elevation="4dp"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="text"
+        android:padding="3dp"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/lenText"
+        app:layout_constraintStart_toStartOf="@+id/cityTextInput"
+        app:layout_constraintTop_toTopOf="@+id/lenText" />
+
+    <EditText
+        android:id="@+id/lenEndTextInput"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="3dp"
+        android:background="@drawable/edittext_rounded"
+        android:elevation="4dp"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="text"
+        android:padding="3dp"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/lenStartTextInput"
+        app:layout_constraintEnd_toStartOf="@+id/km"
+        app:layout_constraintTop_toTopOf="@+id/lenStartTextInput" />
+
+    <EditText
+        android:id="@+id/cityTextInput"
+        android:layout_width="150dp"
+        android:layout_height="28dp"
+        android:background="@drawable/edittext_rounded"
+        android:elevation="4dp"
+        android:ems="10"
+        android:gravity="left"
+        android:inputType="text"
+        android:padding="3dp"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/cityText"
+        app:layout_constraintEnd_toEndOf="@+id/ageSlider"
+        app:layout_constraintStart_toStartOf="@+id/ageSlider"
+        app:layout_constraintTop_toTopOf="@+id/cityText" />
+
+    <TextView
+        android:id="@+id/km"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginEnd="4dp"
+        android:text="км"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/lenEndTextInput"
+        app:layout_constraintEnd_toEndOf="@+id/cityTextInput"
+        app:layout_constraintTop_toTopOf="@+id/lenEndTextInput" />
+
+    <TextView
+        android:id="@+id/dash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="—"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/lenStartTextInput"
+        app:layout_constraintEnd_toStartOf="@+id/lenEndTextInput"
+        app:layout_constraintStart_toEndOf="@+id/lenStartTextInput"
+        app:layout_constraintTop_toTopOf="@+id/lenStartTextInput" />
+
+    <TextView
+        android:id="@+id/acceptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/small_rounded"
+        android:backgroundTint="@color/green"
+        android:padding="2dp"
+        android:text="Применить"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lenStartTextInput" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

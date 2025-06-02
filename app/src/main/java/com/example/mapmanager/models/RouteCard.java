@@ -10,6 +10,10 @@ public class RouteCard {
     private String route;
     private String id;
     private String chatId;
+    private String name;
+    private String description;
+    private long startTime, endTime;
+    private RouteCardSettings routeCardSettings;
 
     public String getChatId() {
         return chatId;
@@ -18,11 +22,6 @@ public class RouteCard {
     public void setChatId(String chatId) {
         this.chatId = chatId;
     }
-
-    private String name;
-    private String description;
-    private long startTime, endTime;
-    private RouteCardSettings routeCardSettings;
     public RouteCard() {}
 
     public RouteCard(String route, String id, String name, String description, RouteCardSettings routeCardSettings, long startTime, long endTime) {

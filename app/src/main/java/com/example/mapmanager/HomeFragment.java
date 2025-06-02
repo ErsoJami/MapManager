@@ -1,28 +1,20 @@
 package com.example.mapmanager;
 
-import static com.example.mapmanager.MainActivity.user;
-
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -30,25 +22,20 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mapmanager.adapters.ChatAdapter;
 import com.example.mapmanager.adapters.RouteDisplayAdapter;
 import com.example.mapmanager.adapters.RouteSelectAdapter;
 import com.example.mapmanager.models.Chat;
-import com.example.mapmanager.models.Message;
+import com.example.mapmanager.models.FilterSettings;
 import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.RouteCard;
 import com.example.mapmanager.models.RouteCardSettings;
-import com.example.mapmanager.models.Waypoint;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
+import com.google.android.material.slider.RangeSlider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -57,22 +44,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.yandex.mapkit.search.search_layer.RequestType;
-import com.yandex.runtime.Error;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 public class HomeFragment extends Fragment implements RouteSelectAdapter.PostListener, RouteDisplayAdapter.RouteDisplayListener  {
+    private static final Pattern FORBIDDEN_CHARS_PATTERN = Pattern.compile("[^\\p{L}\\p{N}\\s-]+");
+    private static final Pattern MULTIPLE_HYPHENS_PATTERN = Pattern.compile("-+");
+    private static final Pattern MULTIPLE_WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final Pattern HYPHEN_WITH_SPACES_PATTERN = Pattern.compile("\\s+-\\s+");
     private RecyclerView routeListView, selectingRouteListView;
     private RouteDisplayAdapter adapter;
     private RouteSelectAdapter selectAdapter;
@@ -81,14 +66,16 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private List<Route> localRouteList;
     private ImageView routeCardBuildingCloseImage;
     private TextView addRouteCardView, routeCardBuildingDateEditText, routeCardBuildingStartTimeEditText, routeCardBuildingEndTimeEditText;
-    private EditText routeCardBuildingNameEnter, routeCardBuildingDescriptionEnter;
-    private View plusView;
+    private EditText routeCardBuildingNameEnter, routeCardBuildingDescriptionEnter, routeCardBuildingCityEditText, routeCardBuildingAgeEditText, filterMinLenEnter, filterMaxLenEnter, filterCityEnter;
+    private RangeSlider ageRangeSlider;
+    private View plusView, filterView, topView, applyView;
     private AlertDialog dialog;
     private FirebaseAuth mAuth;
     private Calendar startTime, endTime;
     private HomeFragmentListener homeFragmentListener;
     private SearchView searchView;
     private DatabaseReference routeCardReference;
+    private FilterSettings settings = new FilterSettings();
     private Query query;
     private boolean isSearching = false;
     private interface SearchResultListener {
@@ -117,8 +104,10 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
 
                     routeList.add(snapshot.getValue(RouteCard.class));
                     if (!isSearching) {
-                        displayedRouteList.add(snapshot.getValue(RouteCard.class));
-                        adapter.notifyItemInserted(displayedRouteList.size() - 1);
+                        if (settings.passFilter(snapshot.getValue(RouteCard.class).getRouteCardSettings())) {
+                            displayedRouteList.add(snapshot.getValue(RouteCard.class));
+                            adapter.notifyItemInserted(displayedRouteList.size() - 1);
+                        }
                     }
                 }
             }
@@ -227,7 +216,9 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         routeListView = view.findViewById(R.id.routeListView);
-        plusView = view.findViewById(R.id.imageView3);
+        plusView = view.findViewById(R.id.plusView);
+        filterView = view.findViewById(R.id.filterView);
+        topView = view.findViewById(R.id.topView);
         searchView = view.findViewById(R.id.routeSearch);
         adapter = new RouteDisplayAdapter(getContext(), displayedRouteList, this);
         selectAdapter = new RouteSelectAdapter(localRouteList, this);
@@ -254,6 +245,41 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             selectingRouteListView.setAdapter(selectAdapter);
             selectingRouteListView.setVisibility(View.VISIBLE);
             dialog.show();
+        });
+        topView.setOnClickListener(v->{
+            LayoutInflater inflater = getLayoutInflater();
+            View topRouteView = inflater.inflate(R.layout.route_top_fragment, null);
+
+        });
+        filterView.setOnClickListener(v->{
+            LayoutInflater inflater = getLayoutInflater();
+            View filterDialogView = inflater.inflate(R.layout.filter_dialog, null);
+            applyView = filterDialogView.findViewById(R.id.acceptButton);
+            ageRangeSlider = filterDialogView.findViewById(R.id.ageSlider);
+            filterMinLenEnter = filterDialogView.findViewById(R.id.lenStartTextInput);
+            filterMaxLenEnter = filterDialogView.findViewById(R.id.lenEndTextInput);
+            filterCityEnter = filterDialogView.findViewById(R.id.cityTextInput);
+
+            ageRangeSlider.setValues(List.of((float) settings.getMinAge(), (float) settings.getMaxAge()));
+            filterCityEnter.setText(settings.getCity());
+            filterMinLenEnter.setText(Double.valueOf(settings.getMinLen()).equals(FilterSettings.DOWN_BORDER_LEN)? "" : String.valueOf(settings.getMinLen()));
+            filterMaxLenEnter.setText(Double.valueOf(settings.getMaxLen()).equals(FilterSettings.UP_BORDER_LEN)? "" : String.valueOf(settings.getMaxLen()));
+
+            applyView.setOnClickListener(list->{
+                settings.setMinAge(ageRangeSlider.getValues().get(0).shortValue());
+                settings.setMaxAge(ageRangeSlider.getValues().get(1).shortValue());
+                settings.setCity(cityUniform(filterCityEnter.getText().toString()));
+                settings.setMaxLen(filterMaxLenEnter.getText().toString().isEmpty()? FilterSettings.UP_BORDER_LEN : Float.parseFloat(filterMaxLenEnter.getText().toString()));
+                settings.setMinLen(filterMinLenEnter.getText().toString().isEmpty()? FilterSettings.DOWN_BORDER_LEN : Float.parseFloat(filterMinLenEnter.getText().toString()));
+                if (!isSearching) showAllRoutes();
+                else {
+                    searchView.setQuery(searchView.getQuery().toString(), true);
+                }
+            });
+            final PopupWindow filterDialog = new PopupWindow(filterDialogView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            filterDialog.setFocusable(true);
+            filterDialog.setOutsideTouchable(true);
+            filterDialog.showAsDropDown(filterView, 0, 14);
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -286,9 +312,42 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             }
         });
     }
+
+    private void searchRoutesByNamePrefix(String prefix, @NonNull SearchResultListener listener) {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            listener.onError();
+            return;
+        }
+        query = routeCardReference.orderByChild("name").startAt(prefix).endAt(prefix + "\uf8ff");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<RouteCard> results = new ArrayList<>();
+                if (snapshot.exists()) {
+                    for (DataSnapshot routeShot : snapshot.getChildren()) {
+                        RouteCard routeCard = routeShot.getValue(RouteCard.class);
+                        if (settings.passFilter(routeCard.getRouteCardSettings())) {
+                            results.add(routeCard);
+                        }
+                    }
+                }
+                listener.onResultsFound(results);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
     private void showAllRoutes() {
         displayedRouteList.clear();
-        displayedRouteList.addAll(routeList);
+        Log.i("INFO", String.valueOf(routeList == null));
+        for (RouteCard route : routeList) {
+            if (settings.passFilter(route.getRouteCardSettings())) {
+                displayedRouteList.add(route);
+            }
+        }
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
@@ -311,10 +370,15 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             endTime = Calendar.getInstance();
             startTime.add(Calendar.SECOND, 1);
             endTime.add(Calendar.SECOND, 1);
-            if (!routeCardBuildingNameEnter.getText().toString().isEmpty() &&
-                    initialStartTimeMillis > startTime.getTimeInMillis() && initialEndTimeMillis > endTime.getTimeInMillis()) {
+            if (routeCardBuildingNameEnter.getText().toString().isEmpty()) {
+                Toast.makeText(requireContext(), "Маршрут должен иметь название", Toast.LENGTH_SHORT).show();
+            } else if (initialStartTimeMillis <= startTime.getTimeInMillis() && initialEndTimeMillis <= endTime.getTimeInMillis()) {
+                Toast.makeText(requireContext(), "Недопустимое время начала и конца", Toast.LENGTH_SHORT).show();
+            } else {
+                RouteCardSettings settings = new RouteCardSettings(Integer.parseInt(routeCardBuildingAgeEditText.getText().toString()), routeCardBuildingCityEditText.getText().toString(), 100);
+                settings.normalize();
                 RouteCard routeCard = new RouteCard(curRoute.getId(), routeCardBuildingNameEnter.getText().toString(), routeCardBuildingDescriptionEnter.getText().toString(),
-                        new RouteCardSettings(), initialStartTimeMillis, initialEndTimeMillis);
+                        settings, initialStartTimeMillis, initialEndTimeMillis);
 
                 ArrayList<String> memberList = new ArrayList<>();
                 Chat chat = new Chat(startTime.getTimeInMillis(), memberList, routeCardBuildingNameEnter.getText().toString(), "");
@@ -324,10 +388,6 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 buildDialog.dismiss();
                 startTime = Calendar.getInstance();
                 endTime = Calendar.getInstance();
-            } else if (routeCardBuildingNameEnter.getText().toString().isEmpty()) {
-                Toast.makeText(requireContext(), "Маршрут должен иметь название", Toast.LENGTH_SHORT).show();
-            } else if (initialStartTimeMillis <= startTime.getTimeInMillis() && initialEndTimeMillis <= endTime.getTimeInMillis()) {
-                Toast.makeText(requireContext(), "Недопустимое время начала и конца", Toast.LENGTH_SHORT).show();
             }
         });
         routeCardBuildingDateEditText.setOnClickListener(v->{
@@ -345,6 +405,8 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     public void buildDialogDeclaration(View view) {
         routeCardBuildingCloseImage = view.findViewById(R.id.routeCardBuildingCloseImage);
         addRouteCardView = view.findViewById(R.id.addRouteCardView);
+        routeCardBuildingAgeEditText = view.findViewById(R.id.routeCardBuildingAgeEditText);
+        routeCardBuildingCityEditText = view.findViewById(R.id.routeCardBuildingCityEditText);
         routeCardBuildingNameEnter = view.findViewById(R.id.routeCardBuildingNameEnter);
         routeCardBuildingDescriptionEnter = view.findViewById(R.id.routeCardBuildingDescriptionEnter);
         routeCardBuildingDateEditText = view.findViewById(R.id.routeCardBuildingDateEditText);
@@ -429,30 +491,12 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         });
 
     }
-
-    private void searchRoutesByNamePrefix(String prefix, @NonNull SearchResultListener listener) {
-        if (prefix == null || prefix.trim().isEmpty()) {
-            listener.onError();
-            return;
-        }
-        query = routeCardReference.orderByChild("name").startAt(prefix).endAt(prefix + "\uf8ff");
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<RouteCard> results = new ArrayList<>();
-                if (snapshot.exists()) {
-                    for (DataSnapshot routeShot : snapshot.getChildren()) {
-                        RouteCard routeCard = routeShot.getValue(RouteCard.class);
-                        results.add(routeCard);
-                    }
-                }
-                listener.onResultsFound(results);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
+    String cityUniform(String s) {
+        s = FORBIDDEN_CHARS_PATTERN.matcher(s).replaceAll("");
+        s = MULTIPLE_HYPHENS_PATTERN.matcher(s).replaceAll("-");
+        s = MULTIPLE_WHITESPACE_PATTERN.matcher(s).replaceAll(" ");
+        s = HYPHEN_WITH_SPACES_PATTERN.matcher(s).replaceAll("-");
+        s = s.trim();
+        return s;
     }
-
 }
