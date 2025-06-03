@@ -143,19 +143,20 @@ public class RegisterActivity extends AppCompatActivity {
                                 Map<String, Object> userData = new HashMap<>();
                                 userData.put("email", email);
                                 userData.put("name", "123");
+                                userData.put("nick", "123");
                                 userData.put("dateBirthday", "213");
                                 usersRef.child(user.getUid()).setValue(userData)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
-                                                    Toast.makeText(RegisterActivity.this, "Регистрация успешна и данные сохранены.", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(RegisterActivity.this, R.string.successful_registration, Toast.LENGTH_SHORT).show();
                                                     Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                                                     intent.putExtra("CLEAR_DATA", true);
                                                     startActivity(intent);
                                                     finish();
                                                 } else {
-                                                    Toast.makeText(RegisterActivity.this, "Ошибка сохранения данных: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(RegisterActivity.this, getResources().getString(R.string.save_data_error) + " " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             }
                                         });

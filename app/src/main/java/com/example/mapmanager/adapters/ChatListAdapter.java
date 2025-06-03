@@ -48,6 +48,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
                     .load(chat.getGroupAvatarUrl())
                     .placeholder(R.drawable.account_icon)
                     .into(holder.imageView);
+            if (chat.getLastMessage() != null) {
+                holder.text2.setText(chat.getLastMessage());
+            }
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

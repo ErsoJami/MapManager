@@ -1,5 +1,7 @@
 package com.example.mapmanager.models;
 
+import com.example.mapmanager.R;
+
 public class SegmentInfo {
     private int type; // 0 - велосипед, 1 - пешком, 2 - транспорт, 3 - машина
     private String name;
@@ -74,7 +76,7 @@ public class SegmentInfo {
         return num + " " + three;
     }
     public String getStep() {
-        return getDeclension(step, "шаг", "шага", "шагов");
+        return getDeclension(step, String.valueOf(R.string.step), String.valueOf(R.string.step_2), String.valueOf(R.string.step_3));
     }
 
     public void setStep(int step) {
@@ -82,7 +84,7 @@ public class SegmentInfo {
     }
 
     public String getCalories() {
-        return getDeclension(calories, "калория", "калории", "калорий");
+        return getDeclension(calories, String.valueOf(R.string.calories), String.valueOf(R.string.caloies_2), String.valueOf(R.string.caloies_3));
     }
 
     public void setCalories(int calories) {

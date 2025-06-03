@@ -141,7 +141,6 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             if (fineLocationGranted != null && fineLocationGranted || coarseLocationGranted!= null && coarseLocationGranted) {
                 mapManager.createUserLayer();
             } else {
-                Toast.makeText(requireContext(), "Location permission denied.", Toast.LENGTH_SHORT).show();
             }
         });
         mAuth = FirebaseAuth.getInstance();
@@ -152,7 +151,6 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (getArguments() != null) {
             routeToShowOnReady = (Route) getArguments().getSerializable("ROUTE_TO_SHOW");
-            Log.d("MapFragment", "Маршрут получен из аргументов.");
         }
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = view.findViewById(R.id.mapview);
@@ -517,11 +515,11 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                     sectionPolyline.setGapLength(8.0f);
                     sectionPolyline.setZIndex(10.0f);
                     if (data.getWeight().getWalkingDistance().getValue() == 0) {
-                        segmentInfos.add(new SegmentInfo(1, "Ожидание", "0", data.getWeight().getTime().getText(),
+                        segmentInfos.add(new SegmentInfo(1, R.string.wait + "", "0", data.getWeight().getTime().getText(),
                                 (int) (data.getWeight().getWalkingDistance().getValue() / 0.762), (int) (data.getWeight().getWalkingDistance().getValue() / 24), ""));
                         number--;
                     } else {
-                        segmentInfos.add(new SegmentInfo(1, "секция " + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
+                        segmentInfos.add(new SegmentInfo(1, R.string.section + "" + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
                                 (int) (data.getWeight().getWalkingDistance().getValue() / 0.762), (int) (data.getWeight().getWalkingDistance().getValue() / 24), ""));
                     }
                 }
@@ -542,8 +540,8 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                     for (Transport t : data.getData().getTransports()) {
                         allTranport += ", " + t.getLine().getName();
                     }
-                    allTranport = "Транспорт: " + allTranport.replaceFirst(", ", "");
-                    segmentInfos.add(new SegmentInfo(2, "секция " + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
+                    allTranport = R.string.tranport + allTranport.replaceFirst(", ", "");
+                    segmentInfos.add(new SegmentInfo(2, R.string.section + "" + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
                             (int) (0), (int) (0), allTranport));
                 }
                 else if (data.getData().getWait() != null || data.getData().getTransfer() != null) {
@@ -576,7 +574,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             routePolyline.setStrokeWidth(5.0f);
             routePolyline.setZIndex(100f);
             mapManager.focusOnPolyline(routeGeometry);
-            segmentInfos.add(new SegmentInfo(3, "секция " + 1, route.getMetadata().getWeight().getDistance().getText(), route.getMetadata().getWeight().getTime().getText(),
+            segmentInfos.add(new SegmentInfo(3, R.string.section + "1", route.getMetadata().getWeight().getDistance().getText(), route.getMetadata().getWeight().getTime().getText(),
                     (int) (0), (int) (0), ""));
         }
         segmentInfoAdapter.notifyDataSetChanged();
@@ -678,6 +676,10 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         } else {
             return -1;
         }
+    }
+    public static int PxToDp(Context context, int px) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return (int) (px / displayMetrics.density);
     }
     private void openRouteView() {
         if (isClosePointsView) {

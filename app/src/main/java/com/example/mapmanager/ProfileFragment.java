@@ -40,11 +40,11 @@ public class ProfileFragment extends Fragment {
     public static interface ProfileChangeEnterListener {
         void startChangingProfile();
     }
-//    TODO: добавить Яндекс в о приложении.
     private ProfileChangeEnterListener profileChangeEnterListener;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
     private TextView userTextView, emailTextView, dateTextView, quitAccountText, deleteAccountText, changePassText, changePersonalDataText;
+    private TextView infoTextView;
     private View view1, view2, view3, view6, view7, view8, view9;
     private ImageView profileImage;
     private ImageView deleteAccountView;
@@ -87,6 +87,7 @@ public class ProfileFragment extends Fragment {
         deleteAccountText = view.findViewById(R.id.deleteAccountText);
         changePassText = view.findViewById(R.id.changePassText);
         changePersonalDataText = view.findViewById(R.id.changePersonalDataText);
+        infoTextView = view.findViewById(R.id.infoTextView);
         view1 = view.findViewById(R.id.view);
         view2 = view.findViewById(R.id.view2);
         view3 = view.findViewById(R.id.view3);
@@ -188,6 +189,10 @@ public class ProfileFragment extends Fragment {
         changePersonalDataText.setOnClickListener(v->{
             profileChangeEnterListener.startChangingProfile();
         });
+        infoTextView.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), InfoActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override
@@ -210,13 +215,13 @@ public class ProfileFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(requireContext(), "Пароль изменён", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), R.string.pass_change, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(requireContext(), "Пароль не изменён", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), R.string.pass_not_change, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -235,14 +240,14 @@ public class ProfileFragment extends Fragment {
                             startActivity(intent);
                             requireActivity().finish();
                         } else {
-                            Toast.makeText(requireContext(), "Удаление акаунта прервано.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.error_account_delete, Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Toast.makeText(requireContext(), "Удаление акаунта прервано: " + e.getLocalizedMessage(),
+                        Toast.makeText(requireContext(), R.string.error_account_delete + e.getLocalizedMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });

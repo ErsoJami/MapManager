@@ -20,48 +20,49 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
-        android:layout_marginTop="10dp"
-        android:text="Описание:"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:text="@string/description"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView15" />
+        app:layout_constraintTop_toBottomOf="@+id/editNameText" />
 
     <TextView
         android:id="@+id/textView15"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginStart="3dp"
-        android:layout_marginTop="7dp"
-        android:text="Название:"
+        android:layout_marginTop="15dp"
+        android:text="@string/name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editDescriptionText"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_rounded"
         android:ems="10"
         android:inputType="text"
-        android:paddingTop="3dp"
-        android:text="Описание"
-        android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@+id/textView15"
-        app:layout_constraintTop_toBottomOf="@+id/textView15" />
+        android:text="@string/description"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView12"
+        app:layout_constraintStart_toEndOf="@+id/textView12"
+        app:layout_constraintTop_toTopOf="@+id/textView12" />
 
     <EditText
         android:id="@+id/editNameText"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="7dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_rounded"
         android:ems="10"
         android:inputType="text"
-        android:paddingTop="3dp"
-        android:text="Название"
-        android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@+id/textView15"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/name"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView15"
+        app:layout_constraintStart_toStartOf="@+id/editDescriptionText"
+        app:layout_constraintTop_toTopOf="@+id/textView15" />
 
 
     <ImageView

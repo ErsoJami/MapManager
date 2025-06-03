@@ -16,13 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mapmanager.adapters.ChatListAdapter;
 import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.models.ChatsData;
+import com.example.mapmanager.models.Message;
 import com.example.mapmanager.models.Route;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,8 +100,31 @@ public class MessengerFragment extends Fragment {
                                 Chat chat = dataSnapshot.getValue(Chat.class);
                                 chat.setLastReadMessageId(chatsData.getLastMessageId());
                                 chat.setId(chatId);
-                                chats.add(chat);
-                                adapter.notifyDataSetChanged();
+                                DatabaseReference messagesRef = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages");
+                                Query lastMessageQuery = messagesRef.orderByKey().limitToLast(1);
+                                lastMessageQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                                                String messageId = messageSnapshot.getKey();
+                                                Message lastMessage = messageSnapshot.getValue(Message.class);
+                                                chat.setLastMessage(lastMessage.getMessage());
+                                                chats.add(chat);
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        } else {
+                                            chats.add(chat);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        chats.add(chat);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
                             }
                         }
                     });

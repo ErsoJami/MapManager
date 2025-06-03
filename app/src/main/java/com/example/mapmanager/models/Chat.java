@@ -18,11 +18,12 @@ public class Chat {
     private String id;
     private String ownerId;
     private long lastMessageTime;
-    private String lastReadMessageId;
     private ArrayList<String> membersList;
     private String groupName;
     private String groupAvatarUrl;
     private DatabaseReference databaseReference;
+    private String lastMessage;
+    private String lastReadMessageId;
     public Chat() {
         this.membersList = new ArrayList<>();
     }
@@ -70,12 +71,28 @@ public class Chat {
         databaseReference.updateChildren(data);
     }
 
+    public String getLastMessage() {
+        return lastMessage;
+    }
+
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
+    }
+
     public String getLastReadMessageId() {
         return lastReadMessageId;
     }
 
     public void setLastReadMessageId(String lastReadMessageId) {
         this.lastReadMessageId = lastReadMessageId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Chat(String id, long lastMessageTime, ArrayList<String> membersList, String groupName, String groupAvatarUrl, String lastReadMessageId) {

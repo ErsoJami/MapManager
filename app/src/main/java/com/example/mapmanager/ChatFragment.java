@@ -2,6 +2,10 @@ package com.example.mapmanager;
 
 import static android.app.Activity.RESULT_OK;
 
+import static com.example.mapmanager.MapFragment.DpToPx;
+import static com.example.mapmanager.MapFragment.PxToDp;
+import static com.example.mapmanager.MapFragment.getScreenWidth;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -204,17 +208,17 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                                         .load(downloadUri)
                                         .placeholder(R.drawable.account_icon)
                                         .into(shapeableImageView);
-                                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getResources().getString(R.string.successful_save), Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(getContext(), "Ошибка загрузки файла", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getResources().getString(R.string.error_file_load), Toast.LENGTH_SHORT).show();
                             saveData.setOnClickListener(saveDataListener);
                         }
                     }
                 });
             } else {
                 MainActivity.user.changeData(databaseReference);
-                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getResources().getString(R.string.successful_save), Toast.LENGTH_SHORT).show();
             }
         };
     }
@@ -330,7 +334,12 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         if (mediaList == null || mediaList.isEmpty()) {
             mediaLoaderView.setVisibility(View.GONE);
         }
-        String key1 = new String(lastReadMessageId);
+        String key1;
+        if (lastReadMessageId != null) {
+            key1 = new String(lastReadMessageId);
+        } else {
+            key1 = "";
+        }
         final String[] key = {new String()};
         final Boolean[] isFocus = {new Boolean(false)};
         Query item = messageReference.orderByKey().limitToLast(1);
@@ -618,7 +627,8 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             popupWindow.dismiss();
         });
         popupWindow.setOutsideTouchable(true);
-        popupWindow.showAsDropDown(view, 300, 0, Gravity.START);
+        int xoff = (int) (getScreenWidth(requireContext()) - DpToPx(273, requireContext()) - DpToPx(22, requireContext()));
+        popupWindow.showAsDropDown(view, xoff, -(int) DpToPx(15, requireContext()), Gravity.START);
     }
 
     @Override
@@ -651,11 +661,11 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             popupWindow.dismiss();
         });
         popupWindow.setOutsideTouchable(true);
-        popupWindow.showAsDropDown(view, 0, 0, Gravity.START);
+        popupWindow.showAsDropDown(view, (int) DpToPx(22, requireContext()), -(int) DpToPx(15, requireContext()), Gravity.START);
     }
     private void copyMessage(String text) {
         ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("Скопированное сообщение", text);
+        ClipData clip = ClipData.newPlainText(getResources().getString(R.string.copy_message), text);
         clipboard.setPrimaryClip(clip);
     }
     private void openMediaPicker() {
@@ -753,7 +763,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                             uploadedMediaUrls.add(downloadUri.toString());
                         }
                     } else {
-                        Toast.makeText(getContext(), "Ошибка загрузки файла", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getString(R.string.error_file_load), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -820,7 +830,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 mediaLoaderView.setVisibility(View.GONE);
                 mediaLoaderAdapter.notifyDataSetChanged();
                 mediaLoaderAdapter.setModeType(1);
-                Toast.makeText(getContext(), "Ошибка при загрузке медиа: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getResources().getString(R.string.media_error) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

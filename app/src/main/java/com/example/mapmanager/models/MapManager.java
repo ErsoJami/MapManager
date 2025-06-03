@@ -126,7 +126,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
 
     private PolylineMapObject lastRoutePolyline;
 
-
+    public static final double LONGTITUDE_RADIUS = 0.01598718, LATITUDE_RADIUS = 0.00899316;
     public interface MapManagerSearchListener {
         void onSearchSuccess();
         void onSearchError(String error);
@@ -241,8 +241,8 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         Point userPoint = getCurrentUserLocation();
         if (userLocationLayer != null && userLocationLayer.cameraPosition() != null) {
             Point userLocation = userLocationLayer.cameraPosition().getTarget();
-            suggestSession.suggest(search, new BoundingBox(new Point(userLocation.getLatitude() - 0.00899316, userLocation.getLongitude() - 0.01598718),
-                    new Point(userLocation.getLatitude() + 0.00899316, userLocation.getLongitude() + 0.01598718)), suggestOptions, this);
+            suggestSession.suggest(search, new BoundingBox(new Point(userLocation.getLatitude() - LATITUDE_RADIUS, userLocation.getLongitude() - LONGTITUDE_RADIUS),
+                    new Point(userLocation.getLatitude() + LATITUDE_RADIUS, userLocation.getLongitude() + LONGTITUDE_RADIUS)), suggestOptions, this);
         }
     }
     public Geometry getVisibleRegionGeometry() {

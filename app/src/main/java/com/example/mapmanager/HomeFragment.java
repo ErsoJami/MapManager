@@ -78,6 +78,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private FilterSettings settings = new FilterSettings();
     private Query query;
     private boolean isSearching = false;
+    private MessengerFragment.OnChatSelectChat selectChatListner;
     private interface SearchResultListener {
         void onResultsFound(List<RouteCard> results);
         void onError();
@@ -208,6 +209,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
 
             }
         });
+        selectChatListner = (MessengerFragment.OnChatSelectChat) context;
         homeFragmentListener = (HomeFragmentListener) context;
         routeCardReference = FirebaseDatabase.getInstance().getReference().child("routeCards");
     }
@@ -342,7 +344,6 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
 
     private void showAllRoutes() {
         displayedRouteList.clear();
-        Log.i("INFO", String.valueOf(routeList == null));
         for (RouteCard route : routeList) {
             if (settings.passFilter(route.getRouteCardSettings())) {
                 displayedRouteList.add(route);
@@ -371,9 +372,9 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             startTime.add(Calendar.SECOND, 1);
             endTime.add(Calendar.SECOND, 1);
             if (routeCardBuildingNameEnter.getText().toString().isEmpty()) {
-                Toast.makeText(requireContext(), "Маршрут должен иметь название", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getResources().getString(R.string.need_name), Toast.LENGTH_SHORT).show();
             } else if (initialStartTimeMillis <= startTime.getTimeInMillis() && initialEndTimeMillis <= endTime.getTimeInMillis()) {
-                Toast.makeText(requireContext(), "Недопустимое время начала и конца", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getResources().getString(R.string.time_error), Toast.LENGTH_SHORT).show();
             } else {
                 RouteCardSettings settings = new RouteCardSettings(Integer.parseInt(routeCardBuildingAgeEditText.getText().toString()), routeCardBuildingCityEditText.getText().toString(), 100);
                 settings.normalize();
@@ -385,6 +386,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 chat.addNewMember(mAuth.getUid());
                 routeCard.setChatId(chat.getId());
                 routeCard.createRoutCard();
+                selectChatListner.onSelectChat(chat.getId(), chat.getLastReadMessageId());
                 buildDialog.dismiss();
                 startTime = Calendar.getInstance();
                 endTime = Calendar.getInstance();
@@ -401,7 +403,6 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         });
         buildDialog.show();
     }
-
     public void buildDialogDeclaration(View view) {
         routeCardBuildingCloseImage = view.findViewById(R.id.routeCardBuildingCloseImage);
         addRouteCardView = view.findViewById(R.id.addRouteCardView);
@@ -474,6 +475,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                     Chat chat = dataSnapshot.getValue(Chat.class);
                     chat.setId(dataSnapshot.getKey());
                     chat.addNewMember(mAuth.getUid());
+                    selectChatListner.onSelectChat(chat.getId(), chat.getLastReadMessageId());
                 }
             }
         });

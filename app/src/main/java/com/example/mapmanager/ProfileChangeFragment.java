@@ -56,8 +56,12 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProfileChangeFragment extends Fragment {
+    private static final int MIN_AGE = 16;
+    private static final int MAX_NICKNAME_LENGTH = 20;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
     private ImageView profileImage;
@@ -97,6 +101,29 @@ public class ProfileChangeFragment extends Fragment {
             }
         });
         saveDataListener = v -> {
+            if (!isAgeValid(date)) {
+                Toast.makeText(getContext(), getResources().getString(R.string.age_need_less) + " " + MIN_AGE + " " + getResources().getString(R.string.age), Toast.LENGTH_LONG).show();
+                saveData.setOnClickListener(saveDataListener);
+                return;
+            }
+            String nickname = changeNicknameText.getText().toString();
+            if (nickname.length() > MAX_NICKNAME_LENGTH) {
+                Toast.makeText(getContext(), getResources().getString(R.string.nick_need_less) + " " + MAX_NICKNAME_LENGTH + " " + getResources().getString(R.string.chars), Toast.LENGTH_LONG).show();
+                saveData.setOnClickListener(saveDataListener);
+                return;
+            }
+            if (nickname.trim().isEmpty()) {
+                Toast.makeText(getContext(), getResources().getString(R.string.nick_not_be_empty), Toast.LENGTH_LONG).show();
+                saveData.setOnClickListener(saveDataListener);
+                return;
+            }
+            String phoneNumber = changePhoneText.getText().toString().replaceAll("[^0-9+]", "");
+            if (!phoneNumber.isEmpty() && !isValidPhoneNumber(phoneNumber)) {
+                Toast.makeText(getContext(), getResources().getString(R.string.enter_correct_number), Toast.LENGTH_LONG).show();
+                saveData.setOnClickListener(saveDataListener);
+                return;
+            }
+
             saveData.setOnClickListener(null);
             if (MainActivity.user.getNick() != null && !changeNicknameText.getText().toString().equals(MainActivity.user.getNick()) && !MainActivity.user.getNick().isEmpty()) {
                 HashMap<String, Object> data2 = new HashMap<>();
@@ -141,10 +168,10 @@ public class ProfileChangeFragment extends Fragment {
                                 MainActivity.user.setAvatarUrl(String.valueOf(downloadUri));
                                 MainActivity.user.changeData(databaseReference);
                                 saveData.setOnClickListener(saveDataListener);
-                                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getResources().getString(R.string.successful_save), Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(getContext(), "Ошибка загрузки файла", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getResources().getString(R.string.error_file_load), Toast.LENGTH_SHORT).show();
                             MainActivity.user.changeData(databaseReference);
                             saveData.setOnClickListener(saveDataListener);
                         }
@@ -153,7 +180,7 @@ public class ProfileChangeFragment extends Fragment {
             } else {
                 MainActivity.user.changeData(databaseReference);
                 saveData.setOnClickListener(saveDataListener);
-                Toast.makeText(getContext(), "Успешно сохранено", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getResources().getString(R.string.successful_save), Toast.LENGTH_SHORT).show();
             }
         };
     }
@@ -235,7 +262,22 @@ public class ProfileChangeFragment extends Fragment {
             getMediaPermissions.launch(permissionsToRequest.toArray(new String[0]));
         }
     }
-
+    private boolean isAgeValid(Calendar birthDate) {
+        Calendar today = Calendar.getInstance();
+        int age = today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR);
+        if (today.get(Calendar.DAY_OF_YEAR) < birthDate.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+        return age >= MIN_AGE;
+    }
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return true;
+        }
+        Pattern pattern = Pattern.compile("^\\+?[0-9\\s-()]{7,20}$");
+        Matcher matcher = pattern.matcher(phoneNumber);
+        return matcher.matches();
+    }
     private void setInitialDateTime() {
         currentDate.setText(DateUtils.formatDateTime(requireContext(),
                 date.getTimeInMillis(),

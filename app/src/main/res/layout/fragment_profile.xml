@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:padding="8dp"
-                android:text="Профиль"
+                android:text="@string/profile"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -77,21 +77,18 @@
                     android:layout_marginStart="30dp"
                     android:layout_marginTop="40dp"
                     android:layout_marginEnd="30dp"
-                    android:layout_marginBottom="40dp"
                     android:background="@drawable/rounded"
                     android:elevation="1dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/view6"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintTop_toBottomOf="@+id/view6" />
 
                 <View
                     android:id="@+id/view"
                     android:layout_width="0dp"
                     android:layout_height="194dp"
                     android:layout_marginStart="30dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="40dp"
                     android:layout_marginEnd="30dp"
                     android:background="@drawable/rounded"
                     android:elevation="1dp"
@@ -155,13 +152,29 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/view" />
 
+                <View
+                    android:id="@+id/view10"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="40dp"
+                    android:background="@drawable/rounded"
+                    android:elevation="1dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/view7"
+                    app:layout_constraintVertical_bias="0.0" />
+
                 <TextView
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="56dp"
                     android:layout_marginTop="8dp"
-                    android:text="Имя пользователя"
+                    android:text="@string/user_name"
                     android:textColor="@color/dark_grey"
                     android:textSize="12sp"
                     android:translationZ="1dp"
@@ -174,7 +187,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="56dp"
                     android:layout_marginTop="8dp"
-                    android:text="Электронная почта"
+                    android:text="@string/email_text"
                     android:textColor="@color/dark_grey"
                     android:textSize="12sp"
                     android:translationZ="1dp"
@@ -187,12 +200,23 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="56dp"
                     android:layout_marginTop="8dp"
-                    android:text="Дата рождения"
+                    android:text="@string/birthday"
                     android:textColor="@color/dark_grey"
                     android:textSize="12sp"
                     android:translationZ="1dp"
                     app:layout_constraintStart_toStartOf="@+id/view"
                     app:layout_constraintTop_toBottomOf="@+id/view2" />
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:translationZ="1dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/view10"
+                    app:layout_constraintStart_toStartOf="@+id/view10"
+                    app:layout_constraintTop_toTopOf="@+id/view10"
+                    app:srcCompat="@drawable/info" />
 
                 <ImageView
                     android:id="@+id/deleteAccountView"
@@ -213,7 +237,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
-                    android:text="Удалить профиль"
+                    android:text="@string/delete_profile"
                     android:textColor="@color/red"
                     android:textSize="14sp"
                     android:translationZ="1dp"
@@ -240,7 +264,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
-                    android:text="Выйти"
+                    android:text="@string/leave"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:translationZ="1dp"
@@ -267,7 +291,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
-                    android:text="Изменить пароль"
+                    android:text="@string/change_pass"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:translationZ="1dp"
@@ -294,7 +318,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
-                    android:text="Изменить персональные данные"
+                    android:text="@string/change_personal_data"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:translationZ="1dp"
@@ -346,7 +370,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="56dp"
-                    android:text="Загрузка..."
+                    android:text="@string/load"
                     android:textColor="@color/black"
                     android:translationZ="1dp"
                     app:layout_constraintBottom_toTopOf="@+id/view3"
@@ -358,7 +382,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="56dp"
-                    android:text="Загрузка..."
+                    android:text="@string/load"
                     android:textColor="@color/black"
                     android:translationZ="1dp"
                     app:layout_constraintBottom_toTopOf="@+id/view2"
@@ -370,12 +394,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="56dp"
-                    android:text="Загрузка..."
+                    android:text="@string/load"
                     android:textColor="@color/black"
                     android:translationZ="1dp"
                     app:layout_constraintBottom_toBottomOf="@+id/view"
                     app:layout_constraintStart_toStartOf="@+id/view"
                     app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+                <TextView
+                    android:id="@+id/infoTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/program_info"
+                    android:textColor="@color/black"
+                    android:translationZ="1dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/view10"
+                    app:layout_constraintStart_toEndOf="@+id/imageView3"
+                    app:layout_constraintTop_toTopOf="@+id/view10" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

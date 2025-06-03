@@ -15,8 +15,7 @@
         app:layout_constraintEnd_toEndOf="@+id/pointsView"
 
         app:layout_constraintStart_toStartOf="@+id/pointsView"
-        app:layout_constraintTop_toTopOf="@+id/pointsView"
-        tools:visibility="visible">
+        app:layout_constraintTop_toTopOf="@+id/pointsView">
 
         <TextView
             android:id="@+id/saveRoute"
@@ -26,7 +25,7 @@
             android:background="@drawable/rounded"
             android:backgroundTint="@color/green"
             android:padding="6dp"
-            android:text="Сохранить маршрут"
+            android:text="@string/save_route"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:translationZ="2dp"
@@ -43,7 +42,7 @@
             android:background="@drawable/rounded"
             android:backgroundTint="@color/red"
             android:padding="6dp"
-            android:text="Назад"
+            android:text="@string/back"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:translationZ="2dp"
@@ -59,6 +58,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/segmentInfoRecyclerView"
             android:layout_width="0dp"
@@ -210,7 +210,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="5dp"
-        android:text="Для создания точки нажмите и удерживайте нужное место на карте. Чтобы переместить точку, зажмите её и перетащите."
+        android:text="@string/route_info"
         android:textColor="@color/dark_grey"
         android:textSize="12sp"
         android:translationZ="2dp"
@@ -226,7 +226,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:text="Мои маршруты"
+        android:text="@string/my_route"
         android:textColor="@color/black"
         android:textSize="18dp"
         android:textStyle="bold"
@@ -296,7 +296,7 @@
         android:background="@drawable/rounded"
         android:backgroundTint="@color/green"
         android:padding="6dp"
-        android:text="Дальше"
+        android:text="@string/further"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:translationZ="2dp"
@@ -313,7 +313,7 @@
         android:background="@drawable/rounded"
         android:backgroundTint="@color/red"
         android:padding="6dp"
-        android:text="Удалить"
+        android:text="@string/delete"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:translationZ="2dp"
@@ -330,7 +330,7 @@
         android:background="@drawable/rounded"
         android:backgroundTint="@color/grey"
         android:padding="6dp"
-        android:text="Сфокусироваться"
+        android:text="@string/focus"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:translationZ="2dp"
@@ -357,7 +357,7 @@
         android:layout_height="20dp"
         android:layout_marginStart="2dp"
         android:layout_marginTop="2dp"
-        android:text="Список точек маршрута:"
+        android:text="@string/waypoint_list"
         android:textStyle="bold"
         android:translationZ="2dp"
         android:visibility="gone"

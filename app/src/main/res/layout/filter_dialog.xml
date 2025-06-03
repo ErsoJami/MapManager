@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/small_rounded"
-    android:backgroundTint="#FAEEFF">
+    android:backgroundTint="@color/light_grey">
 
     <com.google.android.material.slider.RangeSlider
         android:id="@+id/ageSlider"
@@ -33,7 +33,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="Возраст"
+        android:text="@string/ages"
+        android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/ageSlider"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +47,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
-        android:text="Город"
+        android:text="@string/city"
+        android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ageText" />
@@ -57,7 +59,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="25dp"
-        android:text="Длинна"
+        android:text="@string/len"
+        android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cityText" />
@@ -141,7 +144,7 @@
         android:background="@drawable/small_rounded"
         android:backgroundTint="@color/green"
         android:padding="2dp"
-        android:text="Применить"
+        android:text="@string/apply"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

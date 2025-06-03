@@ -37,10 +37,13 @@
         android:id="@+id/RouteTimeIntervalText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
         android:text="14:88 - 52:42"
         android:textColor="@color/dark_grey"
         android:textSize="14sp"
         android:translationZ="2dp"
+        app:layout_constraintEnd_toStartOf="@+id/RouteDescriptionTable"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/RouteNameText"
         app:layout_constraintTop_toTopOf="@+id/RouteDescriptionTable" />
 
@@ -63,7 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-black"
-        android:text="Принять"
+        android:text="@string/confirm"
         android:textAllCaps="false"
         android:textColor="#DEDCDC"
         android:textSize="16sp"
@@ -90,7 +93,7 @@
         android:id="@+id/RouteDescriptionTable"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginStart="7dp"
+        android:layout_marginStart="14dp"
         android:layout_marginTop="3dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="8dp"
@@ -100,7 +103,7 @@
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/AcceptRouteButton"
+        app:layout_constraintStart_toEndOf="@+id/RouteTimeIntervalText"
         app:layout_constraintTop_toBottomOf="@+id/RouteNameText"
         app:layout_constraintVertical_bias="1.0" />
 
@@ -120,30 +123,5 @@
         app:layout_constraintEnd_toEndOf="@+id/RouteDescriptionTable"
         app:layout_constraintStart_toStartOf="@+id/RouteDescriptionTable"
         app:layout_constraintTop_toTopOf="@+id/RouteDescriptionTable" />
-
-    <CheckBox
-        android:id="@+id/likeButton"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/heart_unstated"
-        android:button="@drawable/heart_selector"
-        android:elevation="3dp"
-        app:buttonTint="@null"
-        app:layout_constraintBottom_toTopOf="@+id/RouteDescriptionTable"
-        app:layout_constraintEnd_toStartOf="@+id/ShowInMapButton"
-        app:layout_constraintTop_toTopOf="@+id/view16" />
-
-    <TextView
-        android:id="@+id/likeCounterText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:elevation="3dp"
-        android:text="1,4K"
-        android:textColor="#F4A2CB"
-        app:layout_constraintBottom_toBottomOf="@+id/likeButton"
-        app:layout_constraintEnd_toStartOf="@+id/likeButton"
-        app:layout_constraintTop_toTopOf="@+id/likeButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

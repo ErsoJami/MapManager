@@ -55,8 +55,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
 
     private final LayoutInflater inflater;
     private final List<Message> messageList;
-//    private RecyclerView recyclerViewMessageMedia;
-//    private MessageMediaAdapter mediaAdapter;
     private FirebaseAuth mAuth;
 
     public interface ChatAdapterListener {
@@ -134,6 +132,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                     onSelectMedia.onSelectMedia(url);
                                 }
                             });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onMyMessageClick(currentPosition);
+                                }
+                                return true;
+                            });
                         }
                     } else if (mediaUris.size() == 3) {
                         holder.myGridLayout.setColumnCount(2);
@@ -155,6 +160,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                     onSelectMedia.onSelectMedia(url);
                                 }
                             });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onMyMessageClick(currentPosition);
+                                }
+                                return true;
+                            });
                         }
                     } else if (mediaUris.size() <= 4) {
                         holder.myGridLayout.setColumnCount(mediaUris.size() == 1 ? 1 : 2);
@@ -168,6 +180,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                 if (onSelectMedia != null) {
                                     onSelectMedia.onSelectMedia(url);
                                 }
+                            });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onMyMessageClick(currentPosition);
+                                }
+                                return true;
                             });
                             holder.myGridLayout.addView(imageView);
                         }
@@ -186,6 +205,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                     onSelectMedia.onSelectMedia(url);
                                 }
                             });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onMyMessageClick(currentPosition);
+                                }
+                                return true;
+                            });
                         }
                         String url = mediaUris.get(3);
                         FrameLayout imageView = createImageViewWithText(holder.itemView.getContext(), url, "+ " + (mediaUris.size() - 4));
@@ -193,6 +219,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                             if (onSelectMedia != null) {
                                 onSelectMedia.onSelectViewAllMedia(mediaUris);
                             }
+                        });
+                        imageView.setOnLongClickListener(v -> {
+                            int currentPosition = holder.getBindingAdapterPosition();
+                            if (currentPosition != RecyclerView.NO_POSITION) {
+                                chatAdapterListener.onMyMessageClick(currentPosition);
+                            }
+                            return true;
                         });
                         holder.myGridLayout.addView(imageView);
                     }
@@ -245,6 +278,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                     onSelectMedia.onSelectMedia(url);
                                 }
                             });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onOtherMessageClick(currentPosition);
+                                }
+                                return true;
+                            });
                         }
                     } else if (mediaUris.size() == 3) {
                         holder.otherGridLayout.setColumnCount(2);
@@ -266,6 +306,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                     onSelectMedia.onSelectMedia(url);
                                 }
                             });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onOtherMessageClick(currentPosition);
+                                }
+                                return true;
+                            });
                         }
                     } else if (mediaUris.size() <= 4) {
                         holder.otherGridLayout.setColumnCount(mediaUris.size() == 1 ? 1 : 2);
@@ -279,6 +326,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                 if (onSelectMedia != null) {
                                     onSelectMedia.onSelectMedia(url);
                                 }
+                            });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onOtherMessageClick(currentPosition);
+                                }
+                                return true;
                             });
                             holder.otherGridLayout.addView(imageView);
                         }
@@ -297,6 +351,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                                     onSelectMedia.onSelectMedia(url);
                                 }
                             });
+                            imageView.setOnLongClickListener(v -> {
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition != RecyclerView.NO_POSITION) {
+                                    chatAdapterListener.onOtherMessageClick(currentPosition);
+                                }
+                                return true;
+                            });
                         }
                         String url = mediaUris.get(3);
                         FrameLayout imageView = createImageViewWithText(holder.itemView.getContext(), url, "+ " + (mediaUris.size() - 4));
@@ -304,6 +365,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                             if (onSelectMedia != null) {
                                 onSelectMedia.onSelectViewAllMedia(mediaUris);
                             }
+                        });
+                        imageView.setOnLongClickListener(v -> {
+                            int currentPosition = holder.getBindingAdapterPosition();
+                            if (currentPosition != RecyclerView.NO_POSITION) {
+                                chatAdapterListener.onMyMessageClick(currentPosition);
+                            }
+                            return true;
                         });
                         holder.otherGridLayout.addView(imageView);
                     }
@@ -326,8 +394,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         final ConstraintLayout otherMessageContainer, myMessageContainer;
         final TextView myTextView, otherTextView, otherUsernameTextView;
         final DatabaseReference databaseReference;
-//        final RecyclerView recyclerViewMessageMedia;
-//        MessageMediaAdapter mediaAdapter;
         final GridLayout myGridLayout;
         final GridLayout otherGridLayout;
         ViewHolder(View view){
@@ -337,8 +403,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
             myTextView = view.findViewById(R.id.myTextView);
             otherTextView = view.findViewById(R.id.otherTextView);
             otherUsernameTextView = view.findViewById(R.id.otherUsernameTextView);
-//            recyclerViewMessageMedia = view.findViewById(R.id.otherMediaView);
-//            recyclerViewMessageMedia.setVisibility(VISIBLE);
             myGridLayout = view.findViewById(R.id.myMediaGridLayout);
             ViewGroup.LayoutParams params = myGridLayout.getLayoutParams();
             WindowManager windowManager = (WindowManager) itemView.getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -350,7 +414,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
 
             otherGridLayout = view.findViewById(R.id.otherMediaGridLayout);
             otherGridLayout.setLayoutParams(params);
-//            recyclerViewMessageMedia.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
             databaseReference = FirebaseDatabase.getInstance().getReference();
         }
     }
