@@ -29,6 +29,14 @@ public class SegmentInfo {
         this.busList = busList;
     }
 
+    public int getStep() {
+        return step;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
     public int getType() {
         return type;
     }
@@ -61,30 +69,8 @@ public class SegmentInfo {
         this.time = time;
     }
 
-    private String getDeclension(int num, String one, String two, String three) {
-        int ten = num % 10;
-        int hundred = num % 100;
-        if (hundred >= 11 && hundred <= 19) {
-            return num + " " + three;
-        }
-        if (ten == 1) {
-            return num + " " + one;
-        }
-        if (ten >= 2 && ten <= 4) {
-            return num + " " + two;
-        }
-        return num + " " + three;
-    }
-    public String getStep() {
-        return getDeclension(step, String.valueOf(R.string.step), String.valueOf(R.string.step_2), String.valueOf(R.string.step_3));
-    }
-
     public void setStep(int step) {
         this.step = step;
-    }
-
-    public String getCalories() {
-        return getDeclension(calories, String.valueOf(R.string.calories), String.valueOf(R.string.caloies_2), String.valueOf(R.string.caloies_3));
     }
 
     public void setCalories(int calories) {

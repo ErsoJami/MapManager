@@ -62,6 +62,7 @@
         android:text="@string/len"
         android:textColor="@color/black"
         android:textSize="20sp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cityText" />
 
@@ -77,6 +78,7 @@
         android:inputType="text"
         android:padding="3dp"
         android:translationZ="-1dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/lenText"
         app:layout_constraintStart_toStartOf="@+id/cityTextInput"
         app:layout_constraintTop_toTopOf="@+id/lenText" />
@@ -93,6 +95,7 @@
         android:inputType="text"
         android:padding="3dp"
         android:translationZ="-1dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/lenStartTextInput"
         app:layout_constraintEnd_toStartOf="@+id/km"
         app:layout_constraintTop_toTopOf="@+id/lenStartTextInput" />
@@ -120,6 +123,7 @@
         android:layout_marginEnd="4dp"
         android:text="км"
         android:textColor="@color/black"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/lenEndTextInput"
         app:layout_constraintEnd_toEndOf="@+id/cityTextInput"
         app:layout_constraintTop_toTopOf="@+id/lenEndTextInput" />
@@ -130,6 +134,7 @@
         android:layout_height="wrap_content"
         android:text="—"
         android:textColor="@color/black"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/lenStartTextInput"
         app:layout_constraintEnd_toStartOf="@+id/lenEndTextInput"
         app:layout_constraintStart_toEndOf="@+id/lenStartTextInput"

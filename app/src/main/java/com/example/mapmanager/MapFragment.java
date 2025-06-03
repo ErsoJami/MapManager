@@ -515,11 +515,11 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                     sectionPolyline.setGapLength(8.0f);
                     sectionPolyline.setZIndex(10.0f);
                     if (data.getWeight().getWalkingDistance().getValue() == 0) {
-                        segmentInfos.add(new SegmentInfo(1, R.string.wait + "", "0", data.getWeight().getTime().getText(),
+                        segmentInfos.add(new SegmentInfo(1, getResources().getString(R.string.wait) + " ", "0", data.getWeight().getTime().getText(),
                                 (int) (data.getWeight().getWalkingDistance().getValue() / 0.762), (int) (data.getWeight().getWalkingDistance().getValue() / 24), ""));
                         number--;
                     } else {
-                        segmentInfos.add(new SegmentInfo(1, R.string.section + "" + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
+                        segmentInfos.add(new SegmentInfo(1, getResources().getString(R.string.section) + " " + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
                                 (int) (data.getWeight().getWalkingDistance().getValue() / 0.762), (int) (data.getWeight().getWalkingDistance().getValue() / 24), ""));
                     }
                 }
@@ -540,9 +540,9 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                     for (Transport t : data.getData().getTransports()) {
                         allTranport += ", " + t.getLine().getName();
                     }
-                    allTranport = R.string.tranport + allTranport.replaceFirst(", ", "");
-                    segmentInfos.add(new SegmentInfo(2, R.string.section + "" + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
-                            (int) (0), (int) (0), allTranport));
+                    allTranport = getResources().getString(R.string.tranport) + " " + allTranport.replaceFirst(", ", "");
+                    segmentInfos.add(new SegmentInfo(2, getResources().getString(R.string.section) + " " + number, data.getWeight().getWalkingDistance().getText(), data.getWeight().getTime().getText(),
+                            0, 0, allTranport));
                 }
                 else if (data.getData().getWait() != null || data.getData().getTransfer() != null) {
                     mapManager.mapRoutesObjectCollection.remove(sectionPolyline);
@@ -574,8 +574,8 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             routePolyline.setStrokeWidth(5.0f);
             routePolyline.setZIndex(100f);
             mapManager.focusOnPolyline(routeGeometry);
-            segmentInfos.add(new SegmentInfo(3, R.string.section + "1", route.getMetadata().getWeight().getDistance().getText(), route.getMetadata().getWeight().getTime().getText(),
-                    (int) (0), (int) (0), ""));
+            segmentInfos.add(new SegmentInfo(3, getResources().getString(R.string.section) + " 1", route.getMetadata().getWeight().getDistance().getText(), route.getMetadata().getWeight().getTime().getText(),
+                    0, 0, ""));
         }
         segmentInfoAdapter.notifyDataSetChanged();
     }

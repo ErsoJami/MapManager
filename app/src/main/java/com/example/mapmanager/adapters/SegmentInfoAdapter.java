@@ -22,8 +22,10 @@ public class SegmentInfoAdapter extends RecyclerView.Adapter<SegmentInfoAdapter.
 
     private final LayoutInflater inflater;
     private final ArrayList<SegmentInfo> segmentInfos;
+    private final Context context;
     public SegmentInfoAdapter(Context context, ArrayList<SegmentInfo> segmentInfos) {
         this.segmentInfos = segmentInfos;
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
     }
     @NonNull
@@ -58,7 +60,7 @@ public class SegmentInfoAdapter extends RecyclerView.Adapter<SegmentInfoAdapter.
                 holder.fitnessWalkingLine.setVisibility(View.VISIBLE);
                 if (segmentInfo.getType() == 1) {
                     holder.walkingImageView.setImageResource(R.drawable.walking);
-                    holder.fitnessWalkingLine.setText(segmentInfo.getStep() + " • " + segmentInfo.getCalories());
+                    holder.fitnessWalkingLine.setText(getStep(segmentInfo.getStep()) + " • " + getCalories(segmentInfo.getCalories()));
                 } else {
                     holder.walkingImageView.setImageResource(R.drawable.bicycle);
                     holder.fitnessWalkingLine.setText(segmentInfo.getCalories());
@@ -75,7 +77,28 @@ public class SegmentInfoAdapter extends RecyclerView.Adapter<SegmentInfoAdapter.
             }
         }
     }
+    private String getDeclension(int num, String one, String two, String three) {
+        int ten = num % 10;
+        int hundred = num % 100;
+        if (hundred >= 11 && hundred <= 19) {
+            return num + " " + three;
+        }
+        if (ten == 1) {
+            return num + " " + one;
+        }
+        if (ten >= 2 && ten <= 4) {
+            return num + " " + two;
+        }
+        return num + " " + three;
+    }
+    public String getStep(int step) {
+        return getDeclension(step, context.getResources().getString(R.string.step), context.getResources().getString(R.string.step_2), context.getResources().getString(R.string.step_3));
+    }
 
+
+    public String getCalories(int calories) {
+        return getDeclension(calories, context.getResources().getString(R.string.calories), context.getResources().getString(R.string.caloies_2), context.getResources().getString(R.string.caloies_3));
+    }
     @Override
     public int getItemCount() {
         return segmentInfos.size();
