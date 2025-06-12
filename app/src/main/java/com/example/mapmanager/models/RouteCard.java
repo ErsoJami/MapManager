@@ -1,5 +1,8 @@
 package com.example.mapmanager.models;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ktx.Firebase;
@@ -53,7 +56,12 @@ public class RouteCard {
         data.put("routeCardSettings", routeCardSettings);
         DatabaseReference newRouteCard = databaseReference.push();
         data.put("id", newRouteCard.getKey());
-        newRouteCard.setValue(data);
+        newRouteCard.setValue(data).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
+        });
     }
 
     public long getEndTime() {

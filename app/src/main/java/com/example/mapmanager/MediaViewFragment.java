@@ -69,6 +69,5 @@ public class MediaViewFragment extends Fragment implements MessageMediaAdapter.O
 
     @Override
     public void onDeleteMedia(int position) {
-
     }
 }

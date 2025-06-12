@@ -18,6 +18,7 @@ import com.example.mapmanager.models.Chat;
 import com.example.mapmanager.models.ChatsData;
 import com.example.mapmanager.models.Message;
 import com.example.mapmanager.models.Route;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -126,6 +127,11 @@ public class MessengerFragment extends Fragment {
                                     }
                                 });
                             }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // TODO доделать сообщение об исключении
                         }
                     });
                 }

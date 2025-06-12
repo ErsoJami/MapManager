@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
             MapKitFactory.initialize(this);
 //            TransportFactory.initialize(this);
         } catch (AssertionError e) {
-
+            // TODO доделать сообщение об исключении
         }
 
         user = new User();
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements MessengerFragment
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+                        // TODO доделать сообщение об исключении
                     }
                 }
         );

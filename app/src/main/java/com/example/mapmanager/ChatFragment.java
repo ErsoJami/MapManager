@@ -121,7 +121,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     private String ownerId;
     private ActivityResultLauncher<String[]> mediaSinglePicker;
     private ActivityResultLauncher<String[]> getSingleMediaPermissions;
-    private boolean bim = true;
+    private final boolean bim = true;
     private Uri uri;
     private View.OnClickListener saveDataListener;
     static ChatFragment updateChat(String chatId, String lastReadMessageId) {
@@ -191,6 +191,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                     @Override
                     public com.google.android.gms.tasks.Task<Uri> then(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) throws Exception {
                         if (!task.isSuccessful()) {
+                            // TODO доделать сообщение об исключении
                             throw task.getException();
                         }
                         return fileReference.getDownloadUrl();
@@ -238,7 +239,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // TODO доделать сообщение об исключении
             }
         });
         FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("ownerId").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -251,7 +252,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // TODO доделать сообщение об исключении
             }
         });
         messageListView = view.findViewById(R.id.messageListView);
@@ -296,6 +297,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError error) {
+                                                    // TODO доделать сообщение об исключении
                                                 }
                                             });
                                 }
@@ -304,7 +306,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+                        // TODO доделать сообщение об исключении
                     }
                 });
         FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("groupAvatarUrl").addValueEventListener(new ValueEventListener() {
@@ -336,12 +338,12 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         }
         String key1;
         if (lastReadMessageId != null) {
-            key1 = new String(lastReadMessageId);
+            key1 = lastReadMessageId;
         } else {
             key1 = "";
         }
-        final String[] key = {new String()};
-        final Boolean[] isFocus = {new Boolean(false)};
+        final String[] key = {""};
+        final Boolean[] isFocus = {Boolean.FALSE};
         Query item = messageReference.orderByKey().limitToLast(1);
         item.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -355,7 +357,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // TODO доделать сообщение об исключении
             }
         });
         messageListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -459,7 +461,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-
+                    // TODO доделать сообщение об исключении
                 }
             });
         }
@@ -497,11 +499,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             openMediaPicker();
         });
         settingsChatButton.setOnClickListener(v -> {
-            if (ownerId.equals(mAuth.getUid())) {
-                userAdapter.setType(true);
-            } else {
-                userAdapter.setType(false);
-            }
+            userAdapter.setType(ownerId.equals(mAuth.getUid()));
             settingsLayout.setVisibility(View.VISIBLE);
             Glide.with(requireContext())
                     .load(groupAvatarUrl)
@@ -546,7 +544,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 try {
                     layoutManager.scrollToPositionWithOffset(position, viewHeight - measuredItemHeight);
                 } catch (Exception e) {
-
+                    // TODO доделать сообщение об исключении
                 }
             }
         });
@@ -743,7 +741,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-
+                    // TODO доделать сообщение об исключении
                 }
             });
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -871,7 +869,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // TODO доделать сообщение об исключении
             }
         });
     }

@@ -2,7 +2,10 @@ package com.example.mapmanager.models;
 
 import android.util.Pair;
 
+import androidx.annotation.NonNull;
+
 import com.example.mapmanager.MainActivity;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -125,7 +128,12 @@ public class User {
         data.put("birthDate", birthDayTime);
         data.put("routeList", routeList);
         data.put("avatarUrl", avatarUrl);
-        databaseReference.updateChildren(data);
+        databaseReference.updateChildren(data).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
+        });
     }
     public void loadData(DataSnapshot ashot) {
         if (ashot.exists()) userId = ashot.getKey();

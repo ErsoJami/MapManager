@@ -325,7 +325,9 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     @Override
     public void onSearchError(@NonNull Error error) {
         if (error instanceof com.yandex.runtime.network.NetworkError) {
+            // TODO доделать сообщение об исключении
         }  else {
+            // TODO доделать сообщение об исключении
         }
         mapObjectCollection.clear();
         searchListener.onSearchError(error.toString());
@@ -349,6 +351,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
 
     @Override
     public void onError(@NonNull Error error) {
+        // TODO доделать сообщение об исключении
         suggestListener.onSuggestError(error.toString());
     }
 
@@ -380,7 +383,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
                         null
                 );
             } catch (Exception e) {
-
+                // TODO доделать сообщение об исключении
             }
         }
     }
@@ -408,7 +411,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
                         null
                 );
             } catch (Exception e) {
-
+                // TODO доделать сообщение об исключении
             }
         }
     }

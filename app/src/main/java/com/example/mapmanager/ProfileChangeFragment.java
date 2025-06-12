@@ -154,6 +154,7 @@ public class ProfileChangeFragment extends Fragment {
                     @Override
                     public com.google.android.gms.tasks.Task<Uri> then(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) throws Exception {
                         if (!task.isSuccessful()) {
+                            // TODO доделать сообщение об исключении
                             throw task.getException();
                         }
                         return fileReference.getDownloadUrl();

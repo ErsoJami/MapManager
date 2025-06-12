@@ -33,6 +33,7 @@ import com.example.mapmanager.models.FilterSettings;
 import com.example.mapmanager.models.Route;
 import com.example.mapmanager.models.RouteCard;
 import com.example.mapmanager.models.RouteCardSettings;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.slider.RangeSlider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -75,7 +76,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private HomeFragmentListener homeFragmentListener;
     private SearchView searchView;
     private DatabaseReference routeCardReference;
-    private FilterSettings settings = new FilterSettings();
+    private final FilterSettings settings = new FilterSettings();
     private Query query;
     private boolean isSearching = false;
     private MessengerFragment.OnChatSelectChat selectChatListner;
@@ -174,7 +175,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // TODO доделать сообщение об исключении
             }
         });
         DatabaseReference routeReference = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()).child("routeList");
@@ -206,7 +207,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // TODO доделать сообщение об исключении
             }
         });
         selectChatListner = (MessengerFragment.OnChatSelectChat) context;
@@ -338,6 +339,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // TODO доделать сообщение об исключении
             }
         });
     }
@@ -478,6 +480,11 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                     selectChatListner.onSelectChat(chat.getId(), chat.getLastReadMessageId());
                 }
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
         });
     }
 
@@ -489,6 +496,11 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 if (dataSnapshot.exists()) {
                     homeFragmentListener.showInMap(dataSnapshot.getValue(Route.class));
                 }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
             }
         });
 

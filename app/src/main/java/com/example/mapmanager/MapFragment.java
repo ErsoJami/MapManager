@@ -141,6 +141,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             if (fineLocationGranted != null && fineLocationGranted || coarseLocationGranted!= null && coarseLocationGranted) {
                 mapManager.createUserLayer();
             } else {
+                // TODO доделать сообщение об исключении
             }
         });
         mAuth = FirebaseAuth.getInstance();
@@ -284,7 +285,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
             @Override
             public void onMasstransitRoutesError(@NonNull Error error) {
-
+                // TODO доделать сообщение об исключении
             }
         };
         bicycleListener = new Session.RouteListener() {
@@ -300,7 +301,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
                     @Override
                     public void onMasstransitRoutesError(@NonNull Error error) {
-
+                        // TODO доделать сообщение об исключении
                     }
                 };
 
@@ -318,7 +319,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
             @Override
             public void onMasstransitRoutesError(@NonNull Error error) {
-
+                // TODO доделать сообщение об исключении
             }
         };
 
@@ -335,7 +336,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
             @Override
             public void onDrivingRoutesError(@NonNull Error error) {
-
+                // TODO доделать сообщение об исключении
             }
         };
 
@@ -494,8 +495,6 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         segmentInfos.clear();
         if (masstransitRouteAdapter == walkingRouteAdapter) {
             route = walkingRoutes.get(position);
-            if (walkingRoutes.isEmpty()) {
-            }
         } else if (masstransitRouteAdapter == busRouteAdapter) {
             route = busRoutes.get(position);
         } else if (masstransitRouteAdapter == bicycleRouteAdapter) {
@@ -774,6 +773,11 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                                 routeAdapter.notifyDataSetChanged();
                             }
                         }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // TODO доделать сообщение об исключении
+                        }
                     });
                 }
             }
@@ -908,7 +912,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         Route route = routeArrayList.get(position);
         route.setName(text);
         routeArrayList.set(position, route);
-        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).child("name").setValue(text);
+        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).child("name").setValue(text).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
+        });
     }
 
     @Override
@@ -916,7 +925,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         Route route = routeArrayList.get(position);
         route.setDescription(text);
         routeArrayList.set(position, route);
-        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).child("description").setValue(text);
+        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).child("description").setValue(text).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
+        });
     }
 
     @Override
@@ -927,7 +941,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         MainActivity.user.setRouteList(routeList);
         routeArrayList.remove(position);
         routeAdapter.notifyItemRemoved(position);
-        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).removeValue();
+        FirebaseDatabase.getInstance().getReference().child("routes").child(route.getId()).removeValue().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
+        });
 //        Log.d("debug", "onDeleteRoute: " + routeArrayList.size() + " " + routeAdapter.getItemCount() + " " + routeRecyclerView.getVisibility());
         MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()));
     }

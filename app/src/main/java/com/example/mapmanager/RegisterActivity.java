@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
@@ -164,6 +165,11 @@ public class RegisterActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(RegisterActivity.this, "@string/register_error_text" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // TODO доделать сообщение об исключении
                         }
                     });
         } else {

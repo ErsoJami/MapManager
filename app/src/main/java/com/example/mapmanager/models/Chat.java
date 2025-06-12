@@ -3,7 +3,10 @@ package com.example.mapmanager.models;
 import android.net.Uri;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.mapmanager.MainActivity;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -68,7 +71,12 @@ public class Chat {
         data.put("groupAvatarUrl", this.groupAvatarUrl);
         data.put("lastMessageTime", this.lastMessageTime);
         data.put("membersList", this.membersList);
-        databaseReference.updateChildren(data);
+        databaseReference.updateChildren(data).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
+        });
     }
 
     public String getLastMessage() {
@@ -113,7 +121,12 @@ public class Chat {
         data.put("ownerId", this.ownerId);
         DatabaseReference newChat = databaseReference.push();
         this.id = newChat.getKey();
-        newChat.setValue(data);
+        newChat.setValue(data).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
+        });
     }
     public ArrayList<String> getMembersList() {
         return membersList;

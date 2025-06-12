@@ -2,7 +2,10 @@ package com.example.mapmanager.models;
 
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import com.example.mapmanager.MainActivity;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.database.DataSnapshot;
@@ -89,6 +92,11 @@ public class Message {
                     MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(userId));
                 }
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // TODO доделать сообщение об исключении
+            }
         });
 
     }
@@ -101,13 +109,23 @@ public class Message {
             data.put("time", this.time);
             data.put("message", this.message);
             data.put("nick", this.nick);
-            databaseReference.updateChildren(data);
+            databaseReference.updateChildren(data).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // TODO доделать сообщение об исключении
+                }
+            });
         }
     }
     public void deleteMessage(String chatId) {
         if (this.messageId != null) {
             databaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages").child(this.messageId);
-            databaseReference.removeValue();
+            databaseReference.removeValue().addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // TODO доделать сообщение об исключении
+                }
+            });
         }
     }
 
