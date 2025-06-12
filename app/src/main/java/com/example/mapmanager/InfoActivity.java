@@ -26,7 +26,7 @@ public class InfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info);
         yandexMapInstruction = findViewById(R.id.textView13);
         exitImageView = findViewById(R.id.exitImageView);
-        String htmlString = "YandexMapSdk: <a href=\"https://yandex.ru/legal/maps_api\">https://yandex.ru/legal/maps_api/</a>";
+        String htmlString = "YandexMapSdk: <a href=\"" + getResources().getString(R.string.yandex_api_url) + "\">" + getResources().getString(R.string.yandex_api_url) + "</a>";
         Spanned spannedText;
         spannedText = Html.fromHtml(htmlString, Html.FROM_HTML_MODE_LEGACY);
         yandexMapInstruction.setText(spannedText);

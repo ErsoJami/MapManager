@@ -100,4 +100,5 @@
     <string name="confirm">Принять</string>
     <string name="post_route">Выложить свой маршрут</string>
     <string name="create_new_pass">Придумайте пароль</string>
+    <string name="yandex_api_url">https://yandex.ru/legal/maps_api</string>
 </resources>
