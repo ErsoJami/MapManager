@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private ImageView passStatusView;
     private TextView passRecoveryTextView;
     private boolean showPass = false;
+    //объявление
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin = findViewById(R.id.buttonLogin);
         registerTextView = findViewById(R.id.loginTextView);
         passRecoveryTextView = findViewById(R.id.passRecovery);
+        //инициализация
         buttonLogin.setOnClickListener(v -> {
             String email = editTextEmail.getText().toString();
             String password = editTextPassword.getText().toString();
@@ -64,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
             loginUser(email, password);
-        });
+        }); //вход пользователя с аккаунтом
         String registerText = getResources().getString(R.string.want_to_register_text);
         String passRecovery = getResources().getString(R.string.forgot_password_text);
         SpannableString rt = new SpannableString(registerText);
@@ -84,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                 ds.setUnderlineText(true);
                 ds.setColor(Color.BLUE);
             }
-        };
+        }; //переход на RegisterActivity
         ClickableSpan clickablePassRecovery = new ClickableSpan() {
             @Override
             public void onClick(View widget) {
@@ -113,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
                 ds.setUnderlineText(true);
                 ds.setColor(Color.BLUE);
             }
-        };
+        }; //Восстановление пароля
         rt.setSpan(clickableRegText, getResources().getInteger(R.integer.register_left_border), getResources().getInteger(R.integer.register_right_border), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         pr.setSpan(clickablePassRecovery, getResources().getInteger(R.integer.password_left_border), getResources().getInteger(R.integer.password_right_border), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         registerTextView.setText(rt);
@@ -133,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
                 editTextPassword.setTransformationMethod(new PasswordTransformationMethod());
             }
             editTextPassword.setSelection(editTextPassword.getText().length());
-        });
+        });//показывать/скрывать пароль
     }
 
     private void loginUser(String email, String password) {
@@ -159,5 +161,5 @@ public class LoginActivity extends AppCompatActivity {
                         // TODO доделать сообщение об исключении
                     }
                 });
-    }
+    } //вход пользователя в аккаунт
 }

@@ -39,7 +39,7 @@ import com.google.firebase.database.ValueEventListener;
 public class ProfileFragment extends Fragment {
     public static interface ProfileChangeEnterListener {
         void startChangingProfile();
-    }
+    } //связь между profileFragment и profileChangeFragment
     private ProfileChangeEnterListener profileChangeEnterListener;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
@@ -48,7 +48,7 @@ public class ProfileFragment extends Fragment {
     private View view1, view2, view3, view6, view7, view8, view9;
     private ImageView profileImage;
     private ImageView deleteAccountView;
-    private FirebaseAuth.AuthStateListener authStateListener;
+    private FirebaseAuth.AuthStateListener authStateListener;//объявление
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -72,7 +72,7 @@ public class ProfileFragment extends Fragment {
                     requireActivity().finish();
                 }
             }
-        };
+        };// проверка наличия акканута пользователя(для удаления и выхода из аккаунта)
     }
 
     @Override
@@ -115,7 +115,7 @@ public class ProfileFragment extends Fragment {
                 view9.bringToFront();
                 deleteAccountView.bringToFront();
             }
-        });
+        }); // инициализация view
         return view;
 
     }
@@ -129,7 +129,7 @@ public class ProfileFragment extends Fragment {
         FirebaseUser user = mAuth.getCurrentUser();
         quitAccountText.setOnClickListener(v -> {
             signOut();
-        });
+        });//выход из аккаунта
         deleteAccountText.setOnClickListener(v -> {
             LayoutInflater inflater = getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.account_delete_dialog, null);
@@ -150,8 +150,8 @@ public class ProfileFragment extends Fragment {
 
             dialog.show();
 
-        });
-        changePassText.setOnClickListener(v ->{
+        }); // удаление аккаунта
+        changePassText.setOnClickListener(v ->{ //изменение пароля пользователя
             LayoutInflater inflater = getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.change_pass_dialog, null);
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
@@ -188,11 +188,11 @@ public class ProfileFragment extends Fragment {
         });
         changePersonalDataText.setOnClickListener(v->{
             profileChangeEnterListener.startChangingProfile();
-        });
+        }); //переход в изменение профиля
         infoTextView.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), InfoActivity.class);
             startActivity(intent);
-        });
+        }); //меню информации о приложении
     }
 
     @Override
@@ -224,7 +224,7 @@ public class ProfileFragment extends Fragment {
                         Toast.makeText(requireContext(), R.string.pass_not_change, Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
+    }// изменение пароля пользователя
     void deleteAccount() {
         FirebaseUser user = mAuth.getCurrentUser();
         user.delete()
@@ -251,7 +251,7 @@ public class ProfileFragment extends Fragment {
                                 Toast.LENGTH_LONG).show();
                     }
                 });
-    }
+    } //удаление акаунта пользователя
     void signOut() {
         mAuth.signOut();
     }
@@ -273,5 +273,5 @@ public class ProfileFragment extends Fragment {
         if (MainActivity.user.getBirthDayTime() != 0)
             dateTextView.setText(DateUtils.formatDateTime( requireActivity(), MainActivity.user.getBirthDayTime(),
                     DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_DATE));
-    }
+    }//выгрузка данных из класса юзера в поля изменения данных
 }

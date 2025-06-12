@@ -80,7 +80,7 @@ public class ProfileChangeFragment extends Fragment {
     private ActivityResultLauncher<String[]> mediaPicker;
     Calendar date = Calendar.getInstance();
     private View.OnClickListener saveDataListener;
-    private Uri uri;
+    private Uri uri; //объявление локальных переменных
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +93,7 @@ public class ProfileChangeFragment extends Fragment {
                         .placeholder(R.drawable.user_icon)
                         .into(profileImage);
             }
-        });
+        }); //загрузка аватара пользователя
         getMediaPermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
             @Override
             public void onActivityResult(Map<String, Boolean> o) {
@@ -183,7 +183,7 @@ public class ProfileChangeFragment extends Fragment {
                 saveData.setOnClickListener(saveDataListener);
                 Toast.makeText(getContext(), getResources().getString(R.string.successful_save), Toast.LENGTH_SHORT).show();
             }
-        };
+        }; // загрузка данных пользователя
     }
 
     @Override
@@ -218,6 +218,7 @@ public class ProfileChangeFragment extends Fragment {
 //                view6.bringToFront();
 //            }
 //        });
+//      инициализация view
         return view;
     }
 
@@ -232,15 +233,15 @@ public class ProfileChangeFragment extends Fragment {
         });
         dateIcon.setOnClickListener(v->{
             new DatePickerDialog(requireActivity(), d, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH)).show();
-        });
+        }); // установка листнеров на изменение даты в поле
         leaveButton.setOnClickListener(v->{
             requireActivity().getOnBackPressedDispatcher().onBackPressed();
-        });
+        }); //выход из активити
         dataLoad();
-        saveData.setOnClickListener(saveDataListener);
-        profileImage.setOnClickListener(v -> {
+        saveData.setOnClickListener(saveDataListener); //сохранение данных пользователя
+        profileImage.setOnClickListener(v -> { //
             openMediaPicker();
-        });
+        });//загрузка изображения из хранилища пользователя
     }
     private void openMediaPicker() {
         ArrayList<String> permissionsToRequest = new ArrayList<>();
@@ -262,7 +263,7 @@ public class ProfileChangeFragment extends Fragment {
         } else {
             getMediaPermissions.launch(permissionsToRequest.toArray(new String[0]));
         }
-    }
+    } //открытие медиа загрузки
     private boolean isAgeValid(Calendar birthDate) {
         Calendar today = Calendar.getInstance();
         int age = today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR);
@@ -270,7 +271,7 @@ public class ProfileChangeFragment extends Fragment {
             age--;
         }
         return age >= MIN_AGE;
-    }
+    }//проверка валидности возраста
     private boolean isValidPhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
             return true;
@@ -278,7 +279,7 @@ public class ProfileChangeFragment extends Fragment {
         Pattern pattern = Pattern.compile("^\\+?[0-9\\s-()]{7,20}$");
         Matcher matcher = pattern.matcher(phoneNumber);
         return matcher.matches();
-    }
+    }//проверка валидности номера телефона
     private void setInitialDateTime() {
         currentDate.setText(DateUtils.formatDateTime(requireContext(),
                 date.getTimeInMillis(),
@@ -291,7 +292,7 @@ public class ProfileChangeFragment extends Fragment {
             date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             setInitialDateTime();
         }
-    };
+    }; //работа с выбором даты
 
     public void dataLoad() {
         if (MainActivity.user.getName() != null && uri == null)
@@ -314,5 +315,5 @@ public class ProfileChangeFragment extends Fragment {
         if (MainActivity.user.getBirthDayTime() != 0)
             currentDate.setText(DateUtils.formatDateTime(requireContext(), MainActivity.user.getBirthDayTime(),
                     DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_DATE));
-    }
+    }//выгрузка данных из класса юзера в поля изменения данных
 }

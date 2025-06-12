@@ -80,14 +80,15 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
     private Query query;
     private boolean isSearching = false;
     private MessengerFragment.OnChatSelectChat selectChatListner;
+    //объявление
     private interface SearchResultListener {
         void onResultsFound(List<RouteCard> results);
         void onError();
-    }
+    }//обрабатывает результаты поиска
 
     interface HomeFragmentListener {
         void showInMap(Route route);
-    }
+    } //показать маршрут на карте
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -98,8 +99,9 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         startTime = Calendar.getInstance();
         endTime = Calendar.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        //инициализация
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("routeCards");
-        databaseReference.addChildEventListener(new ChildEventListener() {
+        databaseReference.addChildEventListener(new ChildEventListener() { //что происходит при изменение в списке поездок
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if (snapshot.exists()) {
@@ -112,7 +114,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                         }
                     }
                 }
-            }
+            } //при добавление поездки
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -140,7 +142,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                         }
                     }
                 }
-            }
+            }//при изменение поездки
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
@@ -166,7 +168,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                         adapter.notifyItemRemoved(position);
                     }
                 }
-            }
+            }//при удаление поездки
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -178,7 +180,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 // TODO доделать сообщение об исключении
             }
         });
-        DatabaseReference routeReference = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()).child("routeList");
+        DatabaseReference routeReference = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()).child("routeList");//что происходит при изменении списка маршрутов пользователя
         routeReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -203,7 +205,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                         }
                     }
                 }
-            }
+            }//при любом изменение данных
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -248,10 +250,11 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             selectingRouteListView.setAdapter(selectAdapter);
             selectingRouteListView.setVisibility(View.VISIBLE);
             dialog.show();
-        });
+        });//создание новой поездки
         topView.setOnClickListener(v->{
             LayoutInflater inflater = getLayoutInflater();
             View topRouteView = inflater.inflate(R.layout.route_top_fragment, null);
+            //TODO добывить топ маршрутов
 
         });
         filterView.setOnClickListener(v->{
@@ -261,7 +264,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             ageRangeSlider = filterDialogView.findViewById(R.id.ageSlider);
             filterMinLenEnter = filterDialogView.findViewById(R.id.lenStartTextInput);
             filterMaxLenEnter = filterDialogView.findViewById(R.id.lenEndTextInput);
-            filterCityEnter = filterDialogView.findViewById(R.id.cityTextInput);
+            filterCityEnter = filterDialogView.findViewById(R.id.cityTextInput);//инициализация полей фильтра
 
             ageRangeSlider.setValues(List.of((float) settings.getMinAge(), (float) settings.getMaxAge()));
             filterCityEnter.setText(settings.getCity());
@@ -278,12 +281,12 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 else {
                     searchView.setQuery(searchView.getQuery().toString(), true);
                 }
-            });
+            });//синхронизация фильтров
             final PopupWindow filterDialog = new PopupWindow(filterDialogView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             filterDialog.setFocusable(true);
             filterDialog.setOutsideTouchable(true);
             filterDialog.showAsDropDown(filterView, 0, 14);
-        });
+        });//изменение параметров фильтрации
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -312,8 +315,8 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                     isSearching = true;
                 }
                 return true;
-            }
-        });
+            }//если запрос стал пустым выводим все поездки подходящие фильтрам
+        });//обработка запросов фильтрации
     }
 
     private void searchRoutesByNamePrefix(String prefix, @NonNull SearchResultListener listener) {
@@ -342,7 +345,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 // TODO доделать сообщение об исключении
             }
         });
-    }
+    }//поиск  поездкам из базы данных по префиксу, удовлетваряющих фильтрам
 
     private void showAllRoutes() {
         displayedRouteList.clear();
@@ -355,14 +358,14 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             adapter.notifyDataSetChanged();
         }
         isSearching = false;
-    }
+    }//показать все маршруты удовлетворяющие фильтрам
     @Override
     public void postRouteCard(Route curRoute) {
         dialog.dismiss();
         LayoutInflater inflater = getLayoutInflater();
         View postRouteCardDialogView = inflater.inflate(R.layout.route_card_build_dialog, null);
         AlertDialog buildDialog = new AlertDialog.Builder(requireActivity()).setView(postRouteCardDialogView).setCancelable(false).create();
-        buildDialogDeclaration(postRouteCardDialogView);
+        buildDialogDeclaration(postRouteCardDialogView); //создаём диалог построения поездки
         routeCardBuildingCloseImage.setOnClickListener(v->{
             buildDialog.dismiss();
         });
@@ -392,7 +395,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 buildDialog.dismiss();
                 startTime = Calendar.getInstance();
                 endTime = Calendar.getInstance();
-            }
+            }//загрузка поездки в общий список
         });
         routeCardBuildingDateEditText.setOnClickListener(v->{
             new DatePickerDialog(requireActivity(), d, startTime.get(Calendar.YEAR), startTime.get(Calendar.MONTH), startTime.get(Calendar.DAY_OF_MONTH)).show();
@@ -404,7 +407,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             new TimePickerDialog(requireActivity(), et, endTime.get(Calendar.HOUR), endTime.get(Calendar.MINUTE), true).show();
         });
         buildDialog.show();
-    }
+    } //обработка выкладывания маршрута из списка в топ
     public void buildDialogDeclaration(View view) {
         routeCardBuildingCloseImage = view.findViewById(R.id.routeCardBuildingCloseImage);
         addRouteCardView = view.findViewById(R.id.addRouteCardView);
@@ -415,7 +418,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         routeCardBuildingDateEditText = view.findViewById(R.id.routeCardBuildingDateEditText);
         routeCardBuildingStartTimeEditText = view.findViewById(R.id.routeCardBuildingStartTimeEditText);
         routeCardBuildingEndTimeEditText = view.findViewById(R.id.routeCardBuildingEndTimeEditText);
-    }
+    }//инициализация переменных диалога создания поездки
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             startTime.set(Calendar.YEAR, year);
@@ -429,7 +432,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             }
             setInitialDate();
         }
-    };
+    };//изменение даты поездки
 
     TimePickerDialog.OnTimeSetListener st = new TimePickerDialog.OnTimeSetListener() {
         @Override
@@ -439,7 +442,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             setInitialTime(true);
             setInitialDate();
         }
-    };
+    }; //изменение времени начала путешествия
 
     TimePickerDialog.OnTimeSetListener et = new TimePickerDialog.OnTimeSetListener() {
         @Override
@@ -449,7 +452,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             setInitialTime(false);
             setInitialDate();
         }
-    };
+    };//изменение времени rjywf путешествия
 
     void setInitialTime(boolean isStart) {
         if (isStart) {
@@ -486,7 +489,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
                 // TODO доделать сообщение об исключении
             }
         });
-    }
+    }//подтверждеине участия в поездке
 
     @Override
     public void showInMapButton(int position) {
@@ -504,7 +507,7 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
             }
         });
 
-    }
+    }//показать маршрут на карте
     String cityUniform(String s) {
         s = FORBIDDEN_CHARS_PATTERN.matcher(s).replaceAll("");
         s = MULTIPLE_HYPHENS_PATTERN.matcher(s).replaceAll("-");
@@ -512,5 +515,5 @@ public class HomeFragment extends Fragment implements RouteSelectAdapter.PostLis
         s = HYPHEN_WITH_SPACES_PATTERN.matcher(s).replaceAll("-");
         s = s.trim();
         return s;
-    }
+    }//общая форма отображения названия городов
 }

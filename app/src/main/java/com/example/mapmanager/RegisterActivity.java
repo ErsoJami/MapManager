@@ -47,6 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
     private ImageView passStatusView1, passStatusView2;
     private boolean showPass1 = false;
     private boolean showPass2 = false;
+    //объявление
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity {
         loginTextView = findViewById(R.id.loginTextView);
         passStatusView1 = findViewById(R.id.passStatusView1);
         passStatusView2 = findViewById(R.id.passStatusView2);
-
+        //инициализация
         buttonRegister.setOnClickListener(v -> {
             String email = editTextEmail.getText().toString();
             String password = editTextPassword.getText().toString();
@@ -72,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             registerUser(email, password, confirmPassword);
-        });
+        });//регистрация нового пользователя
         String loginText = getResources().getString(R.string.want_to_login_text);
         SpannableString ss = new SpannableString(loginText);
         ClickableSpan clickableSpan = new ClickableSpan() {
@@ -90,7 +91,7 @@ public class RegisterActivity extends AppCompatActivity {
                 ds.setUnderlineText(true);
                 ds.setColor(Color.BLUE);
             }
-        };
+        };//переход на LoginActivity
         ss.setSpan(clickableSpan, getResources().getInteger(R.integer.login_left_border), getResources().getInteger(R.integer.login_right_border), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         loginTextView.setText(ss);
@@ -107,7 +108,7 @@ public class RegisterActivity extends AppCompatActivity {
                 editTextPassword.setTransformationMethod(new PasswordTransformationMethod());
             }
             editTextPassword.setSelection(editTextPassword.getText().length());
-        });
+        });//показать/скрывать пароль
         passStatusView2.setOnClickListener(v -> {
             if (!showPass2) {
                 passStatusView2.setImageResource(R.drawable.hide_pass);
@@ -119,7 +120,7 @@ public class RegisterActivity extends AppCompatActivity {
                 editTextConfirmPassword.setTransformationMethod(new PasswordTransformationMethod());
             }
             editTextConfirmPassword.setSelection(editTextConfirmPassword.getText().length());
-        });
+        });//показывать/скрывать подтверждение пароля
     }
     @Override
     protected void onStart() {
@@ -175,6 +176,6 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             Toast.makeText(RegisterActivity.this, "@string/different_passwords_text", Toast.LENGTH_SHORT).show();
         }
-    }
+    }//регистрация юзера
 
 }
