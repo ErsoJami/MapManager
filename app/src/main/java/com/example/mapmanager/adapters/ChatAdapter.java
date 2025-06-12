@@ -55,7 +55,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
 
     private final LayoutInflater inflater;
     private final List<Message> messageList;
-    private FirebaseAuth mAuth;
+    private final FirebaseAuth mAuth;
 
     public interface ChatAdapterListener {
         void onMyMessageClick(int position);
@@ -65,8 +65,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
         void onSelectMedia(Object url);
         void onSelectViewAllMedia(ArrayList<String> uri);
     }
-    private OnSelectMedia onSelectMedia;
-    private ChatAdapterListener chatAdapterListener;
+    private final OnSelectMedia onSelectMedia;
+    private final ChatAdapterListener chatAdapterListener;
     public ChatAdapter(Context context, List<Message> messageList, ChatAdapterListener chatAdapterListener) {
         this.messageList = messageList;
         this.inflater = LayoutInflater.from(context);
@@ -108,6 +108,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
                 holder.otherUsernameTextView.setVisibility(GONE);
                 holder.otherMessageContainer.setVisibility(GONE);
                 holder.myGridLayout.removeAllViews();
+                // разная сетка для разного кол-ва изображений
                 if (mediaUris != null && !mediaUris.isEmpty()) {
                     holder.myGridLayout.setVisibility(VISIBLE);
                     ViewGroup.LayoutParams params1 = holder.myGridLayout.getLayoutParams();

@@ -135,6 +135,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // запрос на получения прав к местоположению пользователя
         getLocationPermission = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), permissions -> {
             Boolean fineLocationGranted = permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
             Boolean coarseLocationGranted = permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
@@ -150,6 +151,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // если нам нужно показать маршрут (например при переходе из HomeFragment), то мы распаковываем этот маршрут из аргументов
         if (getArguments() != null) {
             routeToShowOnReady = (Route) getArguments().getSerializable("ROUTE_TO_SHOW");
         }
@@ -181,11 +183,13 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         bicycleRoutes = new ArrayList<>();
         segmentInfos = new ArrayList<>();
 
+        // адаптер для отображения сегментов
         segmentInfoAdapter = new SegmentInfoAdapter(requireContext(), segmentInfos);
         segmentInfoRecyclerView = view.findViewById(R.id.segmentInfoRecyclerView);
         segmentInfoRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         segmentInfoRecyclerView.setAdapter(segmentInfoAdapter);
 
+        // адаптеры списка маршрутов для каждого вида передвижения
         walkingRouteAdapter = new MasstransitRouteAdapter(requireContext(), walkingRoutes, this);
         carRouteAdapter = new DrivingRouteAdapter(requireContext(), carRoutes, this);
         busRouteAdapter = new MasstransitRouteAdapter(requireContext(), busRoutes, this);
@@ -198,13 +202,18 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         continueRouteText = view.findViewById(R.id.continueRoute);
         deleteRouteText = view.findViewById(R.id.deleteRoute);
         focusRouteText = view.findViewById(R.id.focusRoute);
+
+        // адапетр сохранённых маршрутов
         routeRecyclerView = view.findViewById(R.id.routeRecyclerView);
         routeArrayList = new ArrayList<>();
         routeAdapter = new RouteAdapter(requireContext(), routeArrayList, this);
         routeRecyclerView.setAdapter(routeAdapter);
         routeRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        // загрузка данных (также запускаеться при изменении данных пользователя (смотреть в MainActivity))
         dataLoad();
         menuImageView = view.findViewById(R.id.menuButton);
+        // объявление модели карты
         mapManager = new MapManager(requireContext(), mapView, this, this, this);
         getLocationPermission();
         placemarkMapObjectArrayList = new ArrayList<>();
@@ -217,6 +226,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         searchView = view.findViewById(R.id.searchView);
         userLocationImageView = view.findViewById(R.id.userPosition);
         newRouteImageView = view.findViewById(R.id.createNewRoute);
+        // адаптер для поиска
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, new ArrayList<>()) {
             @NonNull
             @Override
@@ -246,6 +256,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 adapter.notifyDataSetChanged();
             }
         });
+        //листнер для поиска
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -271,7 +282,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 return true;
             }
         });
-
+        // листнеры при получении маршрутов для каждого вида перемещения
         busListener = new Session.RouteListener() {
             @Override
             public void onMasstransitRoutes(@NonNull List<com.yandex.mapkit.transport.masstransit.Route> list) {
@@ -340,6 +351,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         };
 
+        // листнеры для переключения м/у типами перемещения
         carTextView.setOnClickListener(v -> {
             setCurrentButton(carTextView);
             if (busRoutes != null && !busRoutes.isEmpty()) {
@@ -369,11 +381,13 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             bicycleRouteAdapter.setSelectPosition(0);
         });
 
+        // фокусировка камеры на местоположении пользователя
         userLocationImageView.setOnClickListener(v -> {
             if (mapManager != null && mapManager.getCurrentUserLocation() != null) {
                 mapManager.moveCamera(mapManager.getCurrentUserLocation(), 17.0f);
             }
         });
+        // взаимодействие с созданием маршрутов, кнопка изначально + потом заменяеться на стрелочку, до удаления
         newRouteImageView.setOnClickListener(v -> {
             if (!mapManager.isUserInCreateMode()) {
                 mapManager.setUserInCreateMode(true);
@@ -386,10 +400,13 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
 
         });
+        // кнопка для получения всех видов маршрута
         continueRouteText.setOnClickListener(v -> {
             getAllRoutes();
         });
+        // сохранение маршрута
         saveRouteText.setOnClickListener(v -> {
+            // открытия диалога с возможностью указать описание и имя, с подтверждением о сохранении
             LayoutInflater inflater2 = getLayoutInflater();
             View dialogView = inflater2.inflate(R.layout.save_route_dialog, null);
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
@@ -400,6 +417,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             EditText text1, text2;
             text1 = dialogView.findViewById(R.id.editNameText);
             text2 = dialogView.findViewById(R.id.editDescriptionText);
+            // запись маршрута в базу данных, и обновления списка мрашрутов у пользователя
             saveView.setOnClickListener(v1 -> {
                 ArrayList<Waypoint> waypointArrayList = new ArrayList<>();
                 for (PlacemarkMapObject placemarkMapObject : placemarkMapObjectArrayList) {
@@ -417,14 +435,17 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 user.changeData(databaseReference.child("users").child(mAuth.getUid()));
                 dialog.dismiss();
             });
+            // отмена
             cancelView.setOnClickListener(v1 -> {
                 dialog.dismiss();
             });
             dialog.show();
         });
+        // возврат в редактироваия маршрута
         backButton.setOnClickListener(v -> {
             closeAllRoutes();
         });
+        // удаление маршрута из списка маршрутов пользователя
         deleteRouteText.setOnClickListener(v -> {
             closeRouteView();
             mapManager.mapObjectCollection.clear();
@@ -435,6 +456,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             newRouteImageView.setImageResource(R.drawable.plus);
             mapManager.setUserInCreateMode(false);
         });
+        // открытие списка сохранённых маршрутов
         menuImageView.setOnClickListener(v ->{
             if (isCloseMenuView) {
                 openMenuView();
@@ -442,6 +464,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 closeMenuView();
             }
         });
+        // фокусировка на маршруте
         focusRouteText.setOnClickListener(v -> {
             mapManager.focusOnPolyline();
             closeRouteView();
@@ -449,6 +472,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 
         return view;
     }
+    // переключение видов передвижения
     private void setCurrentButton(TextView textView) {
         resetButtonsColor();
         if (textView == carTextView) {
@@ -473,6 +497,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             masstransitRouteRecyclerView.setAdapter(bicycleRouteAdapter);
         }
     }
+    // сброс цветов кнопок видов передвижения
     private void resetButtonsColor() {
         carDrawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
         carTextView.setTextColor(getResources().getColor(R.color.black));
@@ -487,12 +512,14 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         bicycleTextView.setTextColor(getResources().getColor(R.color.black));
         bicycleTextView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
     }
+    // отображение выбранного маршрута на карте, а также его сегментов
     @Override
     public void onClickMasstransitItem(int position) {
         MasstransitRouteAdapter masstransitRouteAdapter = (MasstransitRouteAdapter) masstransitRouteRecyclerView.getAdapter();
         com.yandex.mapkit.transport.masstransit.Route route = null;
         mapManager.mapRoutesObjectCollection.clear();
         segmentInfos.clear();
+        // проверка типа перемещения
         if (masstransitRouteAdapter == walkingRouteAdapter) {
             route = walkingRoutes.get(position);
         } else if (masstransitRouteAdapter == busRouteAdapter) {
@@ -507,6 +534,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
                 Polyline sectionGeometry = SubpolylineHelper.subpolyline(route.getGeometry(), section.getGeometry());
                 PolylineMapObject sectionPolyline = mapManager.mapRoutesObjectCollection.addPolyline(sectionGeometry);
                 SectionMetadata data = section.getMetadata();
+                // взависимости от транспорта разные сегменты, и разные типы сегментов
                 if (data.getWeight().getWalkingDistance() != null && (data.getData().getTransports() == null || data.getData().getTransports().isEmpty())) {
                     sectionPolyline.setStrokeColor(getResources().getColor(R.color.dark_grey));
                     sectionPolyline.setStrokeWidth(5.0f);
@@ -567,6 +595,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         DrivingRoute route = carRoutes.get(position);
         Polyline routeGeometry = route.getGeometry();
         mapManager.mapRoutesObjectCollection.clear();
+        // для автомобильных маршрутов
         if (routeGeometry != null && !routeGeometry.getPoints().isEmpty()) {
             PolylineMapObject routePolyline = mapManager.mapRoutesObjectCollection.addPolyline(routeGeometry);
             routePolyline.setStrokeColor(getResources().getColor(R.color.dark_grey));
@@ -581,10 +610,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // если нам нужно показать маршрут (например при переходе из HomeFragment)
         if (routeToShowOnReady != null) {
             routeOnMap(routeToShowOnReady);
         }
     }
+    // метод для получения всех видов маршрутов
     private void getAllRoutes() {
         mapManager.getRoute(placemarkMapObjectArrayList, busListener, walkingListener, carListener, bicycleListener);
         masstransitRouteRecyclerView.setAdapter(walkingRouteAdapter);
@@ -597,6 +628,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         setCurrentButton(walkingTextView);
         routeBuilderLayout.setVisibility(View.VISIBLE);
     }
+    // обработка кнопки назад
     private void closeAllRoutes() {
         if (placemarkMapObjectArrayList.isEmpty()) {
             hintText.setVisibility(View.VISIBLE);
@@ -612,6 +644,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         bicycleRouteAdapter.setSelectPosition(0);
         carRouteAdapter.setSelectPosition(0);
     }
+    // открыть список маршрутов
     private void openMenuView() {
         ValueAnimator valueAnimator;
         ViewGroup.LayoutParams params = menuView.getLayoutParams();
@@ -636,6 +669,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             isCloseMenuView = false;
         }
     }
+    // закрыть список маршрутов
     private void closeMenuView() {
         ValueAnimator valueAnimator;
         ViewGroup.LayoutParams params = menuView.getLayoutParams();
@@ -666,6 +700,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             isCloseMenuView = true;
         }
     }
+    // получить ширину экрана в пикселях
     public static int getScreenWidth(Context context) {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -676,10 +711,12 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             return -1;
         }
     }
+    // конвертация пикселей в dp
     public static int PxToDp(Context context, int px) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return (int) (px / displayMetrics.density);
     }
+    // открыть меню с редактированием маршрута
     private void openRouteView() {
         if (isClosePointsView) {
             ValueAnimator valueAnimator, valueAnimator1;
@@ -715,6 +752,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             isClosePointsView = false;
         }
     }
+    // закрыть меню с редактированием маршрута
     private void closeRouteView() {
         if (!isClosePointsView) {
             ValueAnimator valueAnimator, valueAnimator1;
@@ -755,6 +793,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             isClosePointsView = true;
         }
     }
+    // загрузка данных при изменении данных пользователя
     public void dataLoad() {
         routeArrayList.clear();
         routeAdapter.notifyDataSetChanged();
@@ -783,6 +822,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         }
     }
+    // проверка прав на доступ к карте и создания метки пользователя
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -815,6 +855,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         mapManager = null;
     }
 
+    // успешный поиск
     @Override
     public void onSearchSuccess() {
         adapter.clear();
@@ -826,7 +867,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         adapter.clear();
         adapter.notifyDataSetChanged();
     }
-
+    // получение предложений в поиске
     @Override
     public void onSuggestResults(List<Map<String, String>> suggestions) {
         adapter.clear();
@@ -845,9 +886,11 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         adapter.clear();
         adapter.notifyDataSetChanged();
     }
+    // конвертация Dp в пиксели
     public static float DpToPx(float dp, Context context){
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
+    // создания точки на карте
     @Override
     public void onMapLongTap(PlacemarkMapObject placemarkMapObject) {
         placemarkMapObject.setText(String.valueOf(placemarkMapObjectArrayList.size() + 1));
@@ -858,7 +901,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         hintText.setVisibility(View.GONE);
         waypointAdapter.notifyDataSetChanged();
     }
-
+    // фокусировка на маршруте
     @Override
     public void onFocusToPolyline() {
         if (needToFocusOnPolyline) {
@@ -866,28 +909,28 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             needToFocusOnPolyline = false;
         }
     }
-
+    // перемещение точки на карте и обновление маршрута
     @Override
     public void onDragWaypoint() {
 //        mapManager.getRoute(placemarkMapObjectArrayList);
         mapManager.getRoute(placemarkMapObjectArrayList, busListener, walkingListener, carListener, bicycleListener);
         masstransitRouteRecyclerView.setAdapter(walkingRouteAdapter);
     }
-
+    // поднять точку
     @Override
     public void arrowUpClickListener(int position) {
         if (position != 0) {
             swap(position - 1, position);
         }
     }
-
+    // опустить точку
     @Override
     public void arrowDownClickListener(int position) {
         if (position != placemarkMapObjectArrayList.size() - 1) {
             swap(position, position + 1);
         }
     }
-
+    // изменение названия точки
     @Override
     public void onNameChanged(String text, int position) {
         PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
@@ -897,7 +940,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         placemarkMapObject.setUserData(waypoint);
         placemarkMapObjectArrayList.set(position, placemarkMapObject);
     }
-
+    // изменение описания точки
     @Override
     public void onDescriptionChanged(String text, int position) {
         PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
@@ -906,7 +949,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         placemarkMapObject.setUserData(waypoint);
         placemarkMapObjectArrayList.set(position, placemarkMapObject);
     }
-
+    // изменение имени сохранённого маршрута
     @Override
     public void onRouteNameChanged(String text, int position) {
         Route route = routeArrayList.get(position);
@@ -919,7 +962,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         });
     }
-
+    // изменение описания сохранённого маршрута
     @Override
     public void onRouteDescriptionChanged(String text, int position) {
         Route route = routeArrayList.get(position);
@@ -932,7 +975,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
             }
         });
     }
-
+    // удаления сохранённого маршрута
     @Override
     public void onDeleteRoute(int position) {
         Route route = routeArrayList.get(position);
@@ -950,7 +993,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
 //        Log.d("debug", "onDeleteRoute: " + routeArrayList.size() + " " + routeAdapter.getItemCount() + " " + routeRecyclerView.getVisibility());
         MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()));
     }
-
+    // фокусировка на маршруте
     @Override
     public void onFocusToRoute(int position) {
         hintText.setVisibility(View.GONE);
@@ -993,6 +1036,7 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         openRouteView();
         waypointAdapter.notifyDataSetChanged();
     }
+    // удаление точки на карте
     @Override
     public void onDeleteWaypoint(int position) {
         PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position);
@@ -1006,13 +1050,13 @@ public class MapFragment extends Fragment implements MapManagerSearchListener, M
         masstransitRouteRecyclerView.setAdapter(walkingRouteAdapter);
         waypointAdapter.notifyDataSetChanged();
     }
-
+    // фокусировка на точке
     @Override
     public void onFocusToWaypoint(int position) {
         Point point = placemarkMapObjectArrayList.get(position).getGeometry();
         mapManager.moveCamera(point, 17.0f);
     }
-
+    // функция для смены точек
     void swap(int position1, int position2) {
         PlacemarkMapObject placemarkMapObject = placemarkMapObjectArrayList.get(position1);
         placemarkMapObjectArrayList.set(position1, placemarkMapObjectArrayList.get(position2));

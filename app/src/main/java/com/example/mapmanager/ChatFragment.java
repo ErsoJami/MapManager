@@ -124,6 +124,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     private final boolean bim = true;
     private Uri uri;
     private View.OnClickListener saveDataListener;
+    // конструктор
     static ChatFragment updateChat(String chatId, String lastReadMessageId) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
@@ -136,6 +137,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // получение id чата и полседнего прочитанного сообщения
         if (getArguments() != null) {
             chatId = getArguments().getString("chat_id");
             lastReadMessageId = getArguments().getString("last_read_message_id");
@@ -145,6 +147,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         messageReference = databaseReference.child("chats").child(chatId).child("messages");
         mediaList = new ArrayList<>();
         storageReference = FirebaseStorage.getInstance().getReference().child(chatId);
+        // выбор нескольких медиа
         mediaPicker = registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(), new ActivityResultCallback<List<Uri>>() {
             @Override
             public void onActivityResult(List<Uri> uris) {
@@ -159,6 +162,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 }
             }
         });
+        // выбор одного медиа
         mediaSinglePicker = registerForActivityResult(new ActivityResultContracts.OpenDocument(), new ActivityResultCallback<Uri>() {
             @Override
             public void onActivityResult(Uri o) {
@@ -169,6 +173,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                         .into(shapeableImageView);
             }
         });
+        // запрос прав на доступ к файлам
         getMediaPermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
             @Override
             public void onActivityResult(Map<String, Boolean> o) {
@@ -182,6 +187,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             }
         });
         userArrayList = new ArrayList<>();
+        // загрузка аватара группы
         saveDataListener = v -> {
             saveData.setOnClickListener(null);
             if (uri != null) {
@@ -229,6 +235,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         chatNameText = view.findViewById(R.id.textView4);
+        // получить имя группы
         FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("groupName").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -242,6 +249,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 // TODO доделать сообщение об исключении
             }
         });
+        // получить id владельца группы
         FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("ownerId").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -266,6 +274,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         settingsLayout = view.findViewById(R.id.settingsLayout);
         shapeableImageView = view.findViewById(R.id.shapeableImageView);
 
+        // адапетр списка людей и листнер их получения
         peopleRecyclerView = view.findViewById(R.id.peopleRecyclerView);
         userAdapter = new UserAdapter(requireContext(), userArrayList, false, this);
         peopleRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -309,6 +318,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                         // TODO доделать сообщение об исключении
                     }
                 });
+        // получения url аватара группы
         FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("groupAvatarUrl").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -323,6 +333,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             }
         });
         mAuth = FirebaseAuth.getInstance();
+        // адаптер сообщений
         messageList = new ArrayList<>();
         adapter = new ChatAdapter(requireContext(), messageList, this);
         messageListView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -345,6 +356,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         final String[] key = {""};
         final Boolean[] isFocus = {Boolean.FALSE};
         Query item = messageReference.orderByKey().limitToLast(1);
+        // получение последнего сообщения
         item.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -360,6 +372,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 // TODO доделать сообщение об исключении
             }
         });
+        // запоминание последнего сообщения
         messageListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -381,6 +394,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
 
             }
         });
+        // обработка сообщений
         if (chatId != null) {
             messageListReference = databaseReference.child("chats").child(chatId).child("messages");
             messageListReference.addChildEventListener(new ChildEventListener() {
@@ -470,6 +484,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // отправка сообщения
         sendView.setOnClickListener(v -> {
             String text = sendTextEdit.getText().toString();
             ArrayList<Uri> mediaUris = new ArrayList<>();
@@ -491,13 +506,16 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 }
             }
         });
+        // выйти из чата
         leaveChatButton.setOnClickListener(v -> {
             requireActivity().getOnBackPressedDispatcher().onBackPressed();
         });
+        // прикрепить изображения
         mediaButton.setOnClickListener(v -> {
             mediaLoaderView.setVisibility(View.VISIBLE);
             openMediaPicker();
         });
+        // открыть настройки
         settingsChatButton.setOnClickListener(v -> {
             userAdapter.setType(ownerId.equals(mAuth.getUid()));
             settingsLayout.setVisibility(View.VISIBLE);
@@ -507,14 +525,18 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                     .into(shapeableImageView);
 
         });
+        // выйти настроек
         leaveChatSettingsButton.setOnClickListener(v -> {
             settingsLayout.setVisibility(View.GONE);
         });
+        // сохранение аватара группы
         saveData.setOnClickListener(saveDataListener);
+        // сменить аватар группы
         shapeableImageView.setOnClickListener(v -> {
             openSingleMediaPicker();
         });
     }
+    // переключение на нужное сообщение
     private void focusOnMessage(int position) {
         if (position < 0 || position >= messageList.size()) {
             return;
@@ -536,6 +558,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                     textView.setText(message.getMessage());
                     usernameTextView.setText(message.getNick());
                 }
+                // предподсчёт высоты сообщения с учётом текста
                 int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
                 int parentWidth = messageListView.getWidth();
                 int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parentWidth - messageListView.getPaddingLeft() - messageListView.getPaddingRight(), View.MeasureSpec.EXACTLY);
@@ -555,6 +578,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         chatId = null;
     }
 
+    // клик на своё сообщение
     @Override
     public void onMyMessageClick(int position) {
         Message message = messageList.get(position);
@@ -569,6 +593,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         int weight = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         PopupWindow popupWindow = new PopupWindow(itemView, weight, height, false);
+        // изменить сообщение
         changeMessageText.setOnClickListener(v -> {
             String text = sendTextEdit.getText().toString();
             sendTextEdit.setText(message.getMessage());
@@ -608,6 +633,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
                 });
             });
         });
+        // удалить сообщение
         deleteMessageText.setOnClickListener(v -> {
             message.deleteMessage(chatId);
             HashMap<String, ChatsData> map = MainActivity.user.getUserChatsData();
@@ -620,6 +646,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             MainActivity.user.changeData(FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getUid()));
             popupWindow.dismiss();
         });
+        // скопировать сообщение
         copyMessageText.setOnClickListener(v -> {
             copyMessage(message.getMessage());
             popupWindow.dismiss();
@@ -628,7 +655,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         int xoff = (int) (getScreenWidth(requireContext()) - DpToPx(273, requireContext()) - DpToPx(22, requireContext()));
         popupWindow.showAsDropDown(view, xoff, -(int) DpToPx(15, requireContext()), Gravity.START);
     }
-
+    // клик по чужому сообщению
     @Override
     public void onOtherMessageClick(int position) {
         LinearLayoutManager layoutManager = (LinearLayoutManager) messageListView.getLayoutManager();
@@ -653,6 +680,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         int weight = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         PopupWindow popupWindow = new PopupWindow(itemView, weight, height, false);
+        // скопировать сообщение
         copyMessageText.setOnClickListener(v -> {
             Message message = messageList.get(position);
             copyMessage(message.getMessage());
@@ -708,7 +736,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             getSingleMediaPermissions.launch(permissionsToRequest.toArray(new String[0]));
         }
     }
-
+    // удаление картинки из списка выбранных
     @Override
     public void onDeleteMedia(int position) {
         mediaList.remove(position);
@@ -717,6 +745,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             mediaLoaderView.setVisibility(View.GONE);
         }
     }
+    // загрузка сообщения с картинками
     private void uploadMediaAndSendMessage(ArrayList<Uri> localUris, String messageText) {
         sendView.setOnClickListener(null);
         ArrayList<Task<Uri>> uploadTasks = new ArrayList<>();
@@ -849,7 +878,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
         }
         return extension != null ? extension : "tmp";
     }
-
+    // удаление пользователя из чата (только создатель чата)
     @Override
     public void onDeleteUser(int position) {
         User user = userArrayList.get(position);
@@ -873,6 +902,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ChatAdapterLis
             }
         });
     }
+    // загрузка данных при изменении данных пользовтеля
     public void dataLoad() {
         if (MainActivity.user.getUserChatsData() != null) {
             if (!MainActivity.user.getUserChatsData().containsKey(chatId)) {

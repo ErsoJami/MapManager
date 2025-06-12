@@ -127,14 +127,17 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     private PolylineMapObject lastRoutePolyline;
 
     public static final double LONGTITUDE_RADIUS = 0.01598718, LATITUDE_RADIUS = 0.00899316;
+    // листнеры для поиска
     public interface MapManagerSearchListener {
         void onSearchSuccess();
         void onSearchError(String error);
     }
+    // листнеры подсказок поиска
     public interface MapManagerSuggestListener {
         void onSuggestResults(List<Map<String, String>> suggestions);
         void onSuggestError(String error);
     }
+    // листнеры для точек
     public interface MapLongTapListener {
         void onMapLongTap(PlacemarkMapObject placemarkMapObject);
         void onDragWaypoint();
@@ -175,6 +178,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         this.bicycleRouter = TransportFactory.getInstance().createBicycleRouterV2();
         this.drivingRouter = DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED);
     }
+    // создание метки пользователя
     public void createUserLayer() {
         userLocationLayer = MapKitFactory.getInstance().createUserLocationLayer(mapView.getMapWindow());
         userLocationLayer.setVisible(true);
@@ -189,6 +193,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         MapKitFactory.getInstance().onStop();
         mapView.onStop();
     }
+    // вызов получения маршрутов всех видов
     public void getRoute(ArrayList<PlacemarkMapObject> placemarkMapObjects, com.yandex.mapkit.transport.masstransit.Session.RouteListener busListener,
                          com.yandex.mapkit.transport.masstransit.Session.RouteListener walkingListener, DrivingSession.DrivingRouteListener drivingRouteListener,
                          com.yandex.mapkit.transport.masstransit.Session.RouteListener bicycleListener) {
@@ -210,6 +215,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         session = bicycleRouter.requestRoutes(requestPoints, timeOptions, new RouteOptions(fitnessOptions), bicycleListener);
         drivingSession = drivingRouter.requestRoutes(requestPoints, drivingOptions, vehicleOptions, drivingRouteListener);
     }
+    // вызов поиска
     public void search(String search) {
         if (search.trim().isEmpty()) {
             mapObjectCollection.clear();
@@ -218,6 +224,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         }
         searchSession = searchManager.submit(search, getVisibleRegionGeometry(), searchOptions, this);
     }
+    // поиск по точке
     public void searchByPoint(Point search, SearchOptions searchOptions) {
         if (search == null) {
             mapObjectCollection.clear();
@@ -226,6 +233,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         }
         searchSession = searchManager.submit(search, 0, searchOptions, this);
     }
+    // запрос подсказок
     public void suggest(String search) {
         if (search.trim().isEmpty()) {
             if (suggestSession != null) {
@@ -251,6 +259,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         }
         return null;
     }
+    // получить локацию пользователя
     public Point getCurrentUserLocation() {
         if (userLocationLayer != null && userLocationLayer.cameraPosition() != null) {
             return userLocationLayer.cameraPosition().getTarget();
@@ -270,6 +279,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         drawable.draw(canvas);
         return bitmap;
     }
+    // переместить камеру
     public void moveCamera(@NonNull Point point, float zoom) {
         mapView.getMap().move(
                 new CameraPosition(point, zoom, 0.0f, 0.0f),
@@ -277,6 +287,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
                 null
         );
     }
+    // при добавлении метки локации пользователя (отрисовка)
     @Override
     public void onObjectAdded(@NonNull UserLocationView userLocationView) {
         userLocationView.getPin().setIcon(ImageProvider.fromBitmap(userPinBitmap));
@@ -295,6 +306,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     public void onObjectUpdated(@NonNull UserLocationView userLocationView, @NonNull ObjectEvent objectEvent) {
 
     }
+    // обработка полученного ответа, перемещение камеры на 1 точку из списка
     @Override
     public void onSearchResponse(@NonNull Response response) {
         mapObjectCollection.clear();
@@ -333,7 +345,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
         searchListener.onSearchError(error.toString());
 
     }
-
+    // обработка списка подсказок
     @Override
     public void onResponse(@NonNull SuggestResponse suggestResponse) {
         List<SuggestItem> suggestItems = suggestResponse.getItems();
@@ -367,6 +379,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     public void onMapTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
 
     }
+    // сфокусироваться на последнем маршруте
     public void focusOnPolyline() {
         if (lastRoutePolyline != null) {
             try {
@@ -387,6 +400,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
             }
         }
     }
+    // сфокусироваться на polyline
     public void focusOnPolyline(Polyline polyline) {
         if (polyline != null) {
             try {
@@ -422,11 +436,12 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     @Override
     public void onMapObjectDrag(@NonNull MapObject mapObject, @NonNull Point point) {
     }
-
+    // окончание перемещения точки
     @Override
     public void onMapObjectDragEnd(@NonNull MapObject mapObject) {
         mapLongTapListener.onDragWaypoint();
     }
+    // долгое нажатие по карте
     @Override
     public void onMapLongTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
         if (userInCreateMode) {
@@ -442,7 +457,7 @@ public class MapManager implements UserLocationObjectListener, SearchListener, S
     public void setUserInCreateMode(boolean userInCreateMode) {
         this.userInCreateMode = userInCreateMode;
     }
-
+    // добавление точки
     public PlacemarkMapObject addPlacemarkMapObject(Point point) {
         PlacemarkMapObject mark = mapObjectCollection.addPlacemark(point);
         ImageProvider pinProvider = ImageProvider.fromBitmap(placemarkBitmap);
